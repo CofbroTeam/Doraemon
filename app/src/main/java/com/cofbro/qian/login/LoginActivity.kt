@@ -1,11 +1,13 @@
 package com.cofbro.qian.login
 
+import android.content.Intent
 import android.os.Bundle
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
+import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.hjq.toast.ToastUtils
 
@@ -44,6 +46,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                 // 保存用户信息
                 saveUserInfo()
                 ToastUtils.show("登录成功！")
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
             }
         }
     }
