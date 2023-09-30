@@ -4,4 +4,5 @@
     <string name="course_list_course_id">课程ID：</string>
     <string name="course_list_class_id">班级ID：</string>
     <string name="course_list_student_count">学生人数：</string>
+    <string name="course_list_title">我的课程</string>
 </resources>

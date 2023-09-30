@@ -4,38 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:elevation="6dp"
     android:background="@drawable/app_light_radius_bg">
 
     <ImageView
         android:id="@+id/iv_class_avtar"
-        android:layout_width="120dp"
+        android:layout_width="80dp"
         android:layout_height="60dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:src="@drawable/placeholder"/>
 
     <TextView
         android:id="@+id/tv_class_name"
-        android:layout_width="wrap_content"
+        android:textSize="17sp"
+        android:textColor="#171D42"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:maxEms="6"
         android:maxLines="1"
-        android:text="TextView"
         android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/iv_class_avtar"
         app:layout_constraintTop_toTopOf="@+id/iv_class_avtar" />
 
     <TextView
         android:id="@+id/tv_teacher_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_class_name"
         app:layout_constraintStart_toStartOf="@+id/tv_class_name"
         app:layout_constraintTop_toBottomOf="@+id/tv_class_name" />
 
@@ -52,7 +55,6 @@
         android:id="@+id/tv_course_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/textView6"
         app:layout_constraintStart_toEndOf="@+id/textView6"
         app:layout_constraintTop_toTopOf="@+id/textView6" />
@@ -70,7 +72,6 @@
         android:id="@+id/tv_class_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/textView7"
         app:layout_constraintStart_toEndOf="@+id/textView7"
         app:layout_constraintTop_toTopOf="@+id/textView7" />
@@ -90,7 +91,6 @@
         android:id="@+id/tv_student_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="@+id/textView" />
@@ -103,11 +103,10 @@
         android:ellipsize="end"
         android:maxEms="5"
         android:maxLines="1"
-        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_class_name"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_student_count"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_class_name" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_class_id" />
 </androidx.constraintlayout.widget.ConstraintLayout>
