@@ -14,8 +14,11 @@ object NetworkUtils {
     private val client = OkHttpClient()
 
 
-    fun request(url: String): BaseResponse<Response> {
-        val request = Request.Builder().url(url).build()
+    fun request(url: String, newRequest: Request? = null): BaseResponse<Response> {
+        var request: Request? = newRequest
+        if (request == null) {
+            request = Request.Builder().url(url).build()
+        }
         val call = client.newCall(request)
         val response = BaseResponse<Response>()
         response.dataState = DataState.STATE_INITIALIZE
