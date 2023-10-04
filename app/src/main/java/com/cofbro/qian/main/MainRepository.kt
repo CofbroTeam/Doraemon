@@ -13,4 +13,13 @@ class MainRepository : BaseRepository() {
     ) {
         executeRequest(responseLiveData, showLoading, loadingMsg, block)
     }
+
+    suspend fun <T: Any> queryActiveTaskList(
+        responseLiveData: ResponseMutableLiveData<T>,
+        showLoading: Boolean = true,
+        loadingMsg: String? = null,
+        block: suspend () -> BaseResponse<T>
+    ) {
+        executeRequest(responseLiveData, showLoading, loadingMsg, block)
+    }
 }

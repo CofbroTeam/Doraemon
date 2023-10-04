@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
+import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
@@ -19,8 +20,17 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mPassword: String? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        tryLogin()
         initObserver()
         initEvent()
+    }
+
+    private fun tryLogin() {
+        val username = getBySp("username")
+        val password = getBySp("password")
+        if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
+            viewModel.login(URL.getLoginPath(username, password))
+        }
     }
 
     private fun initObserver() {
@@ -53,6 +63,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         ToastUtils.show("登录成功！")
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         startActivity(intent)
+                        finish()
                     }
                 }
             }
@@ -60,8 +71,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun saveUserInfo() {
-        saveUsedSp("username", mUsername ?: "")
-        saveUsedSp("password", mPassword ?: "")
+        if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()) {
+            saveUsedSp("username", mUsername!!)
+            saveUsedSp("password", mPassword!!)
+        }
     }
 
     private fun initEvent() {
