@@ -11,12 +11,14 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemCourseListBinding
+import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 
 class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewHolder>() {
     private var data: JSONObject? = null
+    private var listener: AdapterListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCourseListBinding.inflate(inflater, parent, false)
@@ -41,9 +43,9 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
                 // cpi，后面签到需用此参数
-                val cpi = jsonObject?.getStringExt("cpi")
+                val cpi = jsonObject?.getStringExt("cpi") ?: ""
                 // 班级id
-                val classId = jsonObject?.getStringExt("key")
+                val classId = jsonObject?.getStringExt("key") ?: ""
                 // 学生人数
                 val studentCount = jsonObject?.getStringExt("content.studentcount")
                 // 班级名称
@@ -52,7 +54,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                 if (itemArray?.size != 0) {
                     val item = (itemArray?.get(0) as? JSONObject)
                     // 课程id
-                    val courseId = item?.getStringExt("id")
+                    val courseId = item?.getStringExt("id") ?: ""
                     // 课程名称
                     val courseName = item?.getStringExt("name")
                     // 学校名称
@@ -75,15 +77,31 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                         .load(item?.getStringExt("imageurl"))
                         .apply(options)
                         .into(binding.ivClassAvtar)
+
+//                    // 存储重要参数
+//                    CacheUtils.cache["courseId"] = courseId ?: ""
+//                    CacheUtils.cache["classId"] = classId ?: ""
+//                    CacheUtils.cache["cpi"] = cpi ?: ""
+                    itemView.setOnClickListener {
+                        listener?.onItemClick(courseId, classId, cpi)
+                    }
                 }
             }
         }
 
     }
 
+    fun setOnItemClickListener(listener: AdapterListener) {
+        this.listener = listener
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun setData(t: JSONObject) {
         data = t
         notifyDataSetChanged()
+    }
+
+    interface AdapterListener {
+        fun onItemClick(courseId: String, classId: String, cpi: String)
     }
 }

@@ -13,12 +13,28 @@ import java.io.IOException
 object NetworkUtils {
     private val client = OkHttpClient()
 
+    fun buildClientRequest(url: String): Request {
+        val cookies = CacheUtils.cache["cookies"] ?: ""
+        return Request.Builder().url(url)
+            .addHeader("Accept-Language", "zh-Hans-CN;q=1, zh-Hant-CN;q=0.9")
+            .addHeader("cookie", cookies)
+            .addHeader(
+                "User-Agent",
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 com.ssreader.ChaoXingStudy/ChaoXingStudy_3_4.8_ios_phone_202012052220_56 (@Kalimdor)_12787186548451577248"
+            )
+            .build()
+    }
 
-    fun request(url: String, newRequest: Request? = null): BaseResponse<Response> {
-        var request: Request? = newRequest
-        if (request == null) {
-            request = Request.Builder().url(url).build()
-        }
+    fun request(clientRequest: Request): BaseResponse<Response> {
+        val call = client.newCall(clientRequest)
+        val response = BaseResponse<Response>()
+        response.dataState = DataState.STATE_INITIALIZE
+        response.data = call.execute()
+        return response
+    }
+
+    fun request(url: String): BaseResponse<Response> {
+        val request = Request.Builder().url(url).build()
         val call = client.newCall(request)
         val response = BaseResponse<Response>()
         response.dataState = DataState.STATE_INITIALIZE
