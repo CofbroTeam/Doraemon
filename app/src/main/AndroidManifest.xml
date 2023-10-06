@@ -46,6 +46,7 @@
         </activity>
         <activity android:name=".main.MainActivity"/>
         <activity android:name=".scan.ScanActivity"/>
+        <activity android:name=".wrapper.WrapperActivity"/>
     </application>
 
 </manifest>

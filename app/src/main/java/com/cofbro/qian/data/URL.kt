@@ -18,4 +18,6 @@ object URL {
     // 获取签到方法
     fun getSignType(activeId: String): String =
         "https://mobilelearn.chaoxing.com/newsign/signDetail?activePrimaryId=$activeId&type=1"
+
+    fun getSignWithCameraPath(aid: String, uid: String, enc: String): String = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId$aid&uid=$uid&enc$enc"
 }

@@ -19,11 +19,14 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.wrapper.WrapperActivity
+import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
+    private val requestCode = 100
     private var scrolledDx = 0
     private var targetScrollDx = 0
     private var mAdapter: CourseListAdapter? = null
@@ -36,7 +39,16 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            var enc = data!!.getStringExtra("result")
+            val result = data?.getStringExtra("result")
+            // SIGNIN:aid=402742574&source=15&Code=402742574&enc=548DF0246153AF088E756B59F33BF3F4
+            val paramList = arrayListOf<String>()
+            val splitArray = result?.split("&")
+            splitArray?.let {
+                val aid = it[0].substringAfter("id")
+                val enc = it[2].substringAfter("enc")
+                signWithCamera(aid, enc)
+            }
+
         }
     }
 
@@ -113,11 +125,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 导航栏扫码签到
         binding?.ivScanBtn?.setOnClickListener {
             val intent = Intent(this, ScanActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, requestCode)
         }
     }
 
     private fun initObserver() {
+        // 课程列表
         viewModel.loadCourseListLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val s = it.data?.body?.string()
@@ -128,7 +141,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                         LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
                     mAdapter?.setOnItemClickListener(object : CourseListAdapter.AdapterListener {
                         override fun onItemClick(courseId: String, classId: String, cpi: String) {
-                            queryAllActiveTask(courseId, classId, cpi)
+                            toWrapperActivity(courseId, classId, cpi)
                         }
 
                     })
@@ -136,13 +149,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             }
         }
 
-        viewModel.queryActiveTaskListLiveData.observe(this) {
+        // 签到
+        viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
-                withContext(Dispatchers.Main) {
-
-                }
+                Log.d("MainActivity", "initObserver: $data")
             }
+            ToastUtils.show("签到成功!")
         }
     }
 
@@ -151,9 +164,26 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         viewModel.loadCourseList(URL.getAllCourseListPath())
     }
 
-    private fun queryAllActiveTask(courseId: String, classId: String, cpi: String) {
-        // 查询所有活动
+
+
+    private fun signWithCamera(aid: String, enc: String) {
         val uid = CacheUtils.cache["uid"] ?: ""
-        viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
+//        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&uid=$uid&enc=BC9662672047A2F2E4A607CC59762973&c=2000072435046&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=2000072435046"
+        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&fid=0"
+        Log.d("MainActivity", "url: $url")
+        //viewModel.signWithCamera(URL.getSignWithCameraPath(aid, uid, enc))
+        viewModel.signWithCamera(url)
+        //191970813
+        // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
+    }
+
+    private fun toWrapperActivity(courseId: String, classId: String, cpi: String) {
+        val intent = Intent(this@MainActivity, WrapperActivity::class.java)
+        intent.apply {
+            putExtra("courseId", courseId)
+            putExtra("classId", classId)
+            putExtra("cpi", cpi)
+        }
+        startActivity(intent)
     }
 }

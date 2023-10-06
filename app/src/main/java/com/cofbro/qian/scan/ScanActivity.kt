@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Vibrator
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -24,9 +25,13 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+        checkPermissions(this, PERMISSION_SCAN, 1)
         binding = ActivityScanBinding.inflate(layoutInflater, null, false)
         setContentView(binding?.root)
-        checkPermissions(this, PERMISSION_SCAN, 1)
         binding?.scanner?.setDelegate(this)
     }
 

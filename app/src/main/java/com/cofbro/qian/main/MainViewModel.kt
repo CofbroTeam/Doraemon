@@ -16,7 +16,7 @@ class MainViewModel : BaseViewModel<MainRepository>() {
     }
 
     val loadCourseListLiveData = ResponseMutableLiveData<Response>()
-    val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
+    val signLiveData = ResponseMutableLiveData<Response>()
 
 
     fun loadCourseList(url: String) {
@@ -28,9 +28,9 @@ class MainViewModel : BaseViewModel<MainRepository>() {
         }
     }
 
-    fun queryActiveTaskList(url: String) {
+    fun signWithCamera(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.queryActiveTaskList(queryActiveTaskListLiveData, false) {
+            repository.sign(signLiveData, false) {
                 val request = NetworkUtils.buildClientRequest(url)
                 NetworkUtils.request(request)
             }
