@@ -5,4 +5,6 @@
     <string name="course_list_class_id">班级ID：</string>
     <string name="course_list_student_count">学生人数：</string>
     <string name="course_list_title">我的课程</string>
+    <string name="sign_active_task">签到活动</string>
+    <string name="all_homework">所有作业</string>
 </resources>

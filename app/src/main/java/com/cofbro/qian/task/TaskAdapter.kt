@@ -16,6 +16,7 @@ import com.cofbro.qian.utils.getStringExt
 
 class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
     private var data: JSONObject? = null
+    private var itemClick: ((itemData: JSONObject) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemTaskListBinding.inflate(inflater, parent, false)
@@ -48,7 +49,13 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
                     .into(binding.ivTaskImage)
 
                 binding.tvTitle.text = item.getStringExt("nameOne", "-")
-                binding.tvTimeLine.text = it.getStringExt("nameTwo", "-")
+
+                val timeLine = item.getStringExt("nameTwo", "进行中")
+                binding.tvTimeLine.text = timeLine.takeIf { timeLine.isNotEmpty() } ?: "进行中"
+
+                itemView.setOnClickListener {
+                    itemClick?.invoke(item)
+                }
             }
         }
     }
@@ -57,5 +64,9 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
     fun setData(t: JSONObject) {
         data = t
         notifyDataSetChanged()
+    }
+
+    fun setItemClickListener(itemClickListener: (itemData: JSONObject) -> Unit) {
+        itemClick = itemClickListener
     }
 }

@@ -15,9 +15,12 @@ object URL {
     fun gatActiveTaskListPath(courseId: String, classId: String, uid: String, cpi: String): String =
         "https://mobilelearn.chaoxing.com/ppt/activeAPI/taskactivelist?courseId=$courseId&classId=$classId&uid=$uid&cpi=$cpi"
 
-    // 获取签到方法
+    // 获取签到类型
     fun getSignType(activeId: String): String =
         "https://mobilelearn.chaoxing.com/newsign/signDetail?activePrimaryId=$activeId&type=1"
 
-    fun getSignWithCameraPath(aid: String, uid: String, enc: String): String = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId$aid&uid=$uid&enc$enc"
+    fun getSignWithCameraPath(aid: String): String = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
+
+    // 普通签到
+    fun getNormalSignPath(courseId: String, classId: String, aid: String): String = "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
 }

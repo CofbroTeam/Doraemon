@@ -24,12 +24,12 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="签到活动" />
+            android:text="@string/sign_active_task" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="所有作业"
+            android:text="@string/all_homework"
             tools:layout_editor_absoluteX="204dp"
             tools:layout_editor_absoluteY="-2dp" />
     </com.google.android.material.tabs.TabLayout>
