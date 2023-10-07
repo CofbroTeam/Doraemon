@@ -19,6 +19,7 @@ import com.cofbro.qian.utils.getStringExt
 class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewHolder>() {
     private var data: JSONObject? = null
     private var listener: AdapterListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCourseListBinding.inflate(inflater, parent, false)
@@ -26,8 +27,8 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     }
 
     override fun getItemCount(): Int {
-        data?.getJSONArray("channelList")?.let {
-            return it.size
+        data?.getJSONArray("channelList")?.let { array ->
+            return (array.size - 1).takeIf { it >= 0 } ?: 0
         }
         return 0
     }
@@ -39,7 +40,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     inner class CourseListViewHolder(private val binding: ItemCourseListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            data?.getJSONArray("channelList")?.get(position)?.let {
+            data?.getJSONArray("channelList")?.get(position + 1)?.let {
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
                 // cpi，后面签到需用此参数

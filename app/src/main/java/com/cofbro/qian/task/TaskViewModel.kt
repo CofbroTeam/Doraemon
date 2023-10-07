@@ -9,7 +9,11 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
+    private val preSignLiveData = ResponseMutableLiveData<Response>()
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
+    val signTypeLiveData = ResponseMutableLiveData<Response>()
+    val signLiveData = ResponseMutableLiveData<Response>()
+
 
     fun queryActiveTaskList(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -17,6 +21,27 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
                 val request = NetworkUtils.buildClientRequest(url)
                 NetworkUtils.request(request)
             }
+        }
+    }
+
+    suspend fun findSignType(url: String) {
+        repository.request(signTypeLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun preSign(url: String) {
+        repository.request(preSignLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun sign(url: String) {
+        repository.request(signLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
         }
     }
 }

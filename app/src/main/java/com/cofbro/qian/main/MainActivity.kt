@@ -41,7 +41,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         if (resultCode == RESULT_OK) {
             val result = data?.getStringExtra("result")
             // SIGNIN:aid=402742574&source=15&Code=402742574&enc=548DF0246153AF088E756B59F33BF3F4
-            val paramList = arrayListOf<String>()
             val splitArray = result?.split("&")
             splitArray?.let {
                 val aid = it[0].substringAfter("id")
@@ -125,7 +124,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         // 导航栏扫码签到
         binding?.ivScanBtn?.setOnClickListener {
             val intent = Intent(this, ScanActivity::class.java)
-            startActivityForResult(intent, requestCode)
+            // TODO: 扫码之前需要预签到，预签到时机？
+            // startActivityForResult(intent, requestCode)
         }
     }
 

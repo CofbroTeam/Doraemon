@@ -3,6 +3,7 @@ package com.cofbro.qian.wrapper
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityWrapperBinding
 import com.cofbro.qian.homework.HomeworkFragment
 import com.cofbro.qian.task.TaskFragment
@@ -53,8 +54,8 @@ class WrapperActivity : AppCompatActivity() {
             it.viewPager.adapter = pageAdapter
             TabLayoutMediator(it.tabLayout, it.viewPager) { tab, position ->
                 when (position) {
-                    0 -> tab.text = "签到活动"
-                    1 -> tab.text = "所有作业"
+                    0 -> tab.text = resources.getString(R.string.sign_active_task)
+                    1 -> tab.text = resources.getString(R.string.all_homework)
                 }
             }.attach()
         }
