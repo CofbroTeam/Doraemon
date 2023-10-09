@@ -13,6 +13,7 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
     val signTypeLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
+    val signCodeLiveData = ResponseMutableLiveData<Response>()
 
 
     fun queryActiveTaskList(url: String) {
@@ -41,6 +42,13 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
     suspend fun sign(url: String) {
         repository.request(signLiveData, false) {
             val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun getSignCode(url: String) {
+        repository.request(signCodeLiveData, false) {
+            val request = NetworkUtils.buildServerRequest(url)
             NetworkUtils.request(request)
         }
     }
