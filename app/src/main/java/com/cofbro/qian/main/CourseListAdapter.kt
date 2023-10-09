@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemCourseListBinding
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
@@ -40,28 +41,29 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     inner class CourseListViewHolder(private val binding: ItemCourseListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            data?.getJSONArray("channelList")?.get(position + 1)?.let {
+            // position + 1 -> 数据中的第一个item不是课程
+            data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.get(position + 1)?.let {
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
                 // cpi，后面签到需用此参数
-                val cpi = jsonObject?.getStringExt("cpi") ?: ""
+                val cpi = jsonObject?.getStringExt(Constants.CourseList.CPI) ?: ""
                 // 班级id
-                val classId = jsonObject?.getStringExt("key") ?: ""
+                val classId = jsonObject?.getStringExt(Constants.CourseList.KEY) ?: ""
                 // 学生人数
-                val studentCount = jsonObject?.getStringExt("content.studentcount")
+                val studentCount = jsonObject?.getStringExt(Constants.CourseList.STUDENT_COUNT)
                 // 班级名称
-                val className = jsonObject?.getStringExt("content.name")
-                val itemArray = jsonObject?.getJSONArrayExt("content.course.data")
+                val className = jsonObject?.getStringExt(Constants.CourseList.CLASS_NAME)
+                val itemArray = jsonObject?.getJSONArrayExt(Constants.CourseList.DATA)
                 if (itemArray?.size != 0) {
                     val item = (itemArray?.get(0) as? JSONObject)
                     // 课程id
-                    val courseId = item?.getStringExt("id") ?: ""
+                    val courseId = item?.getStringExt(Constants.CourseList.COURSE_ID) ?: ""
                     // 课程名称
-                    val courseName = item?.getStringExt("name")
+                    val courseName = item?.getStringExt(Constants.CourseList.COURSE_NAME)
                     // 学校名称
-                    val school = item?.getStringExt("schools", "未设置学校")
+                    val school = item?.getStringExt(Constants.CourseList.SCHOOLS, "未设置学校")
                     // 老师
-                    val teacherName = item?.getStringExt("teacherfactor")
+                    val teacherName = item?.getStringExt(Constants.CourseList.TEACHER_NAME)
 
                     // 绑定数据
                     binding.tvCourseId.text = courseId
@@ -75,7 +77,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                         RoundedCorners(dp2px(binding.root.context, 5))
                     )
                     Glide.with(binding.root)
-                        .load(item?.getStringExt("imageurl"))
+                        .load(item?.getStringExt(Constants.CourseList.IMG_URL))
                         .apply(options)
                         .into(binding.ivClassAvtar)
 

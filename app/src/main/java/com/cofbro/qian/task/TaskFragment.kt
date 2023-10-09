@@ -89,12 +89,14 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
         }
 
-        // 签到类型
+        // 获取签到类型
         viewModel.signTypeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 signTypeData = JSONObject.parseObject(it.data?.body?.string())
+                // 签到类型获取后，开始签到
                 realSign(signTypeData)
             }
+
         }
 
         // 签到
@@ -128,13 +130,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private fun sign(itemData: JSONObject) {
         // aid
-        val id = itemData.getStringExt("id")
+        val id = itemData.getStringExt(Constants.TaskList.ID)
         // 2代表签到活动
-        val type = itemData.getStringExt("activeType")
+        val type = itemData.getStringExt(Constants.TaskList.ACTIVE_TYPE)
         // 预签到地址
-        preSignUrl = itemData.getStringExt("url")
+        preSignUrl = itemData.getStringExt(Constants.TaskList.PRE_SIGN_URL)
         // 1 -> 未签，2 -> 已签
-        val status = itemData.getStringExt("status")
+        val status = itemData.getStringExt(Constants.TaskList.STATUS)
         if (status == Constants.STATUS.CLOSE) {
             ToastUtils.show("签到已过期，下次早点来~")
             return
@@ -149,9 +151,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private suspend fun realSign(itemData: JSONObject?) {
-        val type = itemData?.getStringExt("otherId")
-        val ifPhoto = itemData?.getStringExt("ifPhoto")
-        val id = itemData?.getStringExt("id") ?: ""
+        val type = itemData?.getStringExt(Constants.SIGN.OTHER_ID)
+        val ifPhoto = itemData?.getStringExt(Constants.SIGN.IF_PHOTO)
+        val id = itemData?.getStringExt(Constants.SIGN.ID) ?: ""
         when (type) {
             // 二维码签到
             Constants.SIGN.SCAN_QR -> {
@@ -177,6 +179,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
+            }
+            // 签到码签到
+            Constants.SIGN.SIGN_CODE -> {
             }
         }
     }

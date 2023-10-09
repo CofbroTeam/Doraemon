@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
-    private val requestCode = 100
     private var scrolledDx = 0
     private var targetScrollDx = 0
     private var mAdapter: CourseListAdapter? = null
@@ -36,20 +35,20 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         initObserver()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            val result = data?.getStringExtra("result")
-            // SIGNIN:aid=402742574&source=15&Code=402742574&enc=548DF0246153AF088E756B59F33BF3F4
-            val splitArray = result?.split("&")
-            splitArray?.let {
-                val aid = it[0].substringAfter("id")
-                val enc = it[2].substringAfter("enc")
-                signWithCamera(aid, enc)
-            }
-
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (resultCode == RESULT_OK) {
+//            val result = data?.getStringExtra("result")
+//            // SIGNIN:aid=402742574&source=15&Code=402742574&enc=548DF0246153AF088E756B59F33BF3F4
+//            val splitArray = result?.split("&")
+//            splitArray?.let {
+//                val aid = it[0].substringAfter("id")
+//                val enc = it[2].substringAfter("enc")
+//                signWithCamera(aid, enc)
+//            }
+//
+//        }
+//    }
 
     private fun initView() {
         // 课程论列表
@@ -60,11 +59,14 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     computeVerticalScrollOffset().let {
-                        if (it > targetScrollDx) return
+                        if (it > targetScrollDx) {
+                            solidAppToolBar(255)
+                            return
+                        }
                         scrolledDx = it
                     }
-                    binding?.appToolBar?.background?.alpha =
-                        ((scrolledDx.toFloat() / targetScrollDx.toFloat()) * 255).toInt()
+                    solidAppToolBar(((scrolledDx.toFloat() / targetScrollDx.toFloat()) * 255).toInt())
+
                     Log.d(
                         "MainActivity",
                         "scrolledDx: $scrolledDx, dx: $dx, alpha: ${binding?.appToolBar?.background?.alpha}"
@@ -162,6 +164,10 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun doNetwork() {
         // 加载课程列表
         viewModel.loadCourseList(URL.getAllCourseListPath())
+    }
+
+    private fun solidAppToolBar(alpha: Int) {
+        binding?.appToolBar?.background?.alpha = alpha
     }
 
 
