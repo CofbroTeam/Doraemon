@@ -19,7 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/app_tool_bar"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="77dp"
         android:alpha="1"
         android:background="#03A9F4"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +31,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="37dp"
             android:src="@drawable/avatar_default"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

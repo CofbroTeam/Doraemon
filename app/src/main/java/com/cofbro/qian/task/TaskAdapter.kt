@@ -10,6 +10,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.databinding.ItemTaskListBinding
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
@@ -25,7 +26,7 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     override fun getItemCount(): Int {
         if (data == null) return 0
-        return (data?.getStringExt("count", "0") ?: "0").toInt()
+        return (data?.getStringExt(Constants.TaskList.COUNT, "0") ?: "0").toInt()
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
@@ -36,7 +37,7 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             // 此item数据
-            val item = data?.getJSONArrayExt("activeList")?.get(position)
+            val item = data?.getJSONArrayExt(Constants.TaskList.ACTIVE_LIST)?.get(position)
             (item as? JSONObject)?.let {
                 // 绑定活动图片
                 val options = RequestOptions().transform(
@@ -44,13 +45,13 @@ class TaskAdapter : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
                     RoundedCorners(dp2px(binding.root.context, 5))
                 )
                 Glide.with(binding.root)
-                    .load(item.getStringExt("picUrl"))
+                    .load(item.getStringExt(Constants.TaskList.PIC_URL))
                     .apply(options)
                     .into(binding.ivTaskImage)
 
-                binding.tvTitle.text = item.getStringExt("nameOne", "-")
+                binding.tvTitle.text = item.getStringExt(Constants.TaskList.TITLE, "-")
 
-                val timeLine = item.getStringExt("nameTwo", "进行中")
+                val timeLine = item.getStringExt(Constants.TaskList.TIME_LINE, "进行中")
                 binding.tvTimeLine.text = timeLine.takeIf { timeLine.isNotEmpty() } ?: "进行中"
 
                 itemView.setOnClickListener {
