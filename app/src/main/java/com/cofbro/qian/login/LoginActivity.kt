@@ -47,9 +47,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         for (i in list.indices) {
                             val temp = list[i].split(";".toRegex()).dropLastWhile { it.isEmpty() }
                                 .toTypedArray()[0]
-                            if (temp.startsWith("UID")) uid = temp.substring(4)
-                            if (temp.startsWith("JSESSIONID")) continue
                             cookies.append(temp).append(";")
+                            if (temp.startsWith("UID")) uid = temp.substring(4)
+                            //if (temp.startsWith("JSESSIONID")) continue
+
                         }
                     } else {
                         ToastUtils.show("Cookies获取失败!")

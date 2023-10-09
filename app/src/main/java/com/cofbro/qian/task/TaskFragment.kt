@@ -99,6 +99,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
         }
 
+        viewModel.signCodeLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string()
+            }
+        }
+
         // 签到
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -174,14 +180,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signNormally(id)
                 }
             }
-            // 手势签到
-            Constants.SIGN.GESTURE -> {
+            // 手势签到，签到码签到
+            Constants.SIGN.GESTURE, Constants.SIGN.SIGN_CODE -> {
+                viewModel.preSign(preSignUrl)
+                signNormally(id)
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
-            }
-            // 签到码签到
-            Constants.SIGN.SIGN_CODE -> {
             }
         }
     }
@@ -205,6 +210,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         activity?.let {
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
         }
+    }
 
+    /**
+     * 服务端现已不下发签到码，客户端发起请求后由服务端校验，
+     * 因此暂时没有方法能够拿到密码
+     */
+    private suspend fun signWithSignCode(aid: String) {
+        viewModel.getSignCode(URL.getSignCodePath(aid))
     }
 }
