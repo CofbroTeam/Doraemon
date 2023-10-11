@@ -10,20 +10,13 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
 import com.amap.api.maps2d.MapView
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
-import com.amap.api.services.core.LatLonPoint
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
 import com.amap.api.services.help.Tip
@@ -31,9 +24,7 @@ import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.qian.R
 import com.cofbro.qian.mapSetting.overlay.Poi2DOverlay
-
 import com.cofbro.qian.mapSetting.util.Constants
-import com.cofbro.qian.mapSetting.util.MyActivityResultContract
 import com.cofbro.qian.mapSetting.util.ToastUtil
 
 
