@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
+import com.cofbro.qian.mapSetting.MainActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
@@ -187,6 +188,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
+                //实现跳转
+//                val intent = Intent(this,MainActivity)
             }
         }
     }
