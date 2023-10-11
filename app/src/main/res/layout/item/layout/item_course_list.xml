@@ -127,8 +127,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="end">
 
-            <TextView
-                android:id="@+id/tv_menu"
+            <Button
+                android:id="@+id/settingMap"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
 
@@ -136,7 +136,7 @@
                 android:text="设置"
                 android:textSize="@dimen/text_15" />
 
-            <TextView
+            <Button
                 android:id="@+id/tv_menu_2"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"

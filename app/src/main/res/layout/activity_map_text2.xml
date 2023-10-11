@@ -91,7 +91,7 @@
             android:layout_gravity="end">
 
             <TextView
-                android:id="@+id/tv_menu"
+                android:id="@+id/settingMap"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
 
