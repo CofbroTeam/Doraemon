@@ -6,18 +6,6 @@
     android:layout_height="wrap_content"
     android:elevation="6dp"
     android:background="@drawable/app_light_radius_bg">
-    <wellijohn.org.swipevg.ASwipeLayout
-        android:id="@+id/scroll_del_ll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/ll_content"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:orientation="horizontal">
     <ImageView
         android:id="@+id/iv_class_avtar"
         android:layout_width="80dp"
@@ -120,31 +108,5 @@
         app:layout_constraintBottom_toBottomOf="@+id/tv_student_count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_class_id" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/right_menu_content"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end">
 
-            <Button
-                android:id="@+id/settingMap"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-
-                android:gravity="center"
-                android:text="设置"
-                android:textSize="@dimen/text_15" />
-
-            <Button
-                android:id="@+id/tv_menu_2"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-
-                android:gravity="center"
-                android:text="删除"
-                android:textSize="@dimen/text_15" />
-
-        </LinearLayout>
-    </wellijohn.org.swipevg.ASwipeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
