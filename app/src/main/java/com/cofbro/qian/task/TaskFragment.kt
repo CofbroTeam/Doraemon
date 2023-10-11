@@ -190,6 +190,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             Constants.SIGN.LOCATION -> {
                 //实现跳转
 //                val intent = Intent(this,MainActivity)
+                //跳转map
+                val intent = Intent(requireActivity(), MainActivity::class.java)
+                startActivity(intent)
             }
         }
     }
