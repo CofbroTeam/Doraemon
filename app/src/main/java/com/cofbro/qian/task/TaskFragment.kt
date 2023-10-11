@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
-import com.cofbro.qian.mapSetting.MainActivity
+import com.cofbro.qian.mapsetting.MainActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants

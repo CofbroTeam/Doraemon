@@ -1,4 +1,4 @@
-package com.cofbro.qian.mapSetting.adapter
+package com.cofbro.qian.mapsetting.adapter
 
 import android.content.Context
 import android.view.LayoutInflater

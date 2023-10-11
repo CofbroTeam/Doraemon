@@ -1,10 +1,10 @@
-package com.cofbro.qian.mapSetting.util
+package com.cofbro.qian.mapsetting.util
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.cofbro.qian.mapSetting.InputTipsActivity
+import com.cofbro.qian.mapsetting.InputTipsActivity
 
 class MyActivityResultContract: ActivityResultContract<String, String>(){
     override fun createIntent(context: Context, input: String): Intent {

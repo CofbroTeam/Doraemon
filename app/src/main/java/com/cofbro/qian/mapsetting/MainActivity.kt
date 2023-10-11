@@ -1,4 +1,4 @@
-package com.cofbro.qian.mapSetting
+package com.cofbro.qian.mapsetting
 
 import android.app.Activity
 import android.app.Dialog
@@ -21,13 +21,12 @@ import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
-import com.amap.api.services.help.Tip
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.qian.R
-import com.cofbro.qian.mapSetting.overlay.Poi2DOverlay
-import com.cofbro.qian.mapSetting.util.Constants
-import com.cofbro.qian.mapSetting.util.ToastUtil
+import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
+import com.cofbro.qian.mapsetting.util.Constants
+import com.cofbro.qian.mapsetting.util.ToastUtil
 
 
 open class MainActivity :   Activity(),AMap.OnMarkerClickListener,

@@ -1,4 +1,4 @@
-package com.cofbro.qian.mapSetting
+package com.cofbro.qian.mapsetting
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.cofbro.qian.mapSetting.util
+package com.cofbro.qian.mapsetting.util
 
 import android.content.Context
 import android.widget.Toast

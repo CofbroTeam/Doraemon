@@ -43,15 +43,15 @@
             android:exported="true" />
         <activity android:name=".scan.ScanActivity"/>
         <activity android:name=".wrapper.WrapperActivity"/>
-        <activity android:name=".mapSetting.MapTextActivity2"
+        <activity android:name=".mapsetting.MapTextActivity2"
             android:exported="true" />
-        <activity android:name=".mapSetting.InputTipsActivity"
+        <activity android:name=".mapsetting.InputTipsActivity"
             android:exported="true"
             >
 
         </activity>
         <activity
-            android:name=".mapSetting.MainActivity"
+            android:name=".mapsetting.MainActivity"
             android:exported="true" />
         <service android:name="com.amap.api.location.APSService" />
     </application>

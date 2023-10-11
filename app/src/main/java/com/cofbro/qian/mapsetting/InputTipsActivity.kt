@@ -1,4 +1,4 @@
-package com.cofbro.qian.mapSetting
+package com.cofbro.qian.mapsetting
 
 import android.app.Activity
 import android.content.Context
@@ -18,9 +18,9 @@ import com.amap.api.services.help.Inputtips.InputtipsListener
 import com.amap.api.services.help.InputtipsQuery
 import com.amap.api.services.help.Tip
 import com.cofbro.qian.R
-import com.cofbro.qian.mapSetting.adapter.InputTipsAdapter
-import com.cofbro.qian.mapSetting.util.Constants
-import com.cofbro.qian.mapSetting.util.ToastUtil
+import com.cofbro.qian.mapsetting.adapter.InputTipsAdapter
+import com.cofbro.qian.mapsetting.util.Constants
+import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.utils.TipUtils
 
 

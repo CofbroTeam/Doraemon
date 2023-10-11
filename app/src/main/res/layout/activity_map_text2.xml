@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mapSetting.MapTextActivity2"
+    tools:context=".mapsetting.MapTextActivity2"
     android:orientation="vertical">
 
     <wellijohn.org.swipevg.ASwipeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
