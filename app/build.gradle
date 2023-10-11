@@ -81,4 +81,6 @@ dependencies {
     implementation  'io.github.scwang90:refresh-footer-classics:2.0.5'
     implementation  'io.github.scwang90:refresh-header-radar:2.0.6'
     implementation  'io.github.scwang90:refresh-header-material:2.0.6'
+    //右拉抽屉
+    implementation 'com.github.WelliJohn:ASwipeLayout:0.0.2'
 }
