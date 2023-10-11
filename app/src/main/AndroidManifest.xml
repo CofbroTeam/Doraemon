@@ -27,7 +27,7 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:icon,android:theme,android:roundIcon"
         tools:targetApi="31">
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="key">
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="787057d8a10578894fc4719a3bd274dc">
 
         </meta-data>
         <activity
@@ -38,9 +38,19 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".main.MainActivity"/>
+        <activity
+            android:name=".main.MainActivity"
+            android:exported="true" />
         <activity android:name=".scan.ScanActivity"/>
         <activity android:name=".wrapper.WrapperActivity"/>
+        <activity android:name=".mapSetting.MapTextActivity2"
+            android:exported="true" />
+        <activity android:name=".mapSetting.InputTipsActivity"
+            android:exported="true"
+            >
+
+        </activity>
+        <activity android:name=".mapSetting.MainActivity" />
     </application>
 
 </manifest>
