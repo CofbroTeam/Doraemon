@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
@@ -41,6 +43,8 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
     private var mPoiMarker: Marker? = null
     private var mCleanKeyWords: ImageView? = null
     var mMapView: MapView? = null
+    private lateinit var selectButton:Button
+    private lateinit var currentTipPoint :LatLng //获取当前的经纬度
 //    val myActivityLauncher = registerForActivityResult(MyActivityResultContract()){ result ->
 //        Toast.makeText(applicationContext,result,Toast.LENGTH_SHORT).show()
 //
@@ -51,8 +55,20 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
         mCleanKeyWords = findViewById(R.id.clean_keywords)
+        selectButton = findViewById(R.id.selectButton)
         mCleanKeyWords!!.setOnClickListener(this)
+        selectButton.setOnClickListener {
+        if (currentTipPoint.latitude.toInt() !=0&&currentTipPoint.latitude.toInt()!=0){
+            //成狗初始化mark,并成功定位
+            Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
+            /**
+             * 传递point,构造伪造位置
+             */
 
+        }else{
+            Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
+        }
+    }
           mKeyWords = ""
          mMapView =  findViewById(R.id.maps);
          mMapView!!.onCreate(savedInstanceState)
@@ -64,7 +80,7 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
     mAMap!!.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
         mAMap!!.clear()
         addLatLngMarker(latLng)
-
+        currentTipPoint = latLng
         Log.v("place", "latitude:$latLng");
     }
        val intent = intent
@@ -78,6 +94,7 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
                 */
                Log.v("result_tap:",tip[0])
                mAMap!!.clear()
+               currentTipPoint = LatLng(tip[3].toDouble(),tip[4].toDouble())
             if (tip[2] == null || tip[2] == "") {
                 doSearchQuery(tip[0])
             } else {
@@ -89,6 +106,7 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
             }
            }
        }
+
 
     }
     override fun onResume() {
