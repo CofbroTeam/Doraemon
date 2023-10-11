@@ -3,24 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent">
+
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="132dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo" />
+        app:srcCompat="@mipmap/logo_2" />
 
     <com.cofbro.qian.view.InputView
         android:id="@+id/ip_username"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="108dp"
+        android:layout_marginTop="64dp"
         android:layout_marginEnd="28dp"
         android:clickable="true"
         android:focusable="true"
@@ -30,7 +32,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
-
 
     <com.cofbro.qian.view.InputView
         android:id="@+id/ip_password"
@@ -106,7 +107,7 @@
         android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="#fafafa"
+        android:background="#ffffff"
         android:gravity="center"
         android:text="or"
         android:textSize="12sp"

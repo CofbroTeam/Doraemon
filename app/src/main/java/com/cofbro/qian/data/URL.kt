@@ -19,10 +19,21 @@ object URL {
     fun getSignType(activeId: String): String =
         "https://mobilelearn.chaoxing.com/newsign/signDetail?activePrimaryId=$activeId&type=1"
 
-    fun getSignCodePath(activeId: String): String = "https://mobilelearn.chaoxing.com/v2/apis/active/getPPTActiveInfo?activeId=$activeId&duid=&denc="
+    fun getSignCodePath(activeId: String): String =
+        "https://mobilelearn.chaoxing.com/v2/apis/active/getPPTActiveInfo?activeId=$activeId&duid=&denc="
 
-    fun getSignWithCameraPath(aid: String): String = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
+    fun getSignWithCameraPath(aid: String): String =
+        "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
 
     // 普通签到
-    fun getNormalSignPath(courseId: String, classId: String, aid: String): String = "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
+    fun getNormalSignPath(courseId: String, classId: String, aid: String): String =
+        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
+
+    fun getUploadToken(): String = "https://pan-yz.chaoxing.com/api/token/uservalid"
+
+    fun getUploadImagePath(token: String): String =
+        "https://pan-yz.chaoxing.com/upload?_token=$token"
+
+    fun getSignWithPhoto(aid: String, uid: String, objectId: String): String =
+        "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&uid=$uid&appType=15&fid=0&objectId=$objectId"
 }

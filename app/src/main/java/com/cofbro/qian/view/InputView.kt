@@ -151,7 +151,7 @@ class InputView : View {
         ) isPasswordType = true
         ifShowBitmap = isPasswordType
         bitmap = createBitmap(R.drawable.ic_eye_close)
-        hintBackgroundPaint.color = typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#fafafa"))
+        hintBackgroundPaint.color = typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

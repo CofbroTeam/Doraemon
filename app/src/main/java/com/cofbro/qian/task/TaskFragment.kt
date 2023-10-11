@@ -9,10 +9,12 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
+import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.getStringExt
+import com.cofbro.qian.utils.showSignResult
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -110,13 +112,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
-                    data?.let {
-                        if (data.contains("签到成功") || data.contains("success")) {
-                            ToastUtils.show("签到成功!")
-                        } else if (data.contains("签到过了")) {
-                            ToastUtils.show("您已经签到过了")
-                        }
-                    }
+                    data?.showSignResult()
                 }
             }
         }
@@ -173,7 +169,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // 普通签到
             Constants.SIGN.NORMAl -> {
                 if (ifPhoto == Constants.SIGN.PHOTO) {
-                    // TODO: 照片签到
+                    // 预签到
+                    viewModel.preSign(preSignUrl)
+                    // 照片签到
+                    toPhotoSignActivity(id)
                 } else {
                     viewModel.preSign(preSignUrl)
                     // 签到
@@ -218,5 +217,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
      */
     private suspend fun signWithSignCode(aid: String) {
         viewModel.getSignCode(URL.getSignCodePath(aid))
+    }
+
+    private fun toPhotoSignActivity(aid: String) {
+        val intent = Intent(requireActivity(), PhotoSignActivity::class.java)
+        intent.putExtra("aid", aid)
+        startActivity(intent)
     }
 }
