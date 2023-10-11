@@ -318,4 +318,53 @@ object Constants {
         // 活动状态
         const val STATUS = "status"
     }
+
+    /**
+     * 图片上传
+     * {
+     *     "result": true,
+     *     "msg": "success",
+     *     "crc": "619dd4fdd9045d08cb7795c64817684d",
+     *     "objectId": "45cb143b5af5dc4b3c614d51b1b3f550",
+     *     "resid": 918995675576205312,
+     *     "puid": 191970813,
+     *     "data": {
+     *         "disableOpt": false,
+     *         "resid": 918995675576205312,
+     *         "crc": "619dd4fdd9045d08cb7795c64817684d",
+     *         "puid": 191970813,
+     *         "isfile": true,
+     *         "pantype": "USER_PAN",
+     *         "size": 3353846,
+     *         "name": "1697035241106.jpg",
+     *         "objectId": "45cb143b5af5dc4b3c614d51b1b3f550",
+     *         "restype": "RES_TYPE_NORMAL",
+     *         "uploadDate": "2023-10-11T22:40:43.048+08:00",
+     *         "modifyDate": "2023-10-11T22:40:43.048+08:00",
+     *         "uploadDateFormat": "2023-10-11",
+     *         "residstr": "918995675576205312",
+     *         "suffix": "jpg",
+     *         "preview": "https://pan-yz.chaoxing.com/preview/showpreview_918995675576205312.html?v=1697035243196&enc=a568e8d30a7403556317116885a86616",
+     *         "thumbnail": "https://pan-yz.chaoxing.com/thumbnail/origin/45cb143b5af5dc4b3c614d51b1b3f550?type=img",
+     *         "creator": 191970813,
+     *         "duration": 0,
+     *         "isImg": true,
+     *         "isOffice": false,
+     *         "previewUrl": "https://p.ananas.chaoxing.com/star3/origin/45cb143b5af5dc4b3c614d51b1b3f550.jpg",
+     *         "filetype": "",
+     *         "filepath": "",
+     *         "sort": 0,
+     *         "topsort": 0,
+     *         "resTypeValue": 3,
+     *         "extinfo": ""
+     *     }
+     * }
+     *
+     */
+    object Upload {
+        // 上传图片的token
+        const val TOKEN = "_token"
+        // 图片唯一标识
+        const val OBJECT_ID = "objectId"
+    }
 }

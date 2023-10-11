@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityMainBinding
+import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
@@ -125,9 +126,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         // 导航栏扫码签到
         binding?.ivScanBtn?.setOnClickListener {
-            val intent = Intent(this, ScanActivity::class.java)
             // TODO: 扫码之前需要预签到，预签到时机？
-            // startActivityForResult(intent, requestCode)
+
         }
     }
 
@@ -171,11 +171,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
 
-
     private fun signWithCamera(aid: String, enc: String) {
         val uid = CacheUtils.cache["uid"] ?: ""
 //        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&uid=$uid&enc=BC9662672047A2F2E4A607CC59762973&c=2000072435046&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=2000072435046"
-        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&fid=0"
+        val url =
+            "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&fid=0"
         Log.d("MainActivity", "url: $url")
         //viewModel.signWithCamera(URL.getSignWithCameraPath(aid, uid, enc))
         viewModel.signWithCamera(url)
