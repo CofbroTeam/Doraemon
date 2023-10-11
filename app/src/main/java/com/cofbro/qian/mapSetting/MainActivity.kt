@@ -71,20 +71,20 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
        if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
            Log.v("result_tap:","result_have")
 
-          val tip = intent.getParcelableExtra(Constants.EXTRA_TIP,Tip().javaClass)
+          val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
            if (tip != null) {
                /*
                获取完整Tip
                 */
-               Log.v("result_tap:",tip.name)
+               Log.v("result_tap:",tip[0])
                mAMap!!.clear()
-            if (tip.poiID == null || tip.poiID == "") {
-                doSearchQuery(tip.name)
+            if (tip[2] == null || tip[2] == "") {
+                doSearchQuery(tip[0])
             } else {
                 addTipMarker(tip)
             }
-               mKeywordsTextView!!.text = tip.name
-               if (tip.name != "") {
+               mKeywordsTextView!!.text = tip[0]
+               if (tip[0] != "") {
                 mCleanKeyWords!!.visibility = View.VISIBLE
             }
            }
@@ -268,19 +268,19 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
      *
      * @param tip
      */
-    private fun addTipMarker(tip: Tip?) {
-        if (tip == null) {
+    private fun addTipMarker(tip: ArrayList<String>) {
+        if (tip[0] == "") {
             return
         }
         mPoiMarker = mAMap!!.addMarker(MarkerOptions())
-        val point = tip.point
-        if (point != null) {
-            val markerPosition = LatLng(point.latitude, point.longitude)
+
+        if (tip[3] != "") {
+            val markerPosition = LatLng(tip[3].toDouble(),tip[4].toDouble())
             mPoiMarker!!.position = markerPosition
             mAMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
         }
-        mPoiMarker!!.title = tip.name
-        mPoiMarker!!.snippet = tip.address
+        mPoiMarker!!.title = tip[0]
+        mPoiMarker!!.snippet = tip[1]
     }
 
     private fun addLatLngMarker(LatLng: LatLng?) {

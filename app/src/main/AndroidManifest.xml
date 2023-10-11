@@ -50,7 +50,9 @@
             >
 
         </activity>
-        <activity android:name=".mapSetting.MainActivity" />
+        <activity
+            android:name=".mapSetting.MainActivity"
+            android:exported="true" />
         <service android:name="com.amap.api.location.APSService" />
     </application>
 

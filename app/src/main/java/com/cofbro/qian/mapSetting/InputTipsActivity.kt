@@ -21,6 +21,7 @@ import com.cofbro.qian.R
 import com.cofbro.qian.mapSetting.adapter.InputTipsAdapter
 import com.cofbro.qian.mapSetting.util.Constants
 import com.cofbro.qian.mapSetting.util.ToastUtil
+import com.cofbro.qian.utils.TipUtils
 
 
 class InputTipsActivity : Activity(), SearchView.OnQueryTextListener,
@@ -83,7 +84,7 @@ class InputTipsActivity : Activity(), SearchView.OnQueryTextListener,
                      *  实现跳转
                      */
                     val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra(Constants.EXTRA_TIP, it)
+                    intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
                     startActivity(intent)
                 }
             }
