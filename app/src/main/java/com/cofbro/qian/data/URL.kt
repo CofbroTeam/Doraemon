@@ -26,15 +26,14 @@ object URL {
     // 普通签到
     fun getNormalSignPath(courseId: String, classId: String, aid: String): String = "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
     fun getlocationSignPath(
-        name:String,
+
         add:String,
         aid:String,
-        uid:String,
-        latitude:Double,
-        longitude:Double,
+        lati:Double,
+        longit:Double,
         appType: Int =  15,
         ifTiJiao: Int = -1,
         clientip: String): String {
-        return "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&address=$add"
+        return "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&address=$add&latitude=$lati&longitude=$longit"
     }
 }
