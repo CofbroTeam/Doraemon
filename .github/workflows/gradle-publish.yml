@@ -27,5 +27,12 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: upload-apk
-          path: |
-            ${{github.workspace}}/
+          path: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
+
+      - name: Publish to GitHub Packages
+        uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        with:
+          arguments: publish
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
