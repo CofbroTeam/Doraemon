@@ -31,8 +31,7 @@ import com.cofbro.qian.utils.TipUtils
 
 class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBinding>(), SearchView.OnQueryTextListener,
     InputtipsListener, View.OnClickListener {
-    private var mCurrentTipList: MutableList<Tip>? = null
-    private var mIntipAdapter: InputTipsAdapter? = null
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initSearchView()
         initViewClick()
@@ -59,21 +58,21 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
     override fun onGetInputtips(tipList: MutableList<Tip>, rCode: Int) {
 
         if (rCode == 1000) { // 正确返回
-            mCurrentTipList = tipList
+            viewModel.mCurrentTipList = tipList
             val listString: MutableList<String> = ArrayList()
             for (i in tipList.indices) {
                 listString.add(tipList[i].name)
             }
-            mIntipAdapter = InputTipsAdapter(
-                this, currentTip = mCurrentTipList!!
+            viewModel.mIntipAdapter = InputTipsAdapter(
+                this, currentTip = viewModel.mCurrentTipList!!
             )
             binding?.inputtipList?.apply {
-                adapter = mIntipAdapter
+                adapter = viewModel.mIntipAdapter
                 layoutManager = LinearLayoutManager(this@InputTipsActivity, RecyclerView.VERTICAL,false)
             }
-            mIntipAdapter?.setItemClickListener {
+            viewModel.mIntipAdapter?.setItemClickListener {
                 Log.v("ssx","ssx")
-                if (mCurrentTipList != null) {
+                if (viewModel.mCurrentTipList != null) {
                     /**
                      *  实现跳转
                      */
@@ -113,9 +112,9 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
             inputTips.setInputtipsListener(this)
             inputTips.requestInputtipsAsyn()
         } else {
-            if (mIntipAdapter != null && mCurrentTipList != null) {
-                mCurrentTipList!!.clear()
-                mIntipAdapter!!.notifyDataSetChanged()
+            if (viewModel.mIntipAdapter != null && viewModel.mCurrentTipList != null) {
+                viewModel.mCurrentTipList!!.clear()
+                viewModel.mIntipAdapter!!.notifyDataSetChanged()
             }
         }
         return false
