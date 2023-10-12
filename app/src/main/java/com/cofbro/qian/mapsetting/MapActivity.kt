@@ -32,10 +32,11 @@ import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
+import com.cofbro.qian.utils.CacheUtils
 
- class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
+class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
-
+    val uid = CacheUtils.cache["uid"]
 
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -248,6 +249,8 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
             R.id.main_keywords -> {
                 val intent = Intent(this, InputTipsActivity::class.java)
                 intent.putExtra("code", REQUEST_CODE);
+                intent.putExtra("aid",viewModel.EXTRA_aid)
+                viewModel.EXTRA_aid?.let { Log.v("result:", it) }
                 startActivity(intent)
                 // 开启页面跳转
 //                myActivityLauncher.launch(REQUEST_CODE.toString())
@@ -273,6 +276,8 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
      private fun initViewClick(){
          binding?.cleanKeywords?.setOnClickListener(this)
          binding?.selectButton?.setOnClickListener {
+
+             viewModel.Tip_name?.let { it1 -> Log.v("api_result:", it1) }
              if (viewModel.currentTipPoint.latitude.toInt() !=0&&viewModel.currentTipPoint.latitude.toInt()!=0){
                  //成狗初始化mark,并成功定位
                  Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
@@ -280,14 +285,15 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                   * 传递point,构造伪造位置,完成伪造位置，开始拼接api
                   */
                  Log.v("api_result", viewModel.EXTRA_MSG.toString())
-                 if(viewModel.EXTRA_MSG?.isNotEmpty() == true){
+                 if(viewModel.EXTRA_aid!=null){
                      /**
                       * 开始拼接api
                       */
-                     val aid : String = viewModel.EXTRA_MSG!![0]
-                     val uid : String = viewModel.EXTRA_MSG!![1]
+
+                     val aid : String? = viewModel.EXTRA_aid
+
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
-                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid,uid,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
+                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
                          Log.v("api_result",api_result)
                      }
 
@@ -312,22 +318,32 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
              Log.v("place", "latitude:$latLng");
          }
          val intent = intent
+         if(intent!=null&&intent.hasExtra("aids")){
+             val aid = intent.getStringExtra("aids")
 
-         if (intent!=null&&intent.hasExtra(Constants.EXTRA_MSG)){
+             if (aid != null) {
+                 Log.v("result_opxa:", aid)
+                 viewModel.EXTRA_aid = aid
+
+             }
+         }
+         if (intent!=null&&intent.hasExtra("EXTRA_MSG")){
              /**
               * 开始尝试拼接api ,使用listener监听 ，先获取数据
               */
              /**
               * 需要传递
-              *         name:String, 。。。。0
+              *         name:String,
               *         address:String,
-              *         aid: String, 。。。。1
-              *         uid:String, 。。。。 2
+              *         aid: String, 。。。。0
+              *         uid:String, 。。。。 1
               *         lat:Double,
               *         long:Double,
               */
-             viewModel.EXTRA_MSG= intent.getStringArrayListExtra(Constants.EXTRA_MSG)
-             Log.v("viewModel.EXTRA_MSG","have")
+
+             viewModel.EXTRA_MSG= intent.getStringArrayListExtra("EXTRA_MSG")
+             Log.v("result:main", viewModel.EXTRA_MSG.toString())
+             viewModel.EXTRA_aid = viewModel.EXTRA_MSG?.get(0)
          }
          if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
              Log.v("result_tap:","result_have")

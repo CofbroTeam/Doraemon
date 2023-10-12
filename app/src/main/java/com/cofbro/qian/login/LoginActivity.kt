@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         tryLogin()
         initObserver()
@@ -66,6 +65,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         startActivity(intent)
                         finish()
                     }
+                }else{
+                    ToastUtils.show("账号或者密码错误")
                 }
             }
         }

@@ -17,7 +17,9 @@ class MapViewModel:BaseViewModel<MapRepository>() {
      var poiSearch: PoiSearchV2? = null // POI搜索
      var mPoiMarker: Marker? = null
       var currentTipPoint : LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
-     var EXTRA_MSG :ArrayList<String>? = null
+     var EXTRA_MSG :MutableList<String>? = null
      var Tip_address:String? = null
      var Tip_name:String?=null
+     var EXTRA_uid:String? = null
+     var EXTRA_aid:String? = null
 }

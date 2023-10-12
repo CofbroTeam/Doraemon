@@ -217,7 +217,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val list:ArrayList<String> = ArrayList()
         list.add(aid)
         list.add(uid)
-        intent.putExtra(com.cofbro.qian.mapsetting.util.Constants.EXTRA_MSG, list)
+        intent.putExtra("EXTRA_MSG", list)
         startActivity(intent)
     }
     private fun toScanActivity() {

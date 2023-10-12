@@ -23,10 +23,16 @@ import com.cofbro.qian.utils.TipUtils
 
 class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBinding>(), SearchView.OnQueryTextListener,
     InputtipsListener, View.OnClickListener {
-
+    var aid:String? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        val intent = intent
+        aid = intent.getStringExtra("aid")
+        if (aid != null) {
+            Log.v("result_op:", aid!!)
+        }
         initSearchView()
         initViewClick()
+
     }
     private fun  initViewClick(){
         binding?.back?.setOnClickListener(this)
@@ -68,8 +74,12 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                     /**
                      *  实现跳转
                      */
+
                     val intent = Intent(this, MapActivity::class.java)
+
                     intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
+                    intent.putExtra("aids",aid)
+                    aid?.let { it1 -> Log.v("result:jump:", it1) }
                     startActivity(intent)
                 }
             }
