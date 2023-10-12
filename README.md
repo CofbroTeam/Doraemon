@@ -4,7 +4,7 @@
 
  # 
 
-<div align="center" style="font-weight:bold"><b>学习通智能签到助手 - 还你一个认真学习的梦</b></div>
+<div align="center" style="font-weight:bold"><b>学习通智能签到助手 - 还你一个不被签到问题打扰、认真学习的梦</b></div>
 
 ## 各级页面
 |  页面名称   | 页面图片  |
