@@ -35,7 +35,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 
  class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
-      lateinit var pointListener:(latin:LatLng)->Unit
+
 
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -279,7 +279,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                  /**
                   * 传递point,构造伪造位置,完成伪造位置，开始拼接api
                   */
-                pointListener.invoke(viewModel.currentTipPoint)
+
                  if(viewModel.EXTRA_MSG?.isNotEmpty() == true){
                      /**
                       * 开始拼接api
