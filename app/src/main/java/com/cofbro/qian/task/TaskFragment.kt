@@ -2,6 +2,7 @@ package com.cofbro.qian.task
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +44,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
+            if (result != null) {
+                Log.v("LOG_RESULT:",result)
+            }
             signWithCamera(id)
         }
     }
@@ -188,15 +192,31 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
-                //实现跳转
-//                val intent = Intent(this,MainActivity)
-                //跳转map,选择虚拟地点
-                val intent = Intent(requireActivity(), MapActivity::class.java)
-                startActivity(intent)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.preSign(preSignUrl)
+                    Log.v("preSignUrl", preSignUrl)
+                    val uid = CacheUtils.cache["uid"] ?: ""
+                    toMapActivity( aid = id, uid = uid)
+                }
+
+
             }
         }
     }
-
+    private fun toMapActivity(aid: String,uid: String){
+        /**
+         * 需要传递
+         *         name:String
+         *         address:String,
+         *         aid: String, 。。。。0
+         *         uid:String, 。。。。 1
+         *         lat:Double,
+         *         long:Double,
+         */
+        val intent = Intent(requireActivity(), MapActivity::class.java)
+        intent.putExtra(com.cofbro.qian.mapsetting.util.Constants.EXTRA_MSG, arrayListOf<String>(aid,uid))
+        startActivity(intent)
+    }
     private fun toScanActivity() {
         val intent = Intent(requireActivity(), ScanActivity::class.java)
         startActivityForResult(intent, requestCode)
@@ -215,6 +235,18 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/preSign?activeId=2000072607796
         activity?.let {
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
+        }
+    }
+    private fun signWithLocation(name:String,
+                                 address:String,
+                                 aid: String,
+                                 uid:String,
+                                 lat:Double,
+                                 long:Double,){
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.sign(URL.getlocationSignPath(
+                name,address,aid,uid,lat,long
+            ))
         }
     }
 

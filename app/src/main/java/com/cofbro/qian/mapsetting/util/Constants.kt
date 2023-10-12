@@ -7,6 +7,7 @@ object Constants {
     var DEFAULT_CITY = "北京"
     const val EXTRA_TIP = "ExtraTip"
     const val KEY_WORDS_NAME = "KeyWord"
+    const val EXTRA_MSG = "EXTRA_MSG"
     val BEIJING: LatLng = LatLng(39.90403, 116.407525) // 北京市经纬度
     val ZHONGGUANCUN: LatLng = LatLng(39.983456, 116.3154950) // 北京市中关村经纬度
     val SHANGHAI: LatLng = LatLng(31.238068, 121.501654) // 上海市经纬度

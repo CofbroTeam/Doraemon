@@ -7,6 +7,7 @@ import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.qian.mapsetting.repository.MapRepository
+import com.cofbro.qian.mapsetting.util.Constants
 
 class MapViewModel:BaseViewModel<MapRepository>() {
      var progDialog: Dialog? = null // 搜索时进度条
@@ -16,4 +17,7 @@ class MapViewModel:BaseViewModel<MapRepository>() {
      var poiSearch: PoiSearchV2? = null // POI搜索
      var mPoiMarker: Marker? = null
       var currentTipPoint : LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
+     var EXTRA_MSG :ArrayList<String>? = null
+     var Tip_address:String? = null
+     var Tip_name:String?=null
 }

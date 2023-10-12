@@ -21,10 +21,12 @@ import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
+import com.amap.api.services.help.Tip
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
+import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityMapBinding
 import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
 import com.cofbro.qian.mapsetting.util.Constants
@@ -33,7 +35,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 
  class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
-
+      lateinit var pointListener:(latin:LatLng)->Unit
 
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -185,6 +187,8 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
             }
         } else {
             ToastUtil.showerror(this, rCode)
+
+
         }
     }
 
@@ -273,9 +277,21 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                  //成狗初始化mark,并成功定位
                  Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
                  /**
-                  * 传递point,构造伪造位置
+                  * 传递point,构造伪造位置,完成伪造位置，开始拼接api
                   */
+                pointListener.invoke(viewModel.currentTipPoint)
+                 if(viewModel.EXTRA_MSG?.isNotEmpty() == true){
+                     /**
+                      * 开始拼接api
+                      */
+                     val aid : String = viewModel.EXTRA_MSG!![0]
+                     val uid : String = viewModel.EXTRA_MSG!![1]
+                     if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
+                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid,uid,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
 
+                     }
+
+                 }
              }else{
                  Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
              }
@@ -296,15 +312,30 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
              Log.v("place", "latitude:$latLng");
          }
          val intent = intent
+
+         if (intent!=null&&intent.hasExtra(Constants.EXTRA_MSG)){
+             /**
+              * 开始尝试拼接api ,使用listener监听 ，先获取数据
+              */
+             /**
+              * 需要传递
+              *         name:String, 。。。。0
+              *         address:String,
+              *         aid: String, 。。。。1
+              *         uid:String, 。。。。 2
+              *         lat:Double,
+              *         long:Double,
+              */
+             viewModel.EXTRA_MSG= intent.getStringArrayListExtra(Constants.EXTRA_MSG)
+         }
          if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
              Log.v("result_tap:","result_have")
 
              val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
              if (tip != null) {
-                 /*
+                 /**
                  获取完整Tip
                   */
-                 Log.v("result_tap:",tip[0])
                  binding?.maps?.map?.clear()
                  viewModel.currentTipPoint = LatLng(tip[3].toDouble(),tip[4].toDouble())
                  if (tip[2] == null || tip[2] == "") {
@@ -316,6 +347,12 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                  if (tip[0] != "") {
                      binding?.cleanKeywords?.visibility = View.VISIBLE
                  }
+                 /**
+                  * 获取完整name,address
+                  */
+                 viewModel.Tip_name = tip [0]
+                 viewModel.Tip_address = tip[1]
+
              }
          }
      }
