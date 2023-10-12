@@ -1,16 +1,9 @@
 package com.cofbro.qian.mapsetting
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.InputBinding
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +15,6 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityInputTipsBinding
 import com.cofbro.qian.mapsetting.adapter.InputTipsAdapter
-import com.cofbro.qian.mapsetting.repository.InputTipRepository
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.InputTipViewModel
