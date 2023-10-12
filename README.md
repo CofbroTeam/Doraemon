@@ -46,6 +46,14 @@
 ## 使用
 目前项目还处于开发阶段，如果您想尝鲜已开发的功能或者迫切需要使用 `签到功能` ，请在 `issue` 中告诉我们。
 
+### `1.链接` 
+[尝鲜版请点击这里](https://raw.githubusercontent.com/CofbroTeam/Doraemon/main/app.apk)。由于项目处于开发阶段，并且我们没有 `测试同学`，因此如果大家在使用过程中遇到 `bug`，或者对本项目有更好的 `需求和建议`，烦请在 `issue` 中提出，以便让我们的 `app` 更加完善。
+
+### `2.QR-Code:` 
+请使用浏览器或手机自带的二维码扫描器扫描。
+<div> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60125d13-97d2-4515-a3e4-6460ac97c9d0" width = 200 height = 200 /> </div>
+
+
 ## 开发规范：
 * 使用kt或者java，命名统一使用驼峰命名法
 * 所有kt/java文件需要以 `xxxActivity/xxxFragment` 命名，`xxx` 需要包含业务名称，比如登录页：`LoginActivity`。其中的 `xml` 文件里的 `id` 需要符合 `控件缩写_业务名称` 要求，比如 `TextView` 的 `id` : `tv_login`
