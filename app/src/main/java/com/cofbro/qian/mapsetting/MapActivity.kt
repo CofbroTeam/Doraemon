@@ -34,7 +34,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
  class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
     private var mAMap: AMap? = null
-    private var mKeyWords = "" // 要输入的poi搜索关键字
+//    private var mKeyWords = "" // 要输入的poi搜索关键字
     private var progDialog: Dialog? = null // 搜索时进度条
     private var poiResult: PoiResultV2? = null // poi返回的结果
     private var currentPage = 1
@@ -42,9 +42,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
     private var poiSearch: PoiSearchV2? = null // POI搜索
     private var mKeywordsTextView: TextView? = null
     private var mPoiMarker: Marker? = null
-    private var mCleanKeyWords: ImageView? = null
     var mMapView: MapView? = null
-    lateinit var selection:Button
     private lateinit var currentTipPoint :LatLng //获取当前的经纬度
 //    val myActivityLauncher = registerForActivityResult(MyActivityResultContract()){ result ->
 //        Toast.makeText(applicationContext,result,Toast.LENGTH_SHORT).show()
@@ -52,20 +50,8 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 //    }
 
      private fun initViewClick(){
-
-     }
-     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        binding?.cleanKeywords?.setOnClickListener(this)
-     }
-     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-     override fun onCreate(savedInstanceState: Bundle?) {
-
-         super.onCreate(savedInstanceState)
-         mCleanKeyWords = findViewById(R.id.clean_keywords)
-         mCleanKeyWords!!.setOnClickListener(this)
-         selection = findViewById(R.id.selectButton)
-         selection.setOnClickListener {
+         binding?.cleanKeywords?.setOnClickListener(this)
+         binding?.selectButton?.setOnClickListener {
              if (currentTipPoint.latitude.toInt() !=0&&currentTipPoint.latitude.toInt()!=0){
                  //成狗初始化mark,并成功定位
                  Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
@@ -77,7 +63,11 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                  Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
              }
          }
-          mKeyWords = ""
+     }
+     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+     override fun onActivityCreated(savedInstanceState: Bundle?) {
+         initViewClick()
+
          mMapView =  findViewById(R.id.maps);
          mMapView!!.onCreate(savedInstanceState)
          if (mAMap == null) {
@@ -85,38 +75,37 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
              setUpMap()
          }
          init()
-    mAMap!!.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
-        mAMap!!.clear()
-        addLatLngMarker(latLng)
-        currentTipPoint = latLng
-        Log.v("place", "latitude:$latLng");
-    }
-       val intent = intent
-       if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
-           Log.v("result_tap:","result_have")
+         mAMap!!.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
+             mAMap!!.clear()
+             addLatLngMarker(latLng)
+             currentTipPoint = latLng
+             Log.v("place", "latitude:$latLng");
+         }
+         val intent = intent
+         if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
+             Log.v("result_tap:","result_have")
 
-          val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
-           if (tip != null) {
-               /*
-               获取完整Tip
-                */
-               Log.v("result_tap:",tip[0])
-               mAMap!!.clear()
-               currentTipPoint = LatLng(tip[3].toDouble(),tip[4].toDouble())
-            if (tip[2] == null || tip[2] == "") {
-                doSearchQuery(tip[0])
-            } else {
-                addTipMarker(tip)
-            }
-               mKeywordsTextView!!.text = tip[0]
-               if (tip[0] != "") {
-                mCleanKeyWords!!.visibility = View.VISIBLE
-            }
-           }
-       }
+             val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
+             if (tip != null) {
+                 /*
+                 获取完整Tip
+                  */
+                 Log.v("result_tap:",tip[0])
+                 mAMap!!.clear()
+                 currentTipPoint = LatLng(tip[3].toDouble(),tip[4].toDouble())
+                 if (tip[2] == null || tip[2] == "") {
+                     doSearchQuery(tip[0])
+                 } else {
+                     addTipMarker(tip)
+                 }
+                 mKeywordsTextView!!.text = tip[0]
+                 if (tip[0] != "") {
+                     binding?.cleanKeywords?.visibility = View.VISIBLE
+                 }
+             }
+         }
 
-
-    }
+     }
     override fun onResume() {
         super.onResume()
         mMapView?.onResume();
@@ -145,6 +134,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 
         mKeywordsTextView = findViewById(R.id.main_keywords)
         mKeywordsTextView!!.setOnClickListener(this)
+
     }
 
 
@@ -343,7 +333,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
             R.id.clean_keywords -> {
                 mKeywordsTextView!!.text = ""
                 mAMap!!.clear()
-                mCleanKeyWords!!.visibility = View.GONE
+                binding?.cleanKeywords?.visibility = View.GONE
             }
 
             else -> {}
