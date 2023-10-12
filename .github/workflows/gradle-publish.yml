@@ -28,4 +28,4 @@ jobs:
         with:
           name: upload-apk
           path: |
-            ${{github.workspace}}/app/build/outputs/apk/cofbro/release/*.apk
+            ${{github.workspace}}/
