@@ -13,43 +13,15 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
+    runs-on: ubuntu-18.04
     steps:
-    
-    - name: Release APK
-    # You may pin to the exact commit or the version.
-    # uses: ShowMeThe/github_action_release@c03188563c3286ccd20cf0d2b1413a134e3cabc9
-    uses: ShowMeThe/github_action_release@v0.01
-    with:
-      # Github secret token to allow automated publishing of APK to release.
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release APK
+        # You may pin to the exact commit or the version.
+        # uses: ShowMeThe/github_action_release@c03188563c3286ccd20cf0d2b1413a134e3cabc9
+        uses: ShowMeThe/github_action_release@v0.01
+        with:
+          # Github secret token to allow automated publishing of APK to release.
+          GITHUB_TOKEN: s
 
-      
-    
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: build
 
-    # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
-    # the publishing section of your build.gradle
-    - name: Publish to GitHub Packages
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: publish
-      env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
