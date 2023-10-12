@@ -21,7 +21,7 @@ jobs:
         uses: ShowMeThe/github_action_release@v0.01
         with:
           # Github secret token to allow automated publishing of APK to release.
-          GITHUB_TOKEN: s
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
