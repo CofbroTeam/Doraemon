@@ -51,7 +51,7 @@
 
         </activity>
         <activity
-            android:name=".mapsetting.MainActivity"
+            android:name=".mapsetting.MapActivity"
             android:exported="true" />
         <service android:name="com.amap.api.location.APSService" />
     </application>

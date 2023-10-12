@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputBinding
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ImageView
@@ -17,43 +18,36 @@ import com.amap.api.services.help.Inputtips
 import com.amap.api.services.help.Inputtips.InputtipsListener
 import com.amap.api.services.help.InputtipsQuery
 import com.amap.api.services.help.Tip
+import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
+import com.cofbro.qian.databinding.ActivityInputTipsBinding
 import com.cofbro.qian.mapsetting.adapter.InputTipsAdapter
+import com.cofbro.qian.mapsetting.repository.InputTipRepository
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
+import com.cofbro.qian.mapsetting.viewmodel.InputTipViewModel
 import com.cofbro.qian.utils.TipUtils
 
 
-class InputTipsActivity : Activity(), SearchView.OnQueryTextListener,
-    InputtipsListener, OnItemClickListener, View.OnClickListener {
-    private var mSearchView: SearchView? = null // 输入搜索关键字
-    private var mBack: ImageView? = null
-    private var mInputListView: RecyclerView? = null
+class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBinding>(), SearchView.OnQueryTextListener,
+    InputtipsListener, View.OnClickListener {
     private var mCurrentTipList: MutableList<Tip>? = null
     private var mIntipAdapter: InputTipsAdapter? = null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_input_tips)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
         initSearchView()
-        mInputListView = findViewById(R.id.inputtip_list)
-//        mInputListView!!.addOnItemTouchListener(this)
-        mBack = findViewById<View>(R.id.back) as ImageView
-        mBack!!.setOnClickListener(this)
-
+        initViewClick()
+    }
+    private fun  initViewClick(){
+        binding?.back?.setOnClickListener(this)
     }
 
-    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
-
-        return super.onCreateView(name, context, attrs)
-    }
     private fun initSearchView() {
-        mSearchView = findViewById<View>(R.id.keyWord) as SearchView
-        mSearchView!!.setOnQueryTextListener(this)
+        binding?.keyWord?.setOnQueryTextListener(this)
         //设置SearchView默认为展开显示
-        mSearchView!!.isIconified = false
-        mSearchView!!.onActionViewExpanded()
-        mSearchView!!.setIconifiedByDefault(true)
-        mSearchView!!.isSubmitButtonEnabled = false
+        binding?.keyWord?.isIconified = false
+        binding?.keyWord?.onActionViewExpanded()
+        binding?.keyWord?.setIconifiedByDefault(true)
+        binding?.keyWord?.isSubmitButtonEnabled = false
     }
 
     /**
@@ -73,33 +67,25 @@ class InputTipsActivity : Activity(), SearchView.OnQueryTextListener,
             mIntipAdapter = InputTipsAdapter(
                 this, currentTip = mCurrentTipList!!
             )
-            mInputListView!!.apply {
+            binding?.inputtipList?.apply {
                 adapter = mIntipAdapter
                 layoutManager = LinearLayoutManager(this@InputTipsActivity, RecyclerView.VERTICAL,false)
             }
-            mIntipAdapter!!.setItemClickListener {
+            mIntipAdapter?.setItemClickListener {
                 Log.v("ssx","ssx")
                 if (mCurrentTipList != null) {
                     /**
                      *  实现跳转
                      */
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, MapActivity::class.java)
                     intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
                     startActivity(intent)
                 }
             }
-
-
-
         } else {
             ToastUtil.showerror(this, rCode)
         }
     }
-
-    override fun onItemClick(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-
-    }
-
     /**
      * 按下确认键触发，本例为键盘回车或搜索键
      *
@@ -109,7 +95,7 @@ class InputTipsActivity : Activity(), SearchView.OnQueryTextListener,
     override fun onQueryTextSubmit(query: String?): Boolean {
         val intent = Intent()
         intent.putExtra(Constants.KEY_WORDS_NAME, query)
-        setResult(MainActivity.RESULT_CODE_KEYWORDS, intent)
+        setResult(MapActivity.RESULT_CODE_KEYWORDS, intent)
         finish()
         return false
     }

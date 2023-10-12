@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
-import com.cofbro.qian.mapsetting.MainActivity
+import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
@@ -191,7 +191,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 //实现跳转
 //                val intent = Intent(this,MainActivity)
                 //跳转map,选择虚拟地点
-                val intent = Intent(requireActivity(), MainActivity::class.java)
+                val intent = Intent(requireActivity(), MapActivity::class.java)
                 startActivity(intent)
             }
         }

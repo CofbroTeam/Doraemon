@@ -1,11 +1,11 @@
 package com.cofbro.qian.mapsetting
-
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.telephony.CarrierConfigManager.Bsf
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -23,13 +23,15 @@ import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
+import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
+import com.cofbro.qian.databinding.ActivityMapBinding
 import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
+import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 
-
-open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
+ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
     private var mAMap: AMap? = null
     private var mKeyWords = "" // 要输入的poi搜索关键字
@@ -42,32 +44,39 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
     private var mPoiMarker: Marker? = null
     private var mCleanKeyWords: ImageView? = null
     var mMapView: MapView? = null
-    private lateinit var selectButton:Button
+    lateinit var selection:Button
     private lateinit var currentTipPoint :LatLng //获取当前的经纬度
 //    val myActivityLauncher = registerForActivityResult(MyActivityResultContract()){ result ->
 //        Toast.makeText(applicationContext,result,Toast.LENGTH_SHORT).show()
 //
 //    }
+
+     private fun initViewClick(){
+
+     }
+     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        binding?.cleanKeywords?.setOnClickListener(this)
+     }
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onCreate(savedInstanceState: Bundle?) {
 
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main2)
-        mCleanKeyWords = findViewById(R.id.clean_keywords)
-        selectButton = findViewById(R.id.selectButton)
-        mCleanKeyWords!!.setOnClickListener(this)
-        selectButton.setOnClickListener {
-        if (currentTipPoint.latitude.toInt() !=0&&currentTipPoint.latitude.toInt()!=0){
-            //成狗初始化mark,并成功定位
-            Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
-            /**
-             * 传递point,构造伪造位置
-             */
+         super.onCreate(savedInstanceState)
+         mCleanKeyWords = findViewById(R.id.clean_keywords)
+         mCleanKeyWords!!.setOnClickListener(this)
+         selection = findViewById(R.id.selectButton)
+         selection.setOnClickListener {
+             if (currentTipPoint.latitude.toInt() !=0&&currentTipPoint.latitude.toInt()!=0){
+                 //成狗初始化mark,并成功定位
+                 Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
+                 /**
+                  * 传递point,构造伪造位置
+                  */
 
-        }else{
-            Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
-        }
-    }
+             }else{
+                 Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
+             }
+         }
           mKeyWords = ""
          mMapView =  findViewById(R.id.maps);
          mMapView!!.onCreate(savedInstanceState)
@@ -138,7 +147,10 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
         mKeywordsTextView!!.setOnClickListener(this)
     }
 
-    /**
+
+
+
+     /**
      * 设置页面监听
      */
     private fun setUpMap() {
@@ -218,7 +230,7 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
                 
                 """.trimIndent()
         }
-        ToastUtil.show(this@MainActivity, infomation)
+        ToastUtil.show(this@MapActivity, infomation)
     }
 
     /**
@@ -249,14 +261,14 @@ open class MainActivity :   Activity(),AMap.OnMarkerClickListener,
 //                    }
                     else {
                         ToastUtil.show(
-                            this@MainActivity,
+                            this@MapActivity,
                            " R.string.no_result"
                         )
                     }
                 }
             } else {
                 ToastUtil.show(
-                    this@MainActivity,
+                    this@MapActivity,
                     "R.string.no_result"
                 )
             }
