@@ -203,7 +203,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
         }
     }
-    private fun toMapActivity(aid: String,uid: String){
+    private fun toMapActivity(aid: String,uid: String,result: String = "sx"){
         /**
          * 需要传递
          *         name:String
@@ -214,7 +214,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
          *         long:Double,
          */
         val intent = Intent(requireActivity(), MapActivity::class.java)
-        intent.putExtra(com.cofbro.qian.mapsetting.util.Constants.EXTRA_MSG, arrayListOf<String>(aid,uid))
+        val list:ArrayList<String> = ArrayList()
+        list.add(aid)
+        list.add(uid)
+        intent.putExtra(com.cofbro.qian.mapsetting.util.Constants.EXTRA_MSG, list)
         startActivity(intent)
     }
     private fun toScanActivity() {

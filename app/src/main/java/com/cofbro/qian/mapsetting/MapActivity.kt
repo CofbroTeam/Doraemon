@@ -279,7 +279,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                  /**
                   * 传递point,构造伪造位置,完成伪造位置，开始拼接api
                   */
-
+                 Log.v("api_result", viewModel.EXTRA_MSG.toString())
                  if(viewModel.EXTRA_MSG?.isNotEmpty() == true){
                      /**
                       * 开始拼接api
@@ -288,7 +288,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
                      val uid : String = viewModel.EXTRA_MSG!![1]
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
                          val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid,uid,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
-
+                         Log.v("api_result",api_result)
                      }
 
                  }
@@ -327,6 +327,7 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
               *         long:Double,
               */
              viewModel.EXTRA_MSG= intent.getStringArrayListExtra(Constants.EXTRA_MSG)
+             Log.v("viewModel.EXTRA_MSG","have")
          }
          if (intent!=null&&intent.hasExtra(Constants.EXTRA_TIP)){
              Log.v("result_tap:","result_have")
