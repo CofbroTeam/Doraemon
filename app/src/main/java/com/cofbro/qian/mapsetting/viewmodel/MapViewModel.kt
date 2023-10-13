@@ -1,13 +1,19 @@
 package com.cofbro.qian.mapsetting.viewmodel
 
 import android.app.Dialog
+import androidx.lifecycle.viewModelScope
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseViewModel
+import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.mapsetting.repository.MapRepository
 import com.cofbro.qian.mapsetting.util.Constants
+import com.cofbro.qian.utils.NetworkUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Response
 
 class MapViewModel:BaseViewModel<MapRepository>() {
      var progDialog: Dialog? = null // 搜索时进度条
@@ -22,4 +28,14 @@ class MapViewModel:BaseViewModel<MapRepository>() {
      var Tip_name:String?=null
      var EXTRA_uid:String? = null
      var EXTRA_aid:String? = null
+
+     val signLiveData = ResponseMutableLiveData<Response>()
+     fun sign(url: String) {
+          viewModelScope.launch(Dispatchers.IO) {
+               repository.request(signLiveData, loadingMsg = "正在签到") {
+                    val request = NetworkUtils.buildClientRequest(url)
+                    NetworkUtils.request(request)
+               }
+          }
+     }
 }
