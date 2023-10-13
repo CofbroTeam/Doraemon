@@ -83,4 +83,6 @@ dependencies {
     implementation  'io.github.scwang90:refresh-header-material:2.0.6'
     //右拉抽屉
     implementation 'com.github.WelliJohn:ASwipeLayout:0.0.2'
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.10.2'
 }

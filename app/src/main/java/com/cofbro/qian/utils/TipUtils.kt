@@ -21,6 +21,7 @@ class TipUtils {
         tipArray.add(tip.poiID) //2
         tipArray.add(tip.point.latitude.toString())  //3
         tipArray.add(tip.point.longitude.toString())  //4
+        tipArray.add(tip.district) //5
         return  tipArray
     }
 }

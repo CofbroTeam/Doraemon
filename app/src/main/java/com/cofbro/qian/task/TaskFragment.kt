@@ -2,6 +2,7 @@ package com.cofbro.qian.task
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -18,10 +19,22 @@ import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import java.io.UnsupportedEncodingException
+
+import java.net.URLEncoder
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var activeId = ""
+    private var latitude = ""
+    private var longitude = ""
     private var signTypeData: JSONObject? = null
     private var preSignUrl = ""
     private var refreshing = false
@@ -86,9 +99,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     binding?.rflSignTask?.finishRefresh()
                 }
                 val data = it.data?.body?.string()
+                Log.v("result:Lists", it.toString())
                 withContext(Dispatchers.Main) {
                     JSONObject.parseObject(data)?.let {
                         taskAdapter?.setData(it)
+                        Log.v("result:List",it.toString())
                     }
                 }
             }
@@ -107,6 +122,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signCodeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
+            }
+        }
+
+        viewModel.preSignLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string()
+                data?.let {
+                    val html = Jsoup.parse(it)
+                    latitude = html.getElementById("locationLatitude").`val`()
+                    longitude = html.getElementById("locationLongitude").`val`()
+                    if (latitude.isNotEmpty() && longitude.isNotEmpty()) {
+                        val uid = CacheUtils.cache["uid"] ?: ""
+                        toMapActivity( activeId, uid = uid, latitude, longitude)
+                    }
+                }
+
             }
         }
 
@@ -137,11 +168,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 查询所有活动
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
+        Log.v("sign_task" , URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
     }
 
     private fun sign(itemData: JSONObject) {
         // aid
         val id = itemData.getStringExt(Constants.TaskList.ID)
+        activeId = id
         // 2代表签到活动
         val type = itemData.getStringExt(Constants.TaskList.ACTIVE_TYPE)
         // 预签到地址
@@ -196,14 +229,16 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     viewModel.preSign(preSignUrl)
                     Log.v("preSignUrl", preSignUrl)
                     val uid = CacheUtils.cache["uid"] ?: ""
-                    toMapActivity( aid = id, uid = uid)
+                    Log.v("preSignUrl:",id)
+//                    val default = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?name=%E9%98%BF%E9%87%8C%E4%B8%AD%E5%BF%83%C2%B7%E6%9C%9B%E4%BA%ACB%E5%BA%A7&address=%E6%9C%9B%E4%BA%AC%E4%B8%9C%E5%9B%AD4%E5%8C%BA4%E5%8F%B7%E6%A5%BC&activeId=1000073717972&uid=191970813&clientip=&latitude=40.002528&longitude=116.489878&fid=1840&appType=15&ifTiJiao=1"
+//                    signLoction(default)
                 }
 
 
             }
         }
     }
-    private fun toMapActivity(aid: String,uid: String,result: String = "sx"){
+    private fun toMapActivity(aid: String,uid: String, lat: String, lon: String){
         /**
          * 需要传递
          *         name:String
@@ -218,6 +253,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         list.add(aid)
         list.add(uid)
         intent.putExtra("EXTRA_MSG", list)
+        intent.putExtra("lat", lat)
+        intent.putExtra("lon", lon)
         startActivity(intent)
     }
     private fun toScanActivity() {
@@ -240,17 +277,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
         }
     }
-    private fun signWithLocation(name:String,
-                                 address:String,
-                                 aid: String,
-                                 uid:String,
-                                 fid:String,
-                                 lat:Double,
-                                 long:Double,){
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.sign(URL.getlocationSignPath(
-                name,address,aid,uid,fid,lat,long
-            ))
+    private suspend fun signLoction(api:String) {
+        activity?.let {
+            viewModel.sign(api)
         }
     }
 
@@ -261,4 +290,5 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWithSignCode(aid: String) {
         viewModel.getSignCode(URL.getSignCodePath(aid))
     }
+
 }

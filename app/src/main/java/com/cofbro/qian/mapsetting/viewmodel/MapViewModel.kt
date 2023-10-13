@@ -28,11 +28,11 @@ class MapViewModel:BaseViewModel<MapRepository>() {
      var Tip_name:String?=null
      var EXTRA_uid:String? = null
      var EXTRA_aid:String? = null
-
+     var Tip_City:String?= null
      val signLiveData = ResponseMutableLiveData<Response>()
      fun sign(url: String) {
           viewModelScope.launch(Dispatchers.IO) {
-               repository.request(signLiveData, loadingMsg = "正在签到") {
+               repository.request(signLiveData) {
                     val request = NetworkUtils.buildClientRequest(url)
                     NetworkUtils.request(request)
                }

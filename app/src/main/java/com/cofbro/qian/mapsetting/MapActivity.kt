@@ -38,17 +38,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.cofbro.qian.utils.showSignResult
+import java.io.UnsupportedEncodingException
+import java.net.URLEncoder
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
     val uid = CacheUtils.cache["uid"]
     val fid = CacheUtils.cache["fid"]
+    var api_result = ""
+    private var lat: String = ""
+    private var long: String = ""
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onActivityCreated(savedInstanceState: Bundle?) {
+         initArgs()
          initObserver()
          initViewClick()
          initMap(savedInstanceState)
 
      }
+
+    private fun initArgs() {
+        lat = intent.getStringExtra("lat") ?: ""
+        long = intent.getStringExtra("lon") ?: ""
+    }
+
     override fun onResume() {
         super.onResume()
         binding?.maps?.onResume();
@@ -299,8 +314,9 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
                      val aid : String? = viewModel.EXTRA_aid
 
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
-
-                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!, fid = fid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
+                         val cityName = viewModel.Tip_City
+                         val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name) ?: ""
+                         api_result = URL.getlocationSignPath(address = address,aid!!,uid!!,lat,long)
                          Log.v("api_result",api_result)
                          sign(url = api_result)
                      }
@@ -314,14 +330,22 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
      }
     private fun initObserver() {
         // 签到
-        viewModel.signLiveData.observe(this) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.string()
-                withContext(Dispatchers.Main) {
-                    data?.showSignResult()
-                    finish()
-                }
-            }
+//        viewModel.signLiveData.observe(this) {
+//            lifecycleScope.launch(Dispatchers.IO) {
+//                val data = it.data?.body?.string()
+//                withContext(Dispatchers.Main) {
+//                    data?.showSignResult()
+//                    finish()
+//                }
+//            }
+//        }
+        viewModel.signLiveData.observe(this){
+            Log.v("rsxxx:",api_result)
+            val data = it.data?.body.toString()
+            val data_msg = it.message
+            Log.v("rsxxx:",it.toString()+"msg"+data_msg)
+            data.showSignResult()
+
         }
 
     }
@@ -348,7 +372,6 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
              if (aid != null) {
                  Log.v("result_opxa:", aid)
                  viewModel.EXTRA_aid = aid
-
              }
          }
          if (intent!=null&&intent.hasExtra("EXTRA_MSG")){
@@ -393,10 +416,26 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
                   */
                  viewModel.Tip_name = tip [0]
                  viewModel.Tip_address = tip[1]
+                 viewModel.Tip_City = tip[5]
 
              }
          }
      }
 
 
+
+    private fun urlEncodeChinese(url: String): String? {
+        var url = url
+        try {
+            val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
+            var tmp = ""
+            while (matcher.find()) {
+                tmp = matcher.group()
+                url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
+            }
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+        return url.replace(" ", "%20")
+    }
 }
