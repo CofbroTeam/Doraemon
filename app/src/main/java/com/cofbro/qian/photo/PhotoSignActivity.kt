@@ -24,6 +24,7 @@ import java.io.File
 import java.util.ArrayList
 
 class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBinding>() {
+    private var imageFile: File? = null
     private var aid = ""
     private var token = ""
     private var objectId = ""
@@ -67,6 +68,7 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
                     data?.showSignResult()
+                    imageFile?.delete()
                     finish()
                 }
             }
@@ -91,10 +93,16 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                     override fun onResult(result: ArrayList<LocalMedia>?) {
                         result?.get(0)?.let {
                             lifecycleScope.launch(Dispatchers.IO) {
-                                ImageDownloader.download(this@PhotoSignActivity, it.path) { success, filepath ->
+                                ImageDownloader.download(
+                                    this@PhotoSignActivity,
+                                    it.path
+                                ) { success, filepath ->
                                     if (success) {
-                                        val file = File(filepath)
-                                        viewModel.uploadImage(URL.getUploadImagePath(token), file)
+                                        imageFile = File(filepath)
+                                        imageFile?.let {
+                                            viewModel.uploadImage(URL.getUploadImagePath(token), it)
+                                        }
+
                                     }
                                 }
                             }

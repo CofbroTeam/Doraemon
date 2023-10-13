@@ -1,4 +1,4 @@
-package com.cofbro.qian.task
+package com.cofbro.qian.wrapper.task
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +14,7 @@ import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.getStringExt
+import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
@@ -84,7 +85,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 }
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
-                    JSONObject.parseObject(data)?.let {
+                    data?.safeParseToJson()?.let {
                         taskAdapter?.setData(it)
                     }
                 }
@@ -94,7 +95,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 获取签到类型
         viewModel.signTypeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
-                signTypeData = JSONObject.parseObject(it.data?.body?.string())
+                val data = it.data?.body?.string()
+                signTypeData = data?.safeParseToJson()
                 // 签到类型获取后，开始签到
                 realSign(signTypeData)
             }
