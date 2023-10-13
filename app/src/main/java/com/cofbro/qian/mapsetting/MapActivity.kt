@@ -46,6 +46,7 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
      override fun onActivityCreated(savedInstanceState: Bundle?) {
          initViewClick()
          initMap(savedInstanceState)
+         initObserver()
      }
     override fun onResume() {
         super.onResume()
@@ -299,7 +300,7 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
                          val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
                          Log.v("api_result",api_result)
-                         sign(url = api_result)
+//                         sign(url = api_result)
                      }
 
                  }
