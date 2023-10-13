@@ -30,9 +30,10 @@ object URL {
         address:String,
         aid: String,
         uid:String,
+        fid:String,
         lat:Double,
         long:Double,
     ): String =
-         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?name=$name&address=$address&activeId=$aid&uid=$uid&clientip=&latitude=$lat&longitude=$long&fid=0&appType=15&ifTiJiao=1"
+         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?name=$name&address=$address&activeId=$aid&uid=$uid&clientip=&latitude=$lat&longitude=$long&fid=$fid&appType=15&ifTiJiao=1"
 
 }

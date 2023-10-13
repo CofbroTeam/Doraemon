@@ -41,7 +41,7 @@ import com.cofbro.qian.utils.showSignResult
 class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
     val uid = CacheUtils.cache["uid"]
-
+    val fid = CacheUtils.cache["fid"]
      @RequiresApi(Build.VERSION_CODES.TIRAMISU)
      override fun onActivityCreated(savedInstanceState: Bundle?) {
          initObserver()
@@ -299,7 +299,8 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
                      val aid : String? = viewModel.EXTRA_aid
 
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
-                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
+
+                         val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!, fid = fid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
                          Log.v("api_result",api_result)
                          sign(url = api_result)
                      }

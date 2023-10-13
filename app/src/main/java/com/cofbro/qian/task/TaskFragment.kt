@@ -244,11 +244,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                                  address:String,
                                  aid: String,
                                  uid:String,
+                                 fid:String,
                                  lat:Double,
                                  long:Double,){
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.sign(URL.getlocationSignPath(
-                name,address,aid,uid,lat,long
+                name,address,aid,uid,fid,lat,long
             ))
         }
     }
