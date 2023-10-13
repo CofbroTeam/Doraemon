@@ -18,6 +18,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
+    private val defaultUser = "17772360225"
+    private val defaultPWD= "weihao666"
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         tryLogin()
         initObserver()
@@ -25,8 +27,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun tryLogin() {
-        val username = getBySp("username")
-        val password = getBySp("password")
+//        val username = getBySp("username")
+//        val password = getBySp("password")
+        val username = defaultUser
+        val password = defaultPWD
         if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
             viewModel.login(URL.getLoginPath(username, password))
         }
