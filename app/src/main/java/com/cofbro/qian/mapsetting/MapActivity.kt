@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
 import com.amap.api.maps2d.MapView
@@ -33,7 +34,10 @@ import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
-
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.cofbro.qian.utils.showSignResult
 class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
     val uid = CacheUtils.cache["uid"]
@@ -295,6 +299,7 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
                      if(viewModel.Tip_address!=null&&viewModel.Tip_name!=null){
                          val api_result = URL.getlocationSignPath(name = viewModel.Tip_name!!, address = viewModel.Tip_address!!,aid!!,uid!!,viewModel.currentTipPoint.latitude,viewModel.currentTipPoint.longitude)
                          Log.v("api_result",api_result)
+                         sign(url = api_result)
                      }
 
                  }
@@ -304,6 +309,22 @@ class MapActivity :   BaseActivity<MapViewModel,ActivityMapBinding>(),AMap.OnMar
          }
          binding?.mainKeywords?.setOnClickListener(this)
      }
+    private fun initObserver() {
+        // 签到
+        viewModel.signLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string()
+                withContext(Dispatchers.Main) {
+                    data?.showSignResult()
+                    finish()
+                }
+            }
+        }
+
+    }
+    private fun sign(url:String) {
+        viewModel.sign(url)
+    }
      private fun initMap(savedInstanceState: Bundle?){
          binding?.maps!!.onCreate(savedInstanceState)
          if ( binding?.maps?.map == null) {
