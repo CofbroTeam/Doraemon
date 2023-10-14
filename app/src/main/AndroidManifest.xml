@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -39,21 +40,35 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:icon,android:theme,android:roundIcon"
         tools:targetApi="31">
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="key">
 
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="787057d8a10578894fc4719a3bd274dc">
         </meta-data>
+
         <activity
-        android:name=".login.LoginActivity"
+            android:name=".login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".main.MainActivity"/>
-        <activity android:name=".scan.ScanActivity"/>
-        <activity android:name=".wrapper.WrapperActivity"/>
-        <activity android:name=".photo.PhotoSignActivity"/>
+        <activity android:name=".main.MainActivity" />
+        <activity android:name=".scan.ScanActivity" />
+        <activity
+            android:name=".wrapper.WrapperActivity"
+            android:exported="true">
+            <!--            <intent-filter>-->
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+            <!--            </intent-filter>-->
+        </activity>
+        <activity android:name=".mapsetting.InputTipsActivity" />
+        <activity android:name=".mapsetting.MapActivity" />
+
+        <service android:name="com.amap.api.location.APSService" />
+
     </application>
 
 </manifest>

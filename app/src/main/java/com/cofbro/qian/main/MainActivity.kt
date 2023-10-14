@@ -20,6 +20,7 @@ import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -137,16 +138,26 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val s = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
-                    mAdapter?.setData(JSONObject.parseObject(s))
-                    binding?.rvCourseList?.adapter = mAdapter
-                    binding?.rvCourseList?.layoutManager =
-                        LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
-                    mAdapter?.setOnItemClickListener(object : CourseListAdapter.AdapterListener {
-                        override fun onItemClick(courseId: String, classId: String, cpi: String) {
-                            toWrapperActivity(courseId, classId, cpi)
-                        }
-
-                    })
+                    s?.let {
+                        mAdapter?.setData(it.safeParseToJson())
+                        binding?.rvCourseList?.adapter = mAdapter
+                        binding?.rvCourseList?.layoutManager =
+                            LinearLayoutManager(
+                                this@MainActivity,
+                                LinearLayoutManager.VERTICAL,
+                                false
+                            )
+                        mAdapter?.setOnItemClickListener(object :
+                            CourseListAdapter.AdapterListener {
+                            override fun onItemClick(
+                                courseId: String,
+                                classId: String,
+                                cpi: String
+                            ) {
+                                toWrapperActivity(courseId, classId, cpi)
+                            }
+                        })
+                    }
                 }
             }
         }

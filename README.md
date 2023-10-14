@@ -2,7 +2,15 @@
 
 <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/aa7e4302-59c6-4184-8390-d1022f9b2b2a" width = 300 height = 300 /> </div>
 
- # 
+<p align="center">
+ <img src="https://img.shields.io/github/last-commit/CofbroTeam/Doraemon.svg" width = 120 height = 20 />
+ <img src="https://img.shields.io/github/stars/CofbroTeam/Doraemon.svg" width = 60 height = 20 />
+ <img src="https://img.shields.io/github/forks/CofbroTeam/Doraemon.svg" width = 60 height = 20 />
+ <img src="https://img.shields.io/github/issues-pr-closed/CofbroTeam/Doraemon.svg" width = 150 height = 20 />
+ <img src="https://img.shields.io/github/issues/CofbroTeam/Doraemon.svg" width = 95 height = 20 />
+</p>
+
+# 
 
 <div align="center" style="font-weight:bold"><b>学习通智能签到助手 - 还你一个不被签到问题打扰、认真学习的梦</b></div>
 
@@ -38,6 +46,9 @@
 - [ ] ...
 
 由于开发人手不足，项目所有功能预计11月底完成开发，欢迎感兴趣的同学一起参与进来。
+
+## 特别说明
+开发阶段下，正常情况下三天 `集成` 一次，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。如果您有任何问题，欢迎在 `issues` 中提出，或加入 `567290278` 详细交流。
 
 ## 如何贡献你的代码 & 提出宝贵的建议
 * 贡献代码：`Fork` -> `Pull Request`，或者直接联系我，将您添加为项目成员。

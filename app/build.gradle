@@ -81,6 +81,8 @@ dependencies {
     implementation  'io.github.scwang90:refresh-footer-classics:2.0.5'
     implementation  'io.github.scwang90:refresh-header-radar:2.0.6'
     implementation  'io.github.scwang90:refresh-header-material:2.0.6'
+    // jsoup
+    implementation 'org.jsoup:jsoup:1.10.2'
     // 图片加载库
     implementation 'io.github.lucksiege:pictureselector:v3.11.1'
     // 图片压缩

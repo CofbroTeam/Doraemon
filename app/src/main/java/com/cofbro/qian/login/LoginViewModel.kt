@@ -21,6 +21,7 @@ class LoginViewModel : BaseViewModel<LoginRepository>() {
             repository.login(loginLiveData, loadingMsg = LOGIN_MESSAGE) {
                 NetworkUtils.request(url)
             }
+
         }
     }
 }

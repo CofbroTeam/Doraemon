@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingBottom="10dp"
+
+    android:paddingTop="10dp"
+    android:background="@color/white"
+    android:id="@+id/adapterS"
+    >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textSize="15sp"
+        android:textStyle="bold">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/adress"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textSize="12sp">
+
+    </TextView>
+
+</LinearLayout>

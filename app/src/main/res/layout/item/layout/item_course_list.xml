@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:elevation="6dp"
     android:background="@drawable/app_light_radius_bg">
-
     <ImageView
         android:id="@+id/iv_class_avtar"
         android:layout_width="80dp"
@@ -109,4 +108,5 @@
         app:layout_constraintBottom_toBottomOf="@+id/tv_student_count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_class_id" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
