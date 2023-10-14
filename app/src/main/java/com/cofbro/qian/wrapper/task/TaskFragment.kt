@@ -1,5 +1,6 @@
 package com.cofbro.qian.wrapper.task
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -18,23 +19,26 @@ import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
+/**
+ * @author cofbro
+ * 2023.10.6
+ */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var activeId = ""
-    private var latitude = ""
-    private var longitude = ""
     private var signTypeData: JSONObject? = null
     private var preSignUrl = ""
     private var refreshing = false
     private val requestCode = 1
     private var activity: WrapperActivity? = null
     private var taskAdapter: TaskAdapter? = null
+    private var loadingDialog: Dialog? = null
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -67,6 +71,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         binding?.rvSignTask?.apply {
             taskAdapter = TaskAdapter()
             taskAdapter?.setItemClickListener { itemData ->
+                showLoadingView()
                 sign(itemData)
             }
             adapter = taskAdapter
@@ -92,6 +97,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     refreshing = false
                     binding?.rflSignTask?.finishRefresh()
                 }
+                if (it.data == null) {
+                    hideLoadingView()
+                }
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
                     data?.safeParseToJson()?.let {
@@ -104,6 +112,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 获取签到类型
         viewModel.signTypeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
+                if (it.data == null) {
+                    hideLoadingView()
+                }
                 val data = it.data?.body?.string()
                 signTypeData = data?.safeParseToJson()
                 // 签到类型获取后，开始签到
@@ -114,6 +125,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
         viewModel.signCodeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
+                if (it.data == null) {
+                    hideLoadingView()
+                }
                 val data = it.data?.body?.string()
             }
         }
@@ -123,6 +137,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
+                    hideLoadingView()
                     data?.showSignResult()
                 }
             }
@@ -253,5 +268,18 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val intent = Intent(requireActivity(), PhotoSignActivity::class.java)
         intent.putExtra("aid", aid)
         startActivity(intent)
+    }
+
+    private fun showLoadingView() {
+        if (loadingDialog == null) {
+            loadingDialog = FullScreenDialog(requireContext())
+        }
+        loadingDialog?.setCancelable(false)
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingView() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
     }
 }
