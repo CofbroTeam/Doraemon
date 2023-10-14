@@ -375,10 +375,9 @@ class InputView : View {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        /** 优化键盘弹出被手动收起后再次点不弹出 */
-        isKeyboardHidden(this).let { if (it) showKeyboard() }
         if (!ifShowBitmap) {
             requestFocus()
+            if (isKeyboardHidden(this)) showKeyboard()
             return true
         }
         when (event?.action) {
@@ -387,7 +386,8 @@ class InputView : View {
                     bitmap = createBitmap(R.drawable.ic_eye_open)
                     alreadyTouchDownInRect = true
                     isPasswordType = false
-                } else requestFocus()
+                } else if (isKeyboardHidden(this)) showKeyboard()
+                else requestFocus()
             }
 
             MotionEvent.ACTION_UP -> {
