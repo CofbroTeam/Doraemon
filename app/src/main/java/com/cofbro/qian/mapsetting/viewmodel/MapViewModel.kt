@@ -16,6 +16,9 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 
 class MapViewModel:BaseViewModel<MapRepository>() {
+     val preSignLiveData = ResponseMutableLiveData<Response>()
+     val signLiveData = ResponseMutableLiveData<Response>()
+
      var progDialog: Dialog? = null // 搜索时进度条
      var poiResult: PoiResultV2? = null // poi返回的结果
      var currentPage = 1
@@ -29,10 +32,19 @@ class MapViewModel:BaseViewModel<MapRepository>() {
      var EXTRA_uid:String? = null
      var EXTRA_aid:String? = null
      var Tip_City:String?= null
-     val signLiveData = ResponseMutableLiveData<Response>()
+
      fun sign(url: String) {
           viewModelScope.launch(Dispatchers.IO) {
                repository.request(signLiveData) {
+                    val request = NetworkUtils.buildClientRequest(url)
+                    NetworkUtils.request(request)
+               }
+          }
+     }
+
+     fun preSign(url: String) {
+          viewModelScope.launch(Dispatchers.IO) {
+               repository.request(preSignLiveData, false) {
                     val request = NetworkUtils.buildClientRequest(url)
                     NetworkUtils.request(request)
                }

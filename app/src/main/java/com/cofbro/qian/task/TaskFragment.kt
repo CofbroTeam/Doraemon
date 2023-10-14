@@ -58,7 +58,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
             if (result != null) {
-                Log.v("LOG_RESULT:",result)
+                Log.v("LOG_RESULT:", result)
             }
             signWithCamera(id)
         }
@@ -99,11 +99,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     binding?.rflSignTask?.finishRefresh()
                 }
                 val data = it.data?.body?.string()
-                Log.v("result:Lists", it.toString())
                 withContext(Dispatchers.Main) {
                     JSONObject.parseObject(data)?.let {
                         taskAdapter?.setData(it)
-                        Log.v("result:List",it.toString())
                     }
                 }
             }
@@ -122,22 +120,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signCodeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
-            }
-        }
-
-        viewModel.preSignLiveData.observe(this) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.string()
-                data?.let {
-                    val html = Jsoup.parse(it)
-                    latitude = html.getElementById("locationLatitude").`val`()
-                    longitude = html.getElementById("locationLongitude").`val`()
-                    if (latitude.isNotEmpty() && longitude.isNotEmpty()) {
-                        val uid = CacheUtils.cache["uid"] ?: ""
-                        toMapActivity( activeId, uid = uid, latitude, longitude)
-                    }
-                }
-
             }
         }
 
@@ -168,7 +150,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 查询所有活动
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
-        Log.v("sign_task" , URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
+        Log.v("sign_task", URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
     }
 
     private fun sign(itemData: JSONObject) {
@@ -225,20 +207,14 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.preSign(preSignUrl)
-                    Log.v("preSignUrl", preSignUrl)
-                    val uid = CacheUtils.cache["uid"] ?: ""
-                    Log.v("preSignUrl:",id)
-//                    val default = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?name=%E9%98%BF%E9%87%8C%E4%B8%AD%E5%BF%83%C2%B7%E6%9C%9B%E4%BA%ACB%E5%BA%A7&address=%E6%9C%9B%E4%BA%AC%E4%B8%9C%E5%9B%AD4%E5%8C%BA4%E5%8F%B7%E6%A5%BC&activeId=1000073717972&uid=191970813&clientip=&latitude=40.002528&longitude=116.489878&fid=1840&appType=15&ifTiJiao=1"
-//                    signLoction(default)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    toMapActivity(activeId, preSignUrl)
                 }
-
-
             }
         }
     }
-    private fun toMapActivity(aid: String,uid: String, lat: String, lon: String){
+
+    private fun toMapActivity(aid: String, preUrl: String) {
         /**
          * 需要传递
          *         name:String
@@ -249,14 +225,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
          *         long:Double,
          */
         val intent = Intent(requireActivity(), MapActivity::class.java)
-        val list:ArrayList<String> = ArrayList()
-        list.add(aid)
-        list.add(uid)
-        intent.putExtra("EXTRA_MSG", list)
-        intent.putExtra("lat", lat)
-        intent.putExtra("lon", lon)
+        intent.putExtra("aid", aid)
+        intent.putExtra("preUrl", preUrl)
         startActivity(intent)
     }
+
     private fun toScanActivity() {
         val intent = Intent(requireActivity(), ScanActivity::class.java)
         startActivityForResult(intent, requestCode)
@@ -277,7 +250,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
         }
     }
-    private suspend fun signLoction(api:String) {
+
+    private suspend fun signLoction(api: String) {
         activity?.let {
             viewModel.sign(api)
         }

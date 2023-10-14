@@ -5,61 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".mapsetting.MapActivity">
-
-<!--        <fragment-->
-<!--            android:id="@+id/maps"-->
-<!--            class="com.amap.api.maps2d.SupportMapFragment"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent" />-->
-    <!--<androidx.fragment.app.FragmentContainerView-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    android:id="@+id/maps"-->
-<!--    >-->
-
-<!--</androidx.fragment.app.FragmentContainerView>-->
-
-    <com.amap.api.maps2d.MapView
-        android:id="@+id/maps"
-        android:layout_width="392dp"
-        android:layout_height="479dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
-        app:layout_constraintVertical_bias="1.0">
-
-    </com.amap.api.maps2d.MapView>
-
-    <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="88dp"
-        android:background="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/maps"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/clean_keywords"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/close"
-            android:visibility="gone" />
-
-    </RelativeLayout>
-
     <TextView
         android:id="@+id/main_keywords"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-
         android:layout_marginTop="27dp"
         android:clickable="true"
         android:completionThreshold="1"
@@ -70,15 +19,34 @@
         android:imeOptions="actionDone"
         android:inputType="text|textAutoComplete"
         android:maxLength="20"
-
         android:paddingLeft="10dp"
         android:singleLine="true"
         android:textColor="#000000"
         android:textSize="16.0sp"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_location_name"
+        android:hint="请输入需要想要展示的位置名称"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_keywords" />
+
+    <com.amap.api.maps2d.MapView
+        android:id="@+id/maps"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/selectButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.157"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_location_name"
+        app:layout_constraintVertical_bias="1.0"/>
+
 
     <Button
         android:id="@+id/selectButton"

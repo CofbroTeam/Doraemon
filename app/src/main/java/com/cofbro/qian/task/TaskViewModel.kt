@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
-    val preSignLiveData = ResponseMutableLiveData<Response>()
+    private val preSignLiveData = ResponseMutableLiveData<Response>()
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
     val signTypeLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()

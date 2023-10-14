@@ -19,6 +19,7 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -137,16 +138,26 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val s = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
-                    mAdapter?.setData(JSONObject.parseObject(s))
-                    binding?.rvCourseList?.adapter = mAdapter
-                    binding?.rvCourseList?.layoutManager =
-                        LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
-                    mAdapter?.setOnItemClickListener(object : CourseListAdapter.AdapterListener {
-                        override fun onItemClick(courseId: String, classId: String, cpi: String) {
-                            toWrapperActivity(courseId, classId, cpi)
-                        }
-
-                    })
+                    s?.let {
+                        mAdapter?.setData(it.safeParseToJson())
+                        binding?.rvCourseList?.adapter = mAdapter
+                        binding?.rvCourseList?.layoutManager =
+                            LinearLayoutManager(
+                                this@MainActivity,
+                                LinearLayoutManager.VERTICAL,
+                                false
+                            )
+                        mAdapter?.setOnItemClickListener(object :
+                            CourseListAdapter.AdapterListener {
+                            override fun onItemClick(
+                                courseId: String,
+                                classId: String,
+                                cpi: String
+                            ) {
+                                toWrapperActivity(courseId, classId, cpi)
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -171,11 +182,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
 
-
     private fun signWithCamera(aid: String, enc: String) {
         val uid = CacheUtils.cache["uid"] ?: ""
 //        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&uid=$uid&enc=BC9662672047A2F2E4A607CC59762973&c=2000072435046&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=2000072435046"
-        val url = "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&fid=0"
+        val url =
+            "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&fid=0"
         Log.d("MainActivity", "url: $url")
         //viewModel.signWithCamera(URL.getSignWithCameraPath(aid, uid, enc))
         viewModel.signWithCamera(url)
