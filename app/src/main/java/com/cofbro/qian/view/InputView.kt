@@ -43,7 +43,7 @@ class InputView : View {
         const val CURSOR_HEIGHT = 45f
 
         // 光标离左侧文字的间距
-        const val CURSOR_PADDING = 5f
+        const val CURSOR_PADDING = 10f
 
         // bitmap点击扩大范围
         const val CLICK_SCALE_RANGE = 8f
@@ -112,7 +112,6 @@ class InputView : View {
     }
     private val hintPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
-        textSize = 35f
         color = Color.parseColor("#cccccc")
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
@@ -126,20 +125,16 @@ class InputView : View {
         isAntiAlias = true
         isDither = true
     }
-
     private val cursorPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         strokeWidth = 5f
-        color = Color.argb(0, 87, 209, 118)
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
         isDither = true
     }
-
     private val textPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
-        textSize = 40f
         color = Color.BLACK
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
@@ -164,14 +159,19 @@ class InputView : View {
         isFocusable = true
         isFocusableInTouchMode = true
         typedArray = context.obtainStyledAttributes(attrs, R.styleable.InputView)
-        hintText = typedArray.getString(R.styleable.InputView_hint).toString()
-        if (typedArray.getString(R.styleable.InputView_type)
-                .toString() == "password"
-        ) isPasswordType = true
-        ifShowBitmap = isPasswordType
-        bitmap = createBitmap(R.drawable.ic_eye_close)
+        cursorPaint.color =
+            typedArray.getColor(R.styleable.InputView_cursorColor, Color.parseColor("#0057D176"))
         hintBackgroundPaint.color =
             typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
+        hintText = typedArray.getString(R.styleable.InputView_hint).toString()
+        typedArray.getDimension(R.styleable.InputView_textSize, 50f).let {
+            hintPaint.textSize = it
+            textPaint.textSize = it
+        }
+        if (typedArray.getString(R.styleable.InputView_type) == "password") isPasswordType = true
+        ifShowBitmap = isPasswordType
+
+        bitmap = createBitmap(R.drawable.ic_eye_close)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -507,6 +507,4 @@ class InputView : View {
             return true
         }
     }
-
-
 }
