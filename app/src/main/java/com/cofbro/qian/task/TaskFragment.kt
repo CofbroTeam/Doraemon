@@ -215,15 +215,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private fun toMapActivity(aid: String, preUrl: String) {
-        /**
-         * 需要传递
-         *         name:String
-         *         address:String,
-         *         aid: String, 。。。。0
-         *         uid:String, 。。。。 1
-         *         lat:Double,
-         *         long:Double,
-         */
         val intent = Intent(requireActivity(), MapActivity::class.java)
         intent.putExtra("aid", aid)
         intent.putExtra("preUrl", preUrl)

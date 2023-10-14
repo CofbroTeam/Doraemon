@@ -9,45 +9,41 @@ import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.mapsetting.repository.MapRepository
-import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Response
 
-class MapViewModel:BaseViewModel<MapRepository>() {
-     val preSignLiveData = ResponseMutableLiveData<Response>()
-     val signLiveData = ResponseMutableLiveData<Response>()
+class MapViewModel : BaseViewModel<MapRepository>() {
+    val preSignLiveData = ResponseMutableLiveData<Response>()
+    val signLiveData = ResponseMutableLiveData<Response>()
 
-     var progDialog: Dialog? = null // 搜索时进度条
-     var poiResult: PoiResultV2? = null // poi返回的结果
-     var currentPage = 1
-     var query: PoiSearchV2.Query? = null // Poi查询条件类
-     var poiSearch: PoiSearchV2? = null // POI搜索
-     var mPoiMarker: Marker? = null
-      var currentTipPoint : LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
-     var EXTRA_MSG :MutableList<String>? = null
-     var Tip_address:String? = null
-     var Tip_name:String?=null
-     var EXTRA_uid:String? = null
-     var EXTRA_aid:String? = null
-     var Tip_City:String?= null
+    var progressDialog: Dialog? = null // 搜索时进度条
+    var poiResult: PoiResultV2? = null // poi返回的结果
+    var currentPage = 1
+    var query: PoiSearchV2.Query? = null // Poi查询条件类
+    var poiSearch: PoiSearchV2? = null // POI搜索
+    var mPoiMarker: Marker? = null
+    var currentTipPoint: LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
+    var Tip_address: String? = null
+    var Tip_name: String? = null
+    var Tip_City: String? = null
 
-     fun sign(url: String) {
-          viewModelScope.launch(Dispatchers.IO) {
-               repository.request(signLiveData) {
-                    val request = NetworkUtils.buildClientRequest(url)
-                    NetworkUtils.request(request)
-               }
-          }
-     }
+    fun sign(url: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.request(signLiveData) {
+                val request = NetworkUtils.buildClientRequest(url)
+                NetworkUtils.request(request)
+            }
+        }
+    }
 
-     fun preSign(url: String) {
-          viewModelScope.launch(Dispatchers.IO) {
-               repository.request(preSignLiveData, false) {
-                    val request = NetworkUtils.buildClientRequest(url)
-                    NetworkUtils.request(request)
-               }
-          }
-     }
+    fun preSign(url: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.request(preSignLiveData, false) {
+                val request = NetworkUtils.buildClientRequest(url)
+                NetworkUtils.request(request)
+            }
+        }
+    }
 }

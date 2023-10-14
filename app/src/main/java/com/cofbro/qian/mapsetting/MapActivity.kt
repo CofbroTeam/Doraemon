@@ -1,29 +1,20 @@
 package com.cofbro.qian.mapsetting
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.telephony.CarrierConfigManager.Bsf
-import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
-import com.amap.api.maps2d.MapView
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
-import com.amap.api.services.help.Tip
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseActivity
@@ -51,11 +42,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var uid = ""
     private var aid = ""
     private var preUrl = ""
-    var api_result = ""
+    private var signUrl = ""
     private var lat: String = ""
     private var long: String = ""
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -83,13 +73,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
     override fun onPause() {
         super.onPause()
-        //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
+        // 在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         binding?.maps?.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
+        // 在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         binding?.maps?.onDestroy()
     }
 
@@ -112,20 +102,20 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      * 显示进度框
      */
     private fun showProgressDialog() {
-        if (viewModel.progDialog == null) viewModel.progDialog = Dialog(this)
+        if (viewModel.progressDialog == null) viewModel.progressDialog = Dialog(this)
 //        progDialog!!(ProgressDialog.STYLE_SPINNER)
 //        progDialog!!.isIndeterminate = false
-        viewModel.progDialog?.setCancelable(false)
+        viewModel.progressDialog?.setCancelable(false)
 //        progDialog!!.setMessage("正在搜索:\n$mKeyWords")
-        viewModel.progDialog?.show()
+        viewModel.progressDialog?.show()
     }
 
     /**
      * 隐藏进度框
      */
-    private fun dissmissProgressDialog() {
-        if (viewModel.progDialog != null) {
-            viewModel.progDialog?.dismiss()
+    private fun dismissProgressDialog() {
+        if (viewModel.progressDialog != null) {
+            viewModel.progressDialog?.dismiss()
         }
     }
 
@@ -156,14 +146,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     override fun getInfoWindow(marker: Marker): View {
-        val view: View = getLayoutInflater().inflate(
+        val view: View = layoutInflater.inflate(
             R.layout.poikeywordsearch_uri,
             null
         )
         val title = view.findViewById<View>(R.id.title) as TextView
-        title.setText(marker.getTitle())
+        title.text = marker.title
         val snippet = view.findViewById<View>(R.id.snippet) as TextView
-        snippet.setText(marker.getSnippet())
+        snippet.text = marker.snippet
         return view
     }
 
@@ -186,7 +176,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      */
     //(p0: PoiResultV2?, p1: Int)
     override fun onPoiSearched(result: PoiResultV2?, rCode: Int) {
-        dissmissProgressDialog() // 隐藏对话框
+        dismissProgressDialog() // 隐藏对话框
         if (rCode == 1000) {
             if (result != null && result.query != null) { // 搜索poi的结果
                 if (result.query == viewModel.query) { // 是否是同一条
@@ -202,13 +192,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         poi2DOverlay.removeFromMap()
                         poi2DOverlay.addToMap()
                         poi2DOverlay.zoomToSpan()
-                    }
-//                    } else if (suggestionCities != null
-//                        && suggestionCities.size > 0
-//                    ) {
-//                        showSuggestCity(suggestionCities)
-//                    }
-                    else {
+                    } else {
                         ToastUtil.show(
                             this@MapActivity,
                             " R.string.no_result"
@@ -223,23 +207,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
         } else {
             ToastUtil.showerror(this, rCode)
-
-
         }
     }
 
     override fun onPoiItemSearched(p0: PoiItemV2?, p1: Int) {
         // TODO Auto-generated method stub
     }
-
-    /**
-     * 输入提示activity选择结果后的处理逻辑
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-
 
     /**
      * 用marker展示输入提示list选中数据
@@ -278,18 +251,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      * 点击事件回调方法
      */
     override fun onClick(v: View) {
-        when (v.id) {
-            R.id.main_keywords -> {
-                val intent = Intent(this, InputTipsActivity::class.java)
-                intent.putExtra("code", REQUEST_CODE);
-                intent.putExtra("aid", viewModel.EXTRA_aid)
-                viewModel.EXTRA_aid?.let { Log.v("result:", it) }
-                startActivity(intent)
+//        when (v.id) {
+//            R.id.main_keywords -> {
+//                val intent = Intent(this, InputTipsActivity::class.java)
+//                intent.putExtra("code", REQUEST_CODE);
+//                startActivity(intent)
                 // 开启页面跳转
 //                myActivityLauncher.launch(REQUEST_CODE.toString())
 //                startActivityForResult(intent, REQUEST_CODE)
-
-            }
+//            }
 
 //            R.id.clean_keywords -> {
 //                binding?.mainKeywords?.text = ""
@@ -297,8 +267,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 //                binding?.cleanKeywords?.visibility = View.GONE
 //            }
 
-            else -> {}
-        }
+//            else -> {}
+//        }
     }
 
     companion object {
@@ -310,40 +280,32 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private fun initViewClick() {
         //binding?.cleanKeywords?.setOnClickListener(this)
         binding?.selectButton?.setOnClickListener {
-
-            viewModel.Tip_name?.let { it1 -> Log.v("api_result:", it1) }
             if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
-                //成狗初始化mark,并成功定位
+                // 成功初始化mark并成功定位
                 Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
-                /**
-                 * 传递point,构造伪造位置,完成伪造位置，开始拼接api
-                 */
-                Log.v("api_result", viewModel.EXTRA_MSG.toString())
-                if (viewModel.EXTRA_aid != null) {
-                    /**
-                     * 开始拼接api
-                     */
-                    if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
-                        val cityName = viewModel.Tip_City
-                        val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name) ?: ""
-                        if (lat.isNotEmpty() && long.isNotEmpty()) {
-                            api_result =
-                                URL.getlocationSignPath(address = address, aid, uid, lat, long)
-                            Log.v("api_result", api_result)
-                            sign(url = api_result)
-                        } else {
-                            ToastUtils.show("请稍后")
-                        }
+                if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
+                    val cityName = viewModel.Tip_City
+                    val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
+                    if (lat.isNotEmpty() && long.isNotEmpty()) {
+                        signUrl =
+                            URL.getlocationSignPath(address, aid, uid, lat, long)
+                        sign(signUrl)
+                    } else {
+                        ToastUtils.show("请稍后")
                     }
-
                 }
             } else {
                 //Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
                 if (lat.isNotEmpty() && long.isNotEmpty()) {
-                    api_result =
-                        URL.getlocationSignPath(address = binding?.etLocationName?.text.toString(), aid, uid, lat, long)
-                    Log.v("api_result", api_result)
-                    sign(url = api_result)
+                    signUrl =
+                        URL.getlocationSignPath(
+                            address = binding?.etLocationName?.text.toString(),
+                            aid,
+                            uid,
+                            lat,
+                            long
+                        )
+                    sign(signUrl)
                 } else {
                     ToastUtils.show("请稍后")
                 }
@@ -383,16 +345,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
         }
 
-
+        // 签到
         viewModel.signLiveData.observe(this) {
-            Log.v("rsxxx:", api_result)
-            val data = it.data?.body.toString()
-            val data_msg = it.message
-            Log.v("rsxxx:", it.toString() + "msg" + data_msg)
-            data.showSignResult()
-
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.toString()
+                withContext(Dispatchers.Main) {
+                    data?.showSignResult()
+                }
+            }
         }
-
     }
 
     private fun sign(url: String) {
@@ -402,46 +363,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private fun initMap(savedInstanceState: Bundle?) {
         binding?.maps!!.onCreate(savedInstanceState)
         if (binding?.maps?.map == null) {
-
             setUpMap()
         }
-
         binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng)
             viewModel.currentTipPoint = latLng
-            Log.v("place", "latitude:$latLng");
-        }
-        val intent = intent
-        if (intent != null && intent.hasExtra("aids")) {
-            val aid = intent.getStringExtra("aids")
-
-            if (aid != null) {
-                Log.v("result_opxa:", aid)
-                viewModel.EXTRA_aid = aid
-            }
-        }
-        if (intent != null && intent.hasExtra("EXTRA_MSG")) {
-            /**
-             * 开始尝试拼接api ,使用listener监听 ，先获取数据
-             */
-            /**
-             * 需要传递
-             *         name:String,
-             *         address:String,
-             *         aid: String, 。。。。0
-             *         uid:String, 。。。。 1
-             *         lat:Double,
-             *         long:Double,
-             */
-
-            viewModel.EXTRA_MSG = intent.getStringArrayListExtra("EXTRA_MSG")
-            Log.v("result:main", viewModel.EXTRA_MSG.toString())
-            viewModel.EXTRA_aid = viewModel.EXTRA_MSG?.get(0)
         }
         if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
-            Log.v("result_tap:", "result_have")
-
             val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
             if (tip != null) {
                 /**
@@ -458,9 +387,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 if (tip[0] != "") {
                     //binding?.cleanKeywords?.visibility = View.VISIBLE
                 }
-                /**
-                 * 获取完整name,address
-                 */
+                // 获取完整的name和address
                 viewModel.Tip_name = tip[0]
                 viewModel.Tip_address = tip[1]
                 viewModel.Tip_City = tip[5]
@@ -469,9 +396,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         }
     }
 
-
-    private fun urlEncodeChinese(url: String): String? {
-        var url = url
+    private fun urlEncodeChinese(urlString: String): String {
+        var url = urlString
         try {
             val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
             var tmp = ""
