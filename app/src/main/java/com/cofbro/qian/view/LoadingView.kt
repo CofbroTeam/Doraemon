@@ -9,13 +9,8 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.view.animation.ScaleAnimation
 import com.cofbro.qian.R
 
 
@@ -171,7 +166,6 @@ class LoadingView : View {
     }
 
     private fun drawRightPoint(canvas: Canvas?) {
-        val l = right - pointSize
         cx2 = right - pointSize / 2f
         val paint = rightPointPaint
         canvas?.drawCircle(cx2 - interval, height / 2f, pointSize / 2f, paint)

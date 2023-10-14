@@ -1,5 +1,6 @@
 package com.cofbro.qian.photo
 
+import android.app.Dialog
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
@@ -12,6 +13,7 @@ import com.cofbro.qian.utils.GlideEngine
 import com.cofbro.qian.utils.ImageDownloader
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.view.FullScreenDialog
 import com.luck.picture.lib.basic.PictureSelector
 import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.entity.LocalMedia
@@ -24,6 +26,7 @@ import java.io.File
 import java.util.ArrayList
 
 class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBinding>() {
+    private var loadingDialog: Dialog? = null
     private var imageFile: File? = null
     private var aid = ""
     private var token = ""
@@ -67,6 +70,7 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
+                    hideLoadingView()
                     data?.showSignResult()
                     imageFile?.delete()
                     finish()
@@ -98,6 +102,7 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                                     it.path
                                 ) { success, filepath ->
                                     if (success) {
+                                        showLoadingView()
                                         imageFile = File(filepath)
                                         imageFile?.let {
                                             viewModel.uploadImage(URL.getUploadImagePath(token), it)
@@ -117,5 +122,18 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
     private fun sign() {
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.sign(URL.getSignWithPhoto(aid, uid, objectId))
+    }
+
+    private fun showLoadingView() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            loadingDialog = FullScreenDialog(this@PhotoSignActivity)
+            loadingDialog?.setCancelable(false)
+            loadingDialog?.show()
+        }
+    }
+
+    private fun hideLoadingView() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
     }
 }

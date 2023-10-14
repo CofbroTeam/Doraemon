@@ -44,23 +44,23 @@
             android:value="key">
 
         </meta-data>
-        <!--        <activity-->
-        <!--        android:name=".login.LoginActivity"-->
-        <!--            android:exported="true">-->
-        <!--            <intent-filter>-->
-        <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-        <!--                <action android:name="android.intent.action.MAIN" />-->
-        <!--            </intent-filter>-->
-        <!--        </activity>-->
+                <activity
+                android:name=".login.LoginActivity"
+                    android:exported="true">
+                    <intent-filter>
+                        <category android:name="android.intent.category.LAUNCHER" />
+                        <action android:name="android.intent.action.MAIN" />
+                    </intent-filter>
+                </activity>
         <activity android:name=".main.MainActivity" />
         <activity android:name=".scan.ScanActivity" />
         <activity
             android:name=".wrapper.WrapperActivity"
             android:exported="true">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity android:name=".photo.PhotoSignActivity" />
     </application>
