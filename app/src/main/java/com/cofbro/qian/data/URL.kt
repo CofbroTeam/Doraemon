@@ -29,6 +29,15 @@ object URL {
     fun getNormalSignPath(courseId: String, classId: String, aid: String): String =
         "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
 
+    fun getLocationSignPath(
+        address: String,
+        aid: String,
+        uid: String,
+        lat: String,
+        long: String,
+    ): String =
+        "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?address=$address&activeId=$aid&uid=$uid&clientip=0.0.0.0&latitude=$lat&longitude=$long&fid=&appType=15&ifTiJiao=1"
+
     fun getUploadToken(): String = "https://pan-yz.chaoxing.com/api/token/uservalid"
 
     fun getUploadImagePath(token: String): String =
@@ -36,4 +45,5 @@ object URL {
 
     fun getSignWithPhoto(aid: String, uid: String, objectId: String): String =
         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&uid=$uid&appType=15&fid=0&objectId=$objectId"
+
 }

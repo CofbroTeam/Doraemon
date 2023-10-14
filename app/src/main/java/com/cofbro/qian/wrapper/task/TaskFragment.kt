@@ -2,6 +2,7 @@ package com.cofbro.qian.wrapper.task
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,6 +10,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
+import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
@@ -22,7 +24,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var activeId = ""
+    private var latitude = ""
+    private var longitude = ""
     private var signTypeData: JSONObject? = null
     private var preSignUrl = ""
     private var refreshing = false
@@ -45,6 +51,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
+            if (result != null) {
+                Log.v("LOG_RESULT:", result)
+            }
             signWithCamera(id)
         }
     }
@@ -130,11 +139,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 查询所有活动
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
+        Log.v("sign_task", URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
     }
 
     private fun sign(itemData: JSONObject) {
         // aid
         val id = itemData.getStringExt(Constants.TaskList.ID)
+        activeId = id
         // 2代表签到活动
         val type = itemData.getStringExt(Constants.TaskList.ACTIVE_TYPE)
         // 预签到地址
@@ -188,8 +199,18 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 定位签到
             Constants.SIGN.LOCATION -> {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    toMapActivity(activeId, preSignUrl)
+                }
             }
         }
+    }
+
+    private fun toMapActivity(aid: String, preUrl: String) {
+        val intent = Intent(requireActivity(), MapActivity::class.java)
+        intent.putExtra("aid", aid)
+        intent.putExtra("preUrl", preUrl)
+        startActivity(intent)
     }
 
     private fun toScanActivity() {
@@ -213,6 +234,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    private suspend fun signLoction(api: String) {
+        activity?.let {
+            viewModel.sign(api)
+        }
+    }
+
     /**
      * 服务端现已不下发签到码，客户端发起请求后由服务端校验，
      * 因此暂时没有方法能够拿到密码
@@ -220,6 +247,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWithSignCode(aid: String) {
         viewModel.getSignCode(URL.getSignCodePath(aid))
     }
+
 
     private fun toPhotoSignActivity(aid: String) {
         val intent = Intent(requireActivity(), PhotoSignActivity::class.java)

@@ -2,6 +2,7 @@ package com.cofbro.qian.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
-
+    private val defaultUser = "17772360225"
+    private val defaultPWD= "weihao666"
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         tryLogin()
         initObserver()
@@ -26,8 +28,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun tryLogin() {
-        val username = getBySp("username")
-        val password = getBySp("password")
+//        val username = getBySp("username")
+//        val password = getBySp("password")
+        val username = defaultUser
+        val password = defaultPWD
         if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
             viewModel.login(URL.getLoginPath(username, password))
         }
@@ -43,6 +47,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                     val list: List<String> = headers.values("Set-Cookie")
                     val cookies = StringBuilder()
                     var uid: String? = null
+                    var fid:String? = null
                     if (list.isNotEmpty()) {
                         for (i in list.indices) {
                             val temp = list[i].split(";".toRegex()).dropLastWhile { it.isEmpty() }
@@ -50,14 +55,18 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                             cookies.append(temp).append(";")
                             if (temp.startsWith("UID")) uid = temp.substring(4)
                             //if (temp.startsWith("JSESSIONID")) continue
-
+                            if (temp.startsWith("fid")) fid = temp.substring(4)
+                            Log.v("fid:school:",temp)
                         }
                     } else {
                         ToastUtils.show("Cookies获取失败!")
                     }
                     CacheUtils.cache["uid"] = uid ?: ""
                     CacheUtils.cache["cookies"] = cookies.toString()
-
+                    CacheUtils.cache["fid"] = fid ?: ""
+                    if (fid != null) {
+                        Log.v("fid:school:",fid)
+                    }
                     // 保存用户信息
                     saveUserInfo()
                     lifecycleScope.launch(Dispatchers.Main) {
