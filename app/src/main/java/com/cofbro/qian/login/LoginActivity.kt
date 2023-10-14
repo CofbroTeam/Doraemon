@@ -76,7 +76,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         finish()
                     }
                 }else{
-                    ToastUtils.show("账号或者密码错误")
+                    ToastUtils.show("账号或密码错误!")
                 }
             }
         }

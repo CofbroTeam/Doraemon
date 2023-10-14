@@ -1,7 +1,6 @@
 package com.cofbro.qian.mapsetting
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
@@ -288,7 +287,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
                     if (lat.isNotEmpty() && long.isNotEmpty()) {
                         signUrl =
-                            URL.getlocationSignPath(address, aid, uid, lat, long)
+                            URL.getLocationSignPath(address, aid, uid, lat, long)
                         sign(signUrl)
                     } else {
                         ToastUtils.show("请稍后")
@@ -298,7 +297,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 //Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
                 if (lat.isNotEmpty() && long.isNotEmpty()) {
                     signUrl =
-                        URL.getlocationSignPath(
+                        URL.getLocationSignPath(
                             address = binding?.etLocationName?.text.toString(),
                             aid,
                             uid,

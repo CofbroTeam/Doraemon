@@ -4,9 +4,14 @@ import com.cofbro.hymvvmutils.base.BaseResponse
 import com.cofbro.hymvvmutils.base.DataState
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
+import java.io.File
 import java.io.IOException
 
 
@@ -51,6 +56,32 @@ object NetworkUtils {
 
     fun request(url: String): BaseResponse<Response> {
         val request = Request.Builder().url(url).build()
+        val call = client.newCall(request)
+        val response = BaseResponse<Response>()
+        response.dataState = DataState.STATE_INITIALIZE
+        response.data = call.execute()
+        return response
+    }
+
+    fun post(url: String, file: File): BaseResponse<Response> {
+        val cookies = CacheUtils.cache["cookies"] ?: ""
+        val uid = CacheUtils.cache["uid"] ?: ""
+        val body: RequestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart(
+                "file", file.name,
+                RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            )
+            .addFormDataPart("puid", uid)
+            .build()
+        val request = Request.Builder().url(url)
+            .addHeader("Accept-Language", "zh-Hans-CN;q=1, zh-Hant-CN;q=0.9")
+            .addHeader("cookie", cookies)
+            .addHeader(
+                "User-Agent",
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 14_2_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 com.ssreader.ChaoXingStudy/ChaoXingStudy_3_4.8_ios_phone_202012052220_56 (@Kalimdor)_12787186548451577248"
+            )
+            .post(body).build()
         val call = client.newCall(request)
         val response = BaseResponse<Response>()
         response.dataState = DataState.STATE_INITIALIZE

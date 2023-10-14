@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityMainBinding
+import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
@@ -126,9 +127,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         // 导航栏扫码签到
         binding?.ivScanBtn?.setOnClickListener {
-            val intent = Intent(this, ScanActivity::class.java)
             // TODO: 扫码之前需要预签到，预签到时机？
-            // startActivityForResult(intent, requestCode)
+
         }
     }
 
