@@ -1,4 +1,4 @@
-package com.cofbro.qian.task
+package com.cofbro.qian.wrapper.task
 
 import com.cofbro.hymvvmutils.base.BaseRepository
 import com.cofbro.hymvvmutils.base.BaseResponse

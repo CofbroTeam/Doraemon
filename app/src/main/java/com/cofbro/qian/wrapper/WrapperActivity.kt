@@ -5,8 +5,8 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityWrapperBinding
-import com.cofbro.qian.homework.HomeworkFragment
-import com.cofbro.qian.task.TaskFragment
+import com.cofbro.qian.wrapper.homework.HomeworkFragment
+import com.cofbro.qian.wrapper.task.TaskFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class WrapperActivity : AppCompatActivity() {

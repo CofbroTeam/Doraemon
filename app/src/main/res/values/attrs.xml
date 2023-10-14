@@ -7,4 +7,12 @@
         <attr name="textSize" format="dimension"/>
         <attr name="type" format="string"/>
     </declare-styleable>
+
+
+    <declare-styleable name="LoadingView">
+        <attr name="startColor" format="reference|color"/>
+        <attr name="endColor" format="reference|color"/>
+        <attr name="rightPointColor" format="reference|color"/>
+        <attr name="pointSize" format="dimension"/>
+    </declare-styleable>
 </resources>

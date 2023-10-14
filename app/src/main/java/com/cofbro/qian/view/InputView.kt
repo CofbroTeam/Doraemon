@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.*
 import android.text.InputType
@@ -34,51 +35,70 @@ class InputView : View {
     object Config {
         // 输入框中首字符的缩进距离
         const val TEXT_INDENTED = 30f
+
         // hint的背景内间距
         const val HINT_BACKGROUND_PADDING = 10f
+
         // 光标的高度
         const val CURSOR_HEIGHT = 45f
+
         // 光标离左侧文字的间距
         const val CURSOR_PADDING = 5f
+
         // bitmap点击扩大范围
         const val CLICK_SCALE_RANGE = 8f
+
         // 此view默认的宽度和高度
         const val DEFAULT_WIDTH = 800f
         const val DEFAULT_HEIGHT = 130f
+
         // 默认内间距
         const val DEFAULT_PADDING = 50
+
         // 默认可输入的最大字数
         const val DEFAULT_TEXT_COUNT = 23
     }
+
     // 记录第一次 down是否是在bitmap中
     private var alreadyTouchDownInRect = false
+
     // bitmap/小图标 的rect
     private lateinit var bitmapRect: RectF
+
     // 此view的属性集合
     private lateinit var typedArray: TypedArray
     private var bitmap: Bitmap? = null
+
     // 是否是密码文本
     private var isPasswordType = false
+
     // 由isPasswordType值决定，是否显示输入框右侧的小图标
     private var ifShowBitmap = false
+
     // 输入框输入的内容
     private var inputString: String = ""
+
     // 密码输入框中用来隐藏密码的 -> ******
     private var hideInputString = ""
     private var cursorAnimator: Animator? = null
     private var cursorAlpha = 255
+
     // hint文本横向移动距离
     private var textOffsetY = 0f
+
     // hint文本的纵向移动距离
     private var textOffsetX = 0f
+
     // 此view的 左 上 右 下的坐标
     private var left = 0f
     private var top = 0f
     private var right = 0f
     private var bottom = 0f
+
     // 此view的宽度和高度
     private var mWidth = DEFAULT_WIDTH
     private var mHeight = DEFAULT_HEIGHT
+
     // hint文本
     private var hintText = ""
     private val borderPaint = Paint().apply {
@@ -151,7 +171,8 @@ class InputView : View {
         ) isPasswordType = true
         ifShowBitmap = isPasswordType
         bitmap = createBitmap(R.drawable.ic_eye_close)
-        hintBackgroundPaint.color = typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
+        hintBackgroundPaint.color =
+            typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -333,7 +354,7 @@ class InputView : View {
     }
 
     // 收起软键盘
-    private fun hideInputMethod() {
+    private fun hideKeyboard() {
         val imm: InputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
@@ -353,9 +374,21 @@ class InputView : View {
         return inputString
     }
 
+    private fun isKeyboardHidden(view: View): Boolean {
+        val rect = Rect()
+        view.getWindowVisibleDisplayFrame(rect) // 获取 window可见区域高度，不包括键盘
+        val visibleHeight = rect.height()
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels // 获取 window高度，包括键盘
+        return visibleHeight >= screenHeight
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (!ifShowBitmap){
+        if (!ifShowBitmap) {
+            // 键盘收=收起后，再次电机输入框，弹出键盘
+            if (isKeyboardHidden(this)) {
+                showKeyboard()
+            }
             requestFocus()
             return true
         }
@@ -365,8 +398,14 @@ class InputView : View {
                     bitmap = createBitmap(R.drawable.ic_eye_open)
                     alreadyTouchDownInRect = true
                     isPasswordType = false
-                } else requestFocus()
+                } else if (isKeyboardHidden(this)) {
+                    // 键盘收=收起后，再次电机输入框，弹出键盘
+                    showKeyboard()
+                } else {
+                    requestFocus()
+                }
             }
+
             MotionEvent.ACTION_UP -> {
                 if (bitmapRect.contains(event.x, event.y)) {
                     bitmap = createBitmap(R.drawable.ic_eye_close)
@@ -374,6 +413,7 @@ class InputView : View {
                     alreadyTouchDownInRect = false
                 }
             }
+
             MotionEvent.ACTION_MOVE -> {
                 if (!bitmapRect.contains(event.x, event.y) && alreadyTouchDownInRect) {
                     bitmap = createBitmap(R.drawable.ic_eye_close)
@@ -385,7 +425,11 @@ class InputView : View {
         return true
     }
 
-    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+    override fun onFocusChanged(
+        gainFocus: Boolean,
+        direction: Int,
+        previouslyFocusedRect: Rect?
+    ) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         if (gainFocus) {
             showKeyboard()
@@ -393,7 +437,7 @@ class InputView : View {
             hintOffsetYAnimation(0f, (bottom - top) / 2f, 0f, 20f)
             startCursorAnimator()
         } else {
-            hideInputMethod()
+            hideKeyboard()
             borderPaint.color = Color.parseColor("#dfeeff")
             hintOffsetYAnimation((bottom - top) / 2f, 0f, 20f, 0f)
             stopCursorAnimator()
@@ -460,19 +504,12 @@ class InputView : View {
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            Log.d(
-                "tag",
-                "deleteSurroundingText beforeLength=$beforeLength afterLength=$afterLength"
-            )
             return true
         }
 
         override fun finishComposingText(): Boolean {
             // 结束组合文本输入的时候，这个方法基本上会出现在切换输入法类型，点击回车（完成、搜索、发送、下一步）点击输入法右上角隐藏按钮会触发。
-            Log.d("tag", "finishComposingText")
             return true
         }
     }
-
-
 }

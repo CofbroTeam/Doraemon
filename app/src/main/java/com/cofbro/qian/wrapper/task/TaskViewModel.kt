@@ -1,4 +1,4 @@
-package com.cofbro.qian.task
+package com.cofbro.qian.wrapper.task
 
 import androidx.lifecycle.viewModelScope
 import com.cofbro.hymvvmutils.base.BaseViewModel
