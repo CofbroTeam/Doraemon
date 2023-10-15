@@ -28,7 +28,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     }
 
     override fun getItemCount(): Int {
-        data?.getJSONArray("channelList")?.let { array ->
+        data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
             return (array.size - 1).takeIf { it >= 0 } ?: 0
         }
         return 0
@@ -80,11 +80,6 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                         .load(item?.getStringExt(Constants.CourseList.IMG_URL))
                         .apply(options)
                         .into(binding.ivClassAvtar)
-
-//                    // 存储重要参数
-//                    CacheUtils.cache["courseId"] = courseId ?: ""
-//                    CacheUtils.cache["classId"] = classId ?: ""
-//                    CacheUtils.cache["cpi"] = cpi ?: ""
                     itemView.setOnClickListener {
                         listener?.onItemClick(courseId, classId, cpi)
                     }

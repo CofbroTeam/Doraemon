@@ -71,7 +71,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         binding?.rvSignTask?.apply {
             taskAdapter = TaskAdapter()
             taskAdapter?.setItemClickListener { itemData ->
-                showLoadingView()
                 sign(itemData)
             }
             adapter = taskAdapter
@@ -165,12 +164,14 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val type = itemData.getStringExt(Constants.TaskList.ACTIVE_TYPE)
         // 预签到地址
         preSignUrl = itemData.getStringExt(Constants.TaskList.PRE_SIGN_URL)
-        // 1 -> 未签，2 -> 已签
+        // 2 -> 已结束
         val status = itemData.getStringExt(Constants.TaskList.STATUS)
         if (status == Constants.STATUS.CLOSE) {
-            ToastUtils.show("签到已过期，下次早点来~")
+            hideLoadingView()
+            ToastUtils.show("签到已结束")
             return
         }
+        showLoadingView()
         if (type == Constants.ACTIVITY.SIGN) {
             lifecycleScope.launch(Dispatchers.IO) {
                 // 查询签到类型

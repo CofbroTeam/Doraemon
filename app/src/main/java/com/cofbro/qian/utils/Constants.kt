@@ -130,7 +130,7 @@ object Constants {
      * 签到活动状态
      */
     object STATUS {
-        const val OPEN = "1"
+        //const val OPEN = "1"
         const val CLOSE = "2"
     }
 

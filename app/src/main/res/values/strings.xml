@@ -7,4 +7,8 @@
     <string name="course_list_title">我的课程</string>
     <string name="sign_active_task">签到活动</string>
     <string name="all_homework">所有作业</string>
+
+    <string name="tab_home">主页</string>
+    <string name="tab_friend">好友</string>
+    <string name="tab_profile">我的</string>
 </resources>
