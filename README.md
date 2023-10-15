@@ -18,7 +18,7 @@
 |  页面名称   | 页面图片  |
 |  ----  | ----  |
 | `登录页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c" width = 350 height = 800 /> </div> |
-| `课程列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/f92fccc3-bdea-4a7f-b3a2-b6ae262ee158" width = 350 height = 800 /> </div><div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/8574a7c0-5f15-475c-82c3-d747b2e81aa5" width = 350 height = 800 /> </div>|
+| `课程列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/f92fccc3-bdea-4a7f-b3a2-b6ae262ee158" width = 350 height = 800 /> </div><div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3" width = 350 height = 800 /> </div>|
 | `签到列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8" width = 350 height = 800 /> </div> |
 | `定位签到页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85" width = 350 height = 800 /> </div> |
 
