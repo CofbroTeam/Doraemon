@@ -64,6 +64,7 @@
             <!--                <action android:name="android.intent.action.MAIN" />-->
             <!--            </intent-filter>-->
         </activity>
+        <activity android:name=".profile.ProfileFragment"/>
         <activity android:name=".mapsetting.InputTipsActivity" />
         <activity android:name=".mapsetting.MapActivity" />
 

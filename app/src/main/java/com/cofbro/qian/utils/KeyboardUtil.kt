@@ -17,7 +17,6 @@ import kotlin.math.abs
 
 
 object KeyboardUtil {
-    var imeHeight = 0
     var sDecorViewInvisibleHeightPre = 0
     private var onGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var mNavHeight = 0

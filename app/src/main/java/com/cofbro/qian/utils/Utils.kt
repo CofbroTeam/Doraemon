@@ -1,5 +1,6 @@
 package com.cofbro.qian.utils
 
+import android.content.Context
 import com.hjq.toast.ToastUtils
 
 
@@ -14,3 +15,13 @@ fun String.showSignResult() {
     }
     ToastUtils.show(toast)
 }
+
+fun getStatusBarHeight(context: Context): Int {
+    var result = 0
+    val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+    if (resourceId > 0) {
+        result = context.resources.getDimensionPixelSize(resourceId)
+    }
+    return result
+}
+
