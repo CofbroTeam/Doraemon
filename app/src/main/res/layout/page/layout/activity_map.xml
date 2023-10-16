@@ -45,7 +45,7 @@
         android:id="@+id/et_location_name"
         android:layout_width="0dp"
         android:layout_height="70dp"
-        android:hint="输入需要想要展示的位置名称，然后点击确定"
+        android:hint="输入需要想要为老师展示的位置名称"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_keywords" />

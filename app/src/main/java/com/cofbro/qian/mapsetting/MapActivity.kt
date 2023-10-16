@@ -222,8 +222,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     /**
-     * poi没有搜索到数据，返回一些推荐城市的信息
+     * poi没有搜索到数据，返回一些推荐城市的信息  Deprecated
      */
+    @Deprecated("高德版本更新舍弃")
     private fun showSuggestCity(cities: List<SuggestionCity>) {
         var infomation = "推荐城市\n"
         for (i in cities.indices) {
@@ -259,14 +260,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     } else {
                         ToastUtil.show(
                             this@MapActivity,
-                            " R.string.no_result"
+                            "网络错误"
                         )
                     }
                 }
             } else {
                 ToastUtil.show(
                     this@MapActivity,
-                    "R.string.no_result"
+                    "网络错误"
                 )
             }
         } else {
