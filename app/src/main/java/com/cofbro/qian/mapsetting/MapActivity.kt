@@ -43,7 +43,7 @@ import java.util.regex.Pattern
 
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
-    AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
+    AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener{
     private var uid = ""
     private var aid = ""
     private var preUrl = ""
@@ -323,26 +323,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     /**
      * 点击事件回调方法
      */
-    override fun onClick(v: View) {
-//        when (v.id) {
-//            R.id.main_keywords -> {
-//                val intent = Intent(this, InputTipsActivity::class.java)
-//                intent.putExtra("code", REQUEST_CODE);
-//                startActivity(intent)
-                // 开启页面跳转
-//                myActivityLauncher.launch(REQUEST_CODE.toString())
-//                startActivityForResult(intent, REQUEST_CODE)
-//            }
-
-//            R.id.clean_keywords -> {
-//                binding?.mainKeywords?.text = ""
-//                binding?.maps?.map?.clear()
-//                binding?.cleanKeywords?.visibility = View.GONE
-//            }
-
-//            else -> {}
-//        }
-    }
 
     companion object {
         const val REQUEST_CODE = 100

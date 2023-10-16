@@ -6,17 +6,30 @@
     android:layout_height="match_parent"
     tools:context=".mapsetting.MapActivity">
 
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="6dp"
+        android:src="@drawable/map_search"
+        app:layout_constraintBottom_toTopOf="@+id/et_location_name"
+        app:layout_constraintEnd_toStartOf="@+id/main_keywords"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </ImageView>
+
     <TextView
         android:id="@+id/main_keywords"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginTop="35dp"
         android:clickable="true"
         android:completionThreshold="1"
-        android:drawableLeft="@drawable/close"
         android:dropDownVerticalOffset="1.0dip"
         android:gravity="center_vertical"
-        android:hint="关键字搜索"
+        android:hint="查找地点"
         android:imeOptions="actionDone"
         android:inputType="text|textAutoComplete"
         android:maxLength="20"
@@ -58,5 +71,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.416"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/ps_color_blue"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
