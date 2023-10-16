@@ -1,12 +1,16 @@
 package com.cofbro.qian.mapsetting
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
 import com.amap.api.maps2d.model.LatLng
@@ -33,6 +37,8 @@ import com.hjq.toast.ToastUtils
 import org.jsoup.Jsoup
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -44,7 +50,76 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var signUrl = ""
     private var lat: String = ""
     private var long: String = ""
+    // 声明AMapLocationClient类对象
+    var  mLocationClient: AMapLocationClient? = null;
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        val mLocationOption = AMapLocationClientOption()
+        mLocationOption.isOnceLocation = true
 
+// 设置连续定位，定位间隔,单位毫秒,默认为2000ms，最低1000ms。
+
+// 设置连续定位，定位间隔,单位毫秒,默认为2000ms，最低1000ms。
+        mLocationOption.interval = 1000
+
+
+        /**
+         * 设置定位模式(三种模式) 不设置默认高精度定位模式
+         */
+
+// 高精度定位模式：会同时使用网络定位和GPS定位，优先返回最高精度的定位结果，以及对应的地址描述信息。
+        /**
+         * 设置定位模式(三种模式) 不设置默认高精度定位模式
+         */
+
+// 高精度定位模式：会同时使用网络定位和GPS定位，优先返回最高精度的定位结果，以及对应的地址描述信息。
+        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
+// 低功耗定位模式：不会使用GPS和其他传感器，只会使用网络定位（Wi-Fi和基站定位）；
+// 低功耗定位模式：不会使用GPS和其他传感器，只会使用网络定位（Wi-Fi和基站定位）；
+        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Battery_Saving
+// 仅用设备定位模式：不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位，需要在室外环境下才可以成功定位。注意，自 v2.9.0 版本之后，仅设备定位模式下支持返回地址描述信息。
+// 仅用设备定位模式：不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位，需要在室外环境下才可以成功定位。注意，自 v2.9.0 版本之后，仅设备定位模式下支持返回地址描述信息。
+        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Device_Sensors
+        mLocationClient!!.setLocationListener { amapLocation ->
+            Log.v("eoo","coninute")
+            if (amapLocation != null) {
+                if (amapLocation.errorCode == 0) {
+                    amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
+                    amapLocation.latitude //获取纬度
+                    amapLocation.longitude //获取经度
+                    amapLocation.accuracy //获取精度信息
+                    amapLocation.address //地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
+                    amapLocation.country //国家信息
+                    amapLocation.province //省信息
+                    amapLocation.city //城市信息
+                    amapLocation.district //城区信息
+                    amapLocation.street //街道信息
+                    amapLocation.streetNum //街道门牌号信息
+                    amapLocation.cityCode //城市编码
+                    amapLocation.adCode //地区编码
+                    amapLocation.aoiName //获取当前定位点的AOI信息
+                    amapLocation.buildingId //获取当前室内定位的建筑物Id
+                    amapLocation.floor //获取当前室内定位的楼层
+                    amapLocation.gpsAccuracyStatus //获取GPS的当前状态
+                    //获取定位时间
+                    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                    val date = Date(amapLocation.time)
+                    df.format(date)
+                    Log.v("location", amapLocation.toString()+"data:"+date)
+//                    query(LatLng(amapLocation.latitude,amapLocation.longitude ))
+                } else {
+                    //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
+                    Log.e(
+                        "AmapError",
+                        "location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo
+                    )
+                }
+            }
+        }
+        mLocationClient!!.setLocationOption(mLocationOption);
+// 启动定位
+        mLocationClient!!.startLocation();
+    }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -310,7 +385,11 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 }
             }
         }
-        binding?.mainKeywords?.setOnClickListener(this)
+        binding?.mainKeywords?.setOnClickListener {
+            val intent= Intent(this@MapActivity, InputTipsActivity.Companion::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun initObserver() {
