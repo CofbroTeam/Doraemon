@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/tab_home"
+        android:icon="@drawable/tab_home"
+        android:title="@string/tab_home" />
+
+    <item
+        android:id="@+id/tab_friend"
+        android:icon="@drawable/tab_friends"
+        android:title="@string/tab_friend" />
+
+    <item
+        android:id="@+id/tab_profile"
+        android:icon="@drawable/tab_profile"
+        android:title="@string/tab_profile" />
+</menu>

@@ -18,7 +18,7 @@
 |  页面名称   | 页面图片  |
 |  ----  | ----  |
 | `登录页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c" width = 350 height = 800 /> </div> |
-| `课程列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/f92fccc3-bdea-4a7f-b3a2-b6ae262ee158" width = 350 height = 800 /> </div><div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/8574a7c0-5f15-475c-82c3-d747b2e81aa5" width = 350 height = 800 /> </div>|
+| `课程列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/f92fccc3-bdea-4a7f-b3a2-b6ae262ee158" width = 350 height = 800 /> </div><div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3" width = 350 height = 800 /> </div>|
 | `签到列表页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8" width = 350 height = 800 /> </div> |
 | `定位签到页`  | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85" width = 350 height = 800 /> </div> |
 
@@ -48,7 +48,7 @@
 由于开发人手不足，项目所有功能预计11月底完成开发，欢迎感兴趣的同学一起参与进来。
 
 ## 特别说明
-开发阶段下，正常情况下三天 `集成` 一次，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。如果您有任何问题，欢迎在 `issues` 中提出，或加入 `567290278` 详细交流。
+开发阶段，正常情况下三天 `集成` 一次，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。如果您有任何问题，欢迎在 `issues` 中提出，或加入 `qq群：567290278` 详细交流。
 
 ## 如何贡献你的代码 & 提出宝贵的建议
 * 贡献代码：`Fork` -> `Pull Request`，或者直接联系我，将您添加为项目成员。
