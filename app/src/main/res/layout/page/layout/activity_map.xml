@@ -79,12 +79,14 @@
         android:id="@+id/selectButton"
         android:layout_width="250dp"
         android:layout_height="67dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="28dp"
-        android:background="@drawable/button_back"
 
+        android:background="@drawable/button_back"
         android:text="确定"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/maps" />
 </androidx.constraintlayout.widget.ConstraintLayout>

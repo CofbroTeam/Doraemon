@@ -1,7 +1,9 @@
 package com.cofbro.qian.mapsetting
 
+
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -11,9 +13,9 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
-import com.amap.api.location.AMapLocationListener
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
+import com.amap.api.maps2d.model.BitmapDescriptorFactory
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
@@ -91,8 +93,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.buildingId //获取当前室内定位的建筑物Id
                     amapLocation.floor //获取当前室内定位的楼层
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
-                    viewModel.default_Lating = LatLng(amapLocation.latitude,amapLocation.longitude)
-                    addLatLngMarker(viewModel.default_Lating)
+                    viewModel.default_My_Lating = LatLng(amapLocation.latitude,amapLocation.longitude)
+                    addLatingDefaultMarker(viewModel.default_My_Lating)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -286,18 +288,47 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.mPoiMarker!!.title = tip[0]
         viewModel.mPoiMarker!!.snippet = tip[1]
     }
+    private fun addLatingDefaultMarker(LatLng: LatLng?){
+        if (LatLng == null) {
+            return
+        }
+        viewModel.default_mark = binding?.maps?.map?.addMarker(MarkerOptions())
+        val point = LatLng
+        val markerPosition = LatLng(point.latitude, point.longitude)
+        viewModel.default_mark!!.position = markerPosition
+    }
 
     private fun addLatLngMarker(LatLng: LatLng?,default: Boolean = false) {
         if (LatLng == null) {
             return
         }
-        viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions())
+        val view = View.inflate(applicationContext, com.cofbro.qian.R.layout.item_mark , null)
+
+        val descriptor = BitmapDescriptorFactory.fromView(view)
+        viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions().icon(descriptor))
         val point = LatLng
         val markerPosition = LatLng(point.latitude, point.longitude)
         viewModel.mPoiMarker!!.position = markerPosition
         if (!default){
             binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
         }
+    }
+
+    //view 转bitmap
+    fun convertViewToBitmap(view: View): Bitmap? {
+        view.measure(
+            View.MeasureSpec.makeMeasureSpec(
+                0,
+                View.MeasureSpec.UNSPECIFIED
+            ),
+            View.MeasureSpec.makeMeasureSpec(
+                0,
+                View.MeasureSpec.UNSPECIFIED
+            )
+        )
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        view.buildDrawingCache()
+        return view.drawingCache
     }
 
     /**
@@ -378,12 +409,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         addLatLngMarker(LatLng(viewModel.currentTipPoint.latitude,
                             viewModel.currentTipPoint.longitude
                         ),default = true)
+                        viewModel.default_Sign_Lating = LatLng(latitude.toDouble(),longitude.toDouble())
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
                         if (lat.isNotEmpty()&&long.isNotEmpty()){
                             viewModel.currentTipPoint = LatLng(lat.toDouble(),lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(),long.toDouble()),default = true)
+                            viewModel.default_Sign_Lating = LatLng(lat.toDouble(),lat.toDouble())
                         }
                     }
 
@@ -414,8 +447,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         }
         binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
             binding?.maps?.map?.clear()
-            addLatLngMarker(latLng)
+            addLatLngMarker(latLng,default = true)
             viewModel.currentTipPoint = latLng
+            addLatingDefaultMarker(viewModel.default_Sign_Lating)
         }
         if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
             val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
