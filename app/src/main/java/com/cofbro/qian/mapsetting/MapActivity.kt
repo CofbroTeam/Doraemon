@@ -56,22 +56,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         super.onCreate(savedInstanceState, persistentState)
         val mLocationOption = AMapLocationClientOption()
         mLocationOption.isOnceLocation = true
-
-// 设置连续定位，定位间隔,单位毫秒,默认为2000ms，最低1000ms。
-
-// 设置连续定位，定位间隔,单位毫秒,默认为2000ms，最低1000ms。
         mLocationOption.interval = 1000
-
-
-        /**
-         * 设置定位模式(三种模式) 不设置默认高精度定位模式
-         */
-
-// 高精度定位模式：会同时使用网络定位和GPS定位，优先返回最高精度的定位结果，以及对应的地址描述信息。
-        /**
-         * 设置定位模式(三种模式) 不设置默认高精度定位模式
-         */
-
 // 高精度定位模式：会同时使用网络定位和GPS定位，优先返回最高精度的定位结果，以及对应的地址描述信息。
         mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
 // 低功耗定位模式：不会使用GPS和其他传感器，只会使用网络定位（Wi-Fi和基站定位）；
@@ -386,7 +371,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
         }
         binding?.mainKeywords?.setOnClickListener {
-            val intent= Intent(this@MapActivity, InputTipsActivity.Companion::class.java)
+            val intent = Intent(this, InputTipsActivity::class.java)
+            intent.putExtra("code", REQUEST_CODE);
             startActivity(intent)
         }
 
@@ -488,4 +474,5 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         }
         return url.replace(" ", "%20")
     }
+
 }
