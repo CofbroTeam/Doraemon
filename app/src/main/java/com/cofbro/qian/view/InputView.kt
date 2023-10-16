@@ -26,6 +26,7 @@ import com.cofbro.qian.view.InputView.Config.CURSOR_PADDING
 import com.cofbro.qian.view.InputView.Config.DEFAULT_HEIGHT
 import com.cofbro.qian.view.InputView.Config.DEFAULT_PADDING
 import com.cofbro.qian.view.InputView.Config.DEFAULT_TEXT_COUNT
+import com.cofbro.qian.view.InputView.Config.DEFAULT_TEXT_SIZE
 import com.cofbro.qian.view.InputView.Config.DEFAULT_WIDTH
 import com.cofbro.qian.view.InputView.Config.HINT_BACKGROUND_PADDING
 import com.cofbro.qian.view.InputView.Config.TEXT_INDENTED
@@ -57,6 +58,9 @@ class InputView : View {
 
         // 默认可输入的最大字数
         const val DEFAULT_TEXT_COUNT = 23
+
+        // 默认字体大小
+        const val DEFAULT_TEXT_SIZE = 40f
     }
 
     // 记录第一次 down是否是在bitmap中
@@ -113,6 +117,7 @@ class InputView : View {
     private val hintPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.parseColor("#cccccc")
+        textSize = DEFAULT_TEXT_SIZE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
@@ -136,6 +141,7 @@ class InputView : View {
     private val textPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         color = Color.BLACK
+        textSize = DEFAULT_TEXT_SIZE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
@@ -214,8 +220,11 @@ class InputView : View {
 
     // 画hint文字
     private fun drawHint(canvas: Canvas, str: String) {
-        hintPaint.color = if (inputString.isNotEmpty()) Color.parseColor("#34c759")
-        else Color.parseColor("#cccccc")
+        hintPaint.color = if (inputString.isNotEmpty()) {
+            Color.parseColor("#34c759")
+        } else {
+            Color.parseColor("#cccccc")
+        }
         canvas.drawText(
             str,
             0,
@@ -353,7 +362,7 @@ class InputView : View {
     }
 
     // 收起软键盘
-    private fun hideInputMethod() {
+    private fun hideKeyBoard() {
         val imm: InputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
@@ -386,8 +395,12 @@ class InputView : View {
                     bitmap = createBitmap(R.drawable.ic_eye_open)
                     alreadyTouchDownInRect = true
                     isPasswordType = false
-                } else if (isKeyboardHidden(this)) showKeyboard()
-                else requestFocus()
+                } else if (isKeyboardHidden(this)) {
+                    // 点击位置不是小眼睛处且键盘处于隐藏状态,则显示键盘
+                    showKeyboard()
+                } else {
+                    requestFocus()
+                }
             }
 
             MotionEvent.ACTION_UP -> {
@@ -414,7 +427,6 @@ class InputView : View {
         val rect = Rect()
         view.getWindowVisibleDisplayFrame(rect) // 获取 window可见区域高度，不包括键盘
         val visibleHeight = rect.height()
-        Log.v("hsy111", visibleHeight.toString())
         val screenHeight = Resources.getSystem().displayMetrics.heightPixels // 获取 window高度，包括键盘
         return visibleHeight >= screenHeight
     }
@@ -427,7 +439,7 @@ class InputView : View {
             hintOffsetYAnimation(0f, (bottom - top) / 2f, 0f, 20f)
             startCursorAnimator()
         } else {
-            hideInputMethod()
+            hideKeyBoard()
             borderPaint.color = Color.parseColor("#dfeeff")
             hintOffsetYAnimation((bottom - top) / 2f, 0f, 20f, 0f)
             stopCursorAnimator()
@@ -478,9 +490,6 @@ class InputView : View {
 
         override fun sendKeyEvent(event: KeyEvent?): Boolean {
             /** 当手指离开的按键的时候 */
-            if (event != null) {
-                Log.d("tag", "sendKeyEvent:KeyCode=" + event.keyCode)
-            }
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event.keyCode == KeyEvent.KEYCODE_DEL) {
                     //删除按键
@@ -494,16 +503,11 @@ class InputView : View {
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            Log.d(
-                "tag",
-                "deleteSurroundingText beforeLength=$beforeLength afterLength=$afterLength"
-            )
             return true
         }
 
         override fun finishComposingText(): Boolean {
             // 结束组合文本输入的时候，这个方法基本上会出现在切换输入法类型，点击回车（完成、搜索、发送、下一步）点击输入法右上角隐藏按钮会触发。
-            Log.d("tag", "finishComposingText")
             return true
         }
     }
