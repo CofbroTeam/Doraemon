@@ -4,10 +4,12 @@ package com.cofbro.qian.mapsetting
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +25,10 @@ import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.data.URL
@@ -32,6 +38,7 @@ import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.showSignResult
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +56,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         getCurrentLocationLatLng()
+
     }
     /**
      * 根据LocationManager获取定位信息的提供者
@@ -56,6 +64,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      * @return
      */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        get_AvtarImage()
         initArgs()
         initObserver()
         doNetwork()
@@ -74,7 +83,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         //设置定位回调监听
         viewModel.mLocationClient?.setLocationListener { amapLocation ->
             if (amapLocation != null) {
-
                 if (amapLocation.errorCode == 0) {
                     amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
                     amapLocation.latitude //获取纬度
@@ -279,7 +287,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             return
         }
         viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions())
-
         if (tip[3] != "") {
             val markerPosition = LatLng(tip[3].toDouble(), tip[4].toDouble())
             viewModel.mPoiMarker!!.position = markerPosition
@@ -292,7 +299,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         if (LatLng == null) {
             return
         }
-        viewModel.default_mark = binding?.maps?.map?.addMarker(MarkerOptions())
+        val view = View.inflate(applicationContext, R.layout.item_sign_default_mark , null)
+        val descriptor = BitmapDescriptorFactory.fromView(view)
+        viewModel.default_mark = binding?.maps?.map?.addMarker(MarkerOptions().icon(descriptor))
         val point = LatLng
         val markerPosition = LatLng(point.latitude, point.longitude)
         viewModel.default_mark!!.position = markerPosition
@@ -302,8 +311,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         if (LatLng == null) {
             return
         }
-        val view = View.inflate(applicationContext, com.cofbro.qian.R.layout.item_mark , null)
-
+        val view = View.inflate(applicationContext, R.layout.item_sign_default_mark , null)
+        val imageView :ImageView= view.findViewById(R.id.avatar_default)
+        imageView.setImageDrawable(binding!!.search.drawable)
         val descriptor = BitmapDescriptorFactory.fromView(view)
         viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions().icon(descriptor))
         val point = LatLng
@@ -313,22 +323,22 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
         }
     }
-
-    //view 转bitmap
-    fun convertViewToBitmap(view: View): Bitmap? {
-        view.measure(
-            View.MeasureSpec.makeMeasureSpec(
-                0,
-                View.MeasureSpec.UNSPECIFIED
-            ),
-            View.MeasureSpec.makeMeasureSpec(
-                0,
-                View.MeasureSpec.UNSPECIFIED
+    private fun get_AvtarImage()  {
+        // 用户头像
+        val uid =CacheUtils.cache["uid"]
+        uid?.let {
+            val options = RequestOptions().transform(
+                CenterCrop(),
+                RoundedCorners(dp2px(applicationContext, 5))
             )
-        )
-        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-        view.buildDrawingCache()
-        return view.drawingCache
+             Glide.with(this@MapActivity)
+                 .load(URL.getAvtarImgPath(it))
+                 .apply(options)
+                 .into(binding!!.search)
+
+
+        }
+
     }
 
     /**
