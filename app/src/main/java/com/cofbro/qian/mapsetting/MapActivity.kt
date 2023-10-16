@@ -395,7 +395,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         )
                     sign(viewModel.signUrl)
                 } else {
-                    ToastUtils.show("请稍后")
+
                 }
             }
         }
