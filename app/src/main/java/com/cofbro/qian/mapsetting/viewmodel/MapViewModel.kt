@@ -2,6 +2,8 @@ package com.cofbro.qian.mapsetting.viewmodel
 
 import android.app.Dialog
 import androidx.lifecycle.viewModelScope
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.services.poisearch.PoiResultV2
@@ -28,7 +30,10 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var Tip_address: String? = null
     var Tip_name: String? = null
     var Tip_City: String? = null
-
+    // 声明AMapLocationClient类对象
+    var  mLocationClient: AMapLocationClient? = null;
+    var mLocationOption: AMapLocationClientOption? = null
+    var default_Lating:LatLng? = null
     fun sign(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(signLiveData) {
