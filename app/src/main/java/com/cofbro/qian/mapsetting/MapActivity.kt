@@ -79,11 +79,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.preSign(preUrl)
     }
     private fun getCurrentLocationLatLng() {
+        AMapLocationClient.updatePrivacyAgree(applicationContext, true)
+        AMapLocationClient.updatePrivacyShow(applicationContext,true,true)
         //初始化定位
         mLocationClient =  AMapLocationClient(applicationContext);
         //设置定位回调监听
         mLocationClient?.setLocationListener { amapLocation ->
             if (amapLocation != null) {
+
                 if (amapLocation.errorCode == 0) {
                     amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
                     amapLocation.latitude //获取纬度
@@ -102,7 +105,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.buildingId //获取当前室内定位的建筑物Id
                     amapLocation.floor //获取当前室内定位的楼层
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
-                    Log.v("location:", amapLocation.latitude.toString())
+                    addLatLngMarker(LatLng(amapLocation.latitude,amapLocation.longitude))
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -472,6 +475,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
+        getCurrentLocationLatLng()
     }
 
     private fun urlEncodeChinese(urlString: String): String {
