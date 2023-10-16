@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.location.AMapLocationListener
 import com.amap.api.maps2d.AMap
 import com.amap.api.maps2d.CameraUpdateFactory
 import com.amap.api.maps2d.model.LatLng
@@ -29,18 +30,17 @@ import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.showSignResult
+import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.cofbro.qian.utils.showSignResult
-import com.hjq.toast.ToastUtils
 import org.jsoup.Jsoup
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener, View.OnClickListener {
@@ -52,21 +52,35 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var long: String = ""
     // 声明AMapLocationClient类对象
     var  mLocationClient: AMapLocationClient? = null;
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        val mLocationOption = AMapLocationClientOption()
-        mLocationOption.isOnceLocation = true
-        mLocationOption.interval = 1000
-// 高精度定位模式：会同时使用网络定位和GPS定位，优先返回最高精度的定位结果，以及对应的地址描述信息。
-        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
-// 低功耗定位模式：不会使用GPS和其他传感器，只会使用网络定位（Wi-Fi和基站定位）；
-// 低功耗定位模式：不会使用GPS和其他传感器，只会使用网络定位（Wi-Fi和基站定位）；
-        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Battery_Saving
-// 仅用设备定位模式：不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位，需要在室外环境下才可以成功定位。注意，自 v2.9.0 版本之后，仅设备定位模式下支持返回地址描述信息。
-// 仅用设备定位模式：不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位，需要在室外环境下才可以成功定位。注意，自 v2.9.0 版本之后，仅设备定位模式下支持返回地址描述信息。
-        mLocationOption.locationMode = AMapLocationClientOption.AMapLocationMode.Device_Sensors
-        mLocationClient!!.setLocationListener { amapLocation ->
-            Log.v("eoo","coninute")
+
+    var mLocationOption: AMapLocationClientOption? = null
+
+
+
+
+
+    /**
+     * 根据LocationManager获取定位信息的提供者
+     * @param locationManager
+     * @return
+     */
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        initArgs()
+        initObserver()
+        doNetwork()
+        initViewClick()
+        initMap(savedInstanceState)
+
+    }
+
+    private fun doNetwork() {
+        viewModel.preSign(preUrl)
+    }
+    private fun getCurrentLocationLatLng() {
+        //初始化定位
+        mLocationClient =  AMapLocationClient(applicationContext);
+        //设置定位回调监听
+        mLocationClient?.setLocationListener { amapLocation ->
             if (amapLocation != null) {
                 if (amapLocation.errorCode == 0) {
                     amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
@@ -86,12 +100,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.buildingId //获取当前室内定位的建筑物Id
                     amapLocation.floor //获取当前室内定位的楼层
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
-                    //获取定位时间
-                    val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                    val date = Date(amapLocation.time)
-                    df.format(date)
-                    Log.v("location", amapLocation.toString()+"data:"+date)
-//                    query(LatLng(amapLocation.latitude,amapLocation.longitude ))
+                    addLatLngMarker(LatLng(amapLocation.latitude,amapLocation.longitude))
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -101,21 +110,49 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 }
             }
         }
-        mLocationClient!!.setLocationOption(mLocationOption);
-// 启动定位
-        mLocationClient!!.startLocation();
-    }
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        initArgs()
-        initObserver()
-        doNetwork()
-        initViewClick()
-        initMap(savedInstanceState)
+        //初始化AMapLocationClientOption对象
+        mLocationOption =  AMapLocationClientOption();
 
-    }
+        /* //设置定位场景，目前支持三种场景（签到、出行、运动，默认无场景） 设置了场景就不用配置定位模式等
+           option.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.SignIn);
+           if(null != locationClient){
+               locationClient.setLocationOption(option);
+               //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
+               locationClient.stopLocation();
+               locationClient.startLocation();
+           }*/
 
-    private fun doNetwork() {
-        viewModel.preSign(preUrl)
+        //选择定位模式:高德定位服务包含GPS和网络定位（Wi-Fi和基站定位）两种能力。
+        // 定位SDK将GPS、网络定位能力进行了封装，以三种定位模式对外开放，SDK默认选择使用高精度定位模式。
+        /* //只会使用网络定位
+         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
+         //只使用GPS进行定位
+         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);*/
+        // 同时使用网络定位和GPS定位,优先返回最高精度的定位结果,以及对应的地址描述信息
+        mLocationOption?.locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy;
+
+        // 设置为单次定位  : 默认为false
+        mLocationOption?.isOnceLocation = true;
+        //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。;
+        //mLocationOption.setInterval(3500);
+
+
+        //设置是否返回地址信息（默认返回地址信息）
+        /*mLocationOption.setNeedAddress(true);*/
+
+        //设置定位请求超时时间 : 单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
+        mLocationOption?.httpTimeOut = 20000;
+
+
+        //设置是否开启定位缓存机制: 关闭缓存机制 默认开启 ，
+        // 在高精度模式和低功耗模式下进行的网络定位结果均会生成本地缓存,不区分单次定位还是连续定位。GPS定位结果不会被缓存。
+        mLocationOption?.isLocationCacheEnable = false;
+
+        //启动地位:
+        //给定位客户端对象设置定位参数
+        mLocationClient?.setLocationOption(mLocationOption);
+        //启动定位
+        mLocationClient?.startLocation();
     }
 
     private fun initArgs() {
@@ -293,7 +330,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.mPoiMarker!!.snippet = tip[1]
     }
 
-    private fun addLatLngMarker(LatLng: LatLng?) {
+    private fun addLatLngMarker(LatLng: LatLng?,default: Boolean = false) {
         if (LatLng == null) {
             return
         }
@@ -301,7 +338,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         val point = LatLng
         val markerPosition = LatLng(point.latitude, point.longitude)
         viewModel.mPoiMarker!!.position = markerPosition
-        binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
+        if (!default){
+            binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
+        }
+
         //        mPoiMarker!!.title = tip.name
 //        mPoiMarker!!.snippet = tip.address
     }
@@ -400,10 +440,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
                         lat = latitude
                         long = longitude
+                        addLatLngMarker(LatLng(lat.toDouble(),long.toDouble()),default = true)
                     } else {
                         lat = html.getElementById("latitude")?.`val`() ?: ""
                         long = html.getElementById("longitude")?.`val`() ?: ""
+                        addLatLngMarker(LatLng(lat.toDouble(),long.toDouble()),default = true)
                     }
+
                 }
 
             }
