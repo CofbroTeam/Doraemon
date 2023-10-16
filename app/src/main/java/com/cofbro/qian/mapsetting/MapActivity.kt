@@ -64,16 +64,24 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      * @return
      */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
         get_AvtarImage()
         initArgs()
         initObserver()
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
+        init_Loaction_Data()
     }
 
     private fun doNetwork() {
         viewModel.preSign(viewModel.preUrl)
+    }
+    private fun init_Loaction_Data(){
+        viewModel.default_Sign_Lating =
+            CacheUtils.cache["default_Sign_latitude"]?.toDouble()
+                ?.let { CacheUtils.cache["default_Sign_longitude"]?.toDouble()
+                    ?.let { it1 -> LatLng(it, it1) } }
     }
     private fun getCurrentLocationLatLng() {
         AMapLocationClient.updatePrivacyAgree(applicationContext, true)
@@ -286,7 +294,11 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         if (tip[0] == "") {
             return
         }
-        viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions())
+        val view = View.inflate(applicationContext, R.layout.item_sign_default_mark , null)
+        val imageView :ImageView= view.findViewById(R.id.avatar_default)
+        imageView.setImageDrawable(binding!!.search.drawable)
+        val descriptor = BitmapDescriptorFactory.fromView(view)
+        viewModel.mPoiMarker = binding?.maps?.map?.addMarker(MarkerOptions().icon(descriptor))
         if (tip[3] != "") {
             val markerPosition = LatLng(tip[3].toDouble(), tip[4].toDouble())
             viewModel.mPoiMarker!!.position = markerPosition
@@ -420,6 +432,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             viewModel.currentTipPoint.longitude
                         ),default = true)
                         viewModel.default_Sign_Lating = LatLng(latitude.toDouble(),longitude.toDouble())
+                        CacheUtils.cache["default_Sign_latitude"] = latitude
+                        CacheUtils.cache["default_Sign_longitude"] = longitude
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
@@ -427,6 +441,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             viewModel.currentTipPoint = LatLng(lat.toDouble(),lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(),long.toDouble()),default = true)
                             viewModel.default_Sign_Lating = LatLng(lat.toDouble(),lat.toDouble())
+                            CacheUtils.cache["default_Sign_latitude"] = lat
+                            CacheUtils.cache["default_Sign_longitude"] = long
                         }
                     }
 
