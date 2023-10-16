@@ -44,13 +44,6 @@ import java.util.regex.Pattern
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener{
-    private var uid = ""
-    private var aid = ""
-    private var preUrl = ""
-    private var signUrl = ""
-//    private var lat: String = ""
-//    private var long: String = ""
-
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         getCurrentLocationLatLng()
@@ -69,7 +62,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun doNetwork() {
-        viewModel.preSign(preUrl)
+        viewModel.preSign(viewModel.preUrl)
     }
     private fun getCurrentLocationLatLng() {
         AMapLocationClient.updatePrivacyAgree(applicationContext, true)
@@ -124,9 +117,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun initArgs() {
-        aid = intent.getStringExtra("aid") ?: ""
-        preUrl = intent.getStringExtra("preUrl") ?: ""
-        uid = CacheUtils.cache["uid"] ?: ""
+        viewModel.aid = intent.getStringExtra("aid") ?: ""
+        viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
+        viewModel.uid = CacheUtils.cache["uid"] ?: ""
     }
 
     override fun onResume() {
@@ -167,10 +160,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
      */
     private fun showProgressDialog() {
         if (viewModel.progressDialog == null) viewModel.progressDialog = Dialog(this)
-//        progDialog!!(ProgressDialog.STYLE_SPINNER)
-//        progDialog!!.isIndeterminate = false
         viewModel.progressDialog?.setCancelable(false)
-//        progDialog!!.setMessage("正在搜索:\n$mKeyWords")
         viewModel.progressDialog?.show()
     }
 
@@ -248,9 +238,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     viewModel.poiResult = result
                     // 取得搜索到的poiitems有多少页
                     val poiItems: ArrayList<PoiItemV2>? =
-                        viewModel.poiResult!!.pois // 取得第一页的poiitem数据，页数从数字0开始
-//                    val suggestionCities = (poiResult!! )
-//                        .searchSuggestionCitys // 当搜索不到poiitem数据时，会返回含有搜索关键字的城市信息
+                        viewModel.poiResult!!.pois
                     if (poiItems != null && poiItems.size > 0) {
                         binding?.maps?.map?.clear() // 清理之前的图标
                         val poi2DOverlay = Poi2DOverlay(binding?.maps?.map, poiItems)
@@ -310,9 +298,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         if (!default){
             binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
         }
-
-        //        mPoiMarker!!.title = tip.name
-//        mPoiMarker!!.snippet = tip.address
     }
 
     /**
@@ -335,9 +320,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
                     if (viewModel.currentTipPoint.latitude!=0.0 && viewModel.currentTipPoint.longitude!=0.0) {
-                        signUrl =
-                            URL.getLocationSignPath(address, aid, uid, viewModel.currentTipPoint.latitude.toString(), viewModel.currentTipPoint.longitude.toString())
-                        sign(signUrl)
+                        viewModel.signUrl =
+                            URL.getLocationSignPath(address, viewModel.aid, viewModel.uid, viewModel.currentTipPoint.latitude.toString(), viewModel.currentTipPoint.longitude.toString())
+                        sign(viewModel.signUrl)
                     } else {
                         ToastUtils.show("请稍后")
                     }
@@ -348,14 +333,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                  * 选择上传让老师看到的位置
                  */
                 if (viewModel.currentTipPoint.latitude!=0.0 && viewModel.currentTipPoint.longitude!=0.0) {
-                    signUrl =
+                    viewModel.signUrl =
                         URL.getLocationSignPath(
                             address = binding?.etLocationName?.text.toString(),
-                            aid,
-                            uid,
+                            viewModel.aid,
+                            viewModel.uid,
                             viewModel.currentTipPoint.latitude.toString(), viewModel.currentTipPoint.longitude.toString()
                         )
-                    sign(signUrl)
+                    sign(viewModel.signUrl)
                 } else {
                     ToastUtils.show("请稍后")
                 }
@@ -389,8 +374,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     val latitude = html.getElementById("locationLatitude")?.`val`()
                     val longitude = html.getElementById("locationLongitude")?.`val`()
                     if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
-//                        lat = latitude
-//                        long = longitude
                         viewModel.currentTipPoint = LatLng(latitude.toDouble(),longitude.toDouble())
                         addLatLngMarker(LatLng(viewModel.currentTipPoint.latitude,
                             viewModel.currentTipPoint.longitude
@@ -433,8 +416,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng)
             viewModel.currentTipPoint = latLng
-//            lat = latLng.latitude.toString()
-//            long = latLng.longitude.toString()
         }
         if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
             val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)

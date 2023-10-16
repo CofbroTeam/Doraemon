@@ -34,6 +34,10 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var  mLocationClient: AMapLocationClient? = null;
     var mLocationOption: AMapLocationClientOption? = null
     var default_Lating:LatLng? = null
+    var preUrl= ""
+    var signUrl= ""
+    var uid = ""
+    var aid = ""
     fun sign(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(signLiveData) {
