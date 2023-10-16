@@ -490,6 +490,9 @@ class InputView : View {
 
         override fun sendKeyEvent(event: KeyEvent?): Boolean {
             /** 当手指离开的按键的时候 */
+            if (event != null) {
+                Log.d("tag", "sendKeyEvent:KeyCode=" + event.keyCode)
+            }
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event.keyCode == KeyEvent.KEYCODE_DEL) {
                     //删除按键
@@ -503,11 +506,16 @@ class InputView : View {
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            Log.d(
+                "tag",
+                "deleteSurroundingText beforeLength=$beforeLength afterLength=$afterLength"
+            )
             return true
         }
 
         override fun finishComposingText(): Boolean {
             // 结束组合文本输入的时候，这个方法基本上会出现在切换输入法类型，点击回车（完成、搜索、发送、下一步）点击输入法右上角隐藏按钮会触发。
+            Log.d("tag", "finishComposingText")
             return true
         }
     }
