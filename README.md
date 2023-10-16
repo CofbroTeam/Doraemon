@@ -20,7 +20,7 @@
 | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85"/> </div> |
 
 ## 特点
-👏 Doraemon 拥有清晰明了的 UI 界面以及易于操作的特点。除此之外，还具备：
+👏 **Doraemon** 拥有清晰明了的 UI 界面以及易于操作的特点。除此之外，还具备：
 
 - [x] 普通签到  
 - [x] 签到码签到
@@ -39,7 +39,7 @@
 由于开发人手不足，项目所有功能预计 11 月底完成开发，欢迎感兴趣的同学一起参与进来。
 
 ## 特别说明
-开发阶段，正常情况下<b>三天集成一次</b>，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。<br>如果您有任何问题，欢迎在 `issues` 中提出，或加入 QQ 群：`567290278` 详细交流。
+开发阶段，正常情况下**三天集成一次**，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。<br>如果您有任何问题，欢迎在 `issues` 中提出，或加入 QQ 群：`567290278` 详细交流。
 
 ## 如何贡献你的代码 & 提出宝贵的建议
 * 贡献代码：`Fork` -> `Pull Request`，或者直接联系我，将您添加为项目成员。
