@@ -170,7 +170,7 @@ class InputView : View {
         hintBackgroundPaint.color =
             typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
         hintText = typedArray.getString(R.styleable.InputView_hint).toString()
-        typedArray.getDimension(R.styleable.InputView_textSize, 50f).let {
+        typedArray.getDimension(R.styleable.InputView_textSize, 40f).let {
             hintPaint.textSize = it
             textPaint.textSize = it
         }
