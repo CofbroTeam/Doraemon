@@ -54,7 +54,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     var  mLocationClient: AMapLocationClient? = null;
 
     var mLocationOption: AMapLocationClientOption? = null
-
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        getCurrentLocationLatLng()
+    }
 
 
 
@@ -70,7 +73,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
-
     }
 
     private fun doNetwork() {
@@ -100,7 +102,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.buildingId //获取当前室内定位的建筑物Id
                     amapLocation.floor //获取当前室内定位的楼层
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
-                    addLatLngMarker(LatLng(amapLocation.latitude,amapLocation.longitude))
+                    Log.v("location:", amapLocation.latitude.toString())
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -113,43 +115,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         //初始化AMapLocationClientOption对象
         mLocationOption =  AMapLocationClientOption();
 
-        /* //设置定位场景，目前支持三种场景（签到、出行、运动，默认无场景） 设置了场景就不用配置定位模式等
-           option.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.SignIn);
-           if(null != locationClient){
-               locationClient.setLocationOption(option);
-               //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
-               locationClient.stopLocation();
-               locationClient.startLocation();
-           }*/
-
-        //选择定位模式:高德定位服务包含GPS和网络定位（Wi-Fi和基站定位）两种能力。
-        // 定位SDK将GPS、网络定位能力进行了封装，以三种定位模式对外开放，SDK默认选择使用高精度定位模式。
-        /* //只会使用网络定位
-         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
-         //只使用GPS进行定位
-         mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);*/
-        // 同时使用网络定位和GPS定位,优先返回最高精度的定位结果,以及对应的地址描述信息
         mLocationOption?.locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy;
 
         // 设置为单次定位  : 默认为false
         mLocationOption?.isOnceLocation = true;
-        //设置定位间隔,单位毫秒,默认为2000ms，最低1000ms。;
-        //mLocationOption.setInterval(3500);
-
-
-        //设置是否返回地址信息（默认返回地址信息）
-        /*mLocationOption.setNeedAddress(true);*/
-
-        //设置定位请求超时时间 : 单位是毫秒，默认30000毫秒，建议超时时间不要低于8000毫秒。
         mLocationOption?.httpTimeOut = 20000;
-
-
-        //设置是否开启定位缓存机制: 关闭缓存机制 默认开启 ，
-        // 在高精度模式和低功耗模式下进行的网络定位结果均会生成本地缓存,不区分单次定位还是连续定位。GPS定位结果不会被缓存。
         mLocationOption?.isLocationCacheEnable = false;
-
-        //启动地位:
-        //给定位客户端对象设置定位参数
         mLocationClient?.setLocationOption(mLocationOption);
         //启动定位
         mLocationClient?.startLocation();
