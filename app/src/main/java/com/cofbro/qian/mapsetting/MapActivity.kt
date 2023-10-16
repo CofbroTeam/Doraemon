@@ -40,6 +40,8 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.wrapper.WrapperActivity
+import com.cofbro.qian.wrapper.task.TaskFragment
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -417,7 +419,20 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
                     data?.showSignResult()
-                    finish()
+                    /**
+                     * 回到TaskActivity
+                     */
+                    if (data == "不在可签到范围内") {
+                        finish()
+                    }else{
+                        /**
+                         * 回到TaskFragment
+                         */
+                        val intent = Intent(applicationContext,WrapperActivity::class.java)
+                       startActivity(intent)
+                    }
+
+
                 }
             }
         }
