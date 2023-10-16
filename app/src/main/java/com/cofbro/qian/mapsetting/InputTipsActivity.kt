@@ -78,7 +78,7 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                     val intent = Intent(this, MapActivity::class.java)
 
                     intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
-                    intent.putExtra("aids",aid)
+                    intent.putExtra("aid",aid)
                     aid?.let { it1 -> Log.v("result:jump:", it1) }
                     startActivity(intent)
                 }

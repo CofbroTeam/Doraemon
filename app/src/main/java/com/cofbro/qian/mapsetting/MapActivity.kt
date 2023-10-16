@@ -136,6 +136,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
     private fun initArgs() {
         viewModel.aid = intent.getStringExtra("aid") ?: ""
+        Log.v("sign:aid:",viewModel.aid)
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
         viewModel.uid = CacheUtils.cache["uid"] ?: ""
     }
@@ -402,6 +403,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         binding?.mainKeywords?.setOnClickListener {
             val intent = Intent(this, InputTipsActivity::class.java)
             intent.putExtra("code", REQUEST_CODE);
+            intent.putExtra("aid",viewModel.aid)
+            Log.v("sign:",viewModel.aid)
             startActivity(intent)
         }
 
