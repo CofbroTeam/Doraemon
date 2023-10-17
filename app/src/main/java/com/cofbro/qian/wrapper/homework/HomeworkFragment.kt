@@ -27,7 +27,7 @@ class HomeworkFragment : Fragment() {
         dialog.setCancelable(false)
         dialog.show()
         lifecycleScope.launch(Dispatchers.IO) {
-            delay(10000)
+            delay(2000)
             withContext(Dispatchers.Main) {
                 dialog.dismiss()
 
