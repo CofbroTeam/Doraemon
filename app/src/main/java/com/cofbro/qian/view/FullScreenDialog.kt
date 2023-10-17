@@ -21,7 +21,7 @@ class FullScreenDialog(context: Context) : AlertDialog(context, R.style.Dialog_F
         super.onCreate(savedInstanceState)
         setContentView(getLayoutResId())
         val dm = context.resources.displayMetrics
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,dm.heightPixels+100)
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
         window?.decorView?.setPadding(0,0,0,0)
         window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window?.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
