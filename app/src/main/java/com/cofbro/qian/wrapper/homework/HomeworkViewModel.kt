@@ -15,7 +15,7 @@ class HomeworkViewModel : BaseViewModel<DefaultRepository>() {
     fun queryHomeworkList(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(homeworkLiveData, false) {
-                val request = NetworkUtils.buildClientRequest(url)
+                val request = NetworkUtils.buildServerRequest(url)
                 NetworkUtils.request(request)
             }
         }
