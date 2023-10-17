@@ -28,10 +28,18 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     }
 
     override fun getItemCount(): Int {
+        var courseCount = 0
         data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
-            return (array.size - 1).takeIf { it >= 0 } ?: 0
+            array.forEach {
+                val jsonObject = (it as? JSONObject)
+                // 是否是课程，否则不展示
+                val cataName = jsonObject?.getStringExt(Constants.CourseList.CATA_NAME) ?: ""
+                if (cataName == "课程") {
+                    courseCount++
+                }
+            }
         }
-        return 0
+        return courseCount
     }
 
     override fun onBindViewHolder(holder: CourseListViewHolder, position: Int) {
@@ -45,6 +53,9 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
             data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.get(position + 1)?.let {
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
+                // 是否是课程，否则不展示
+                val cataName = jsonObject?.getStringExt(Constants.CourseList.CATA_NAME) ?: ""
+                if (cataName.isEmpty() || cataName != "课程") return
                 // cpi，后面签到需用此参数
                 val cpi = jsonObject?.getStringExt(Constants.CourseList.CPI) ?: ""
                 // 班级id
