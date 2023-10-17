@@ -56,7 +56,7 @@
 <div> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60125d13-97d2-4515-a3e4-6460ac97c9d0" width = 200 height = 200 /> </div>
 
 
-## 开发规范：
+## 开发规范
 * 使用 kt 或者 java，命名统一使用驼峰命名法
 * 所有 kt/java 文件需要以 `xxxActivity/xxxFragment` 命名，`xxx` 需要包含业务名称，比如登录页：`LoginActivity`。其中的 `xml` 文件里的 `id` 需要符合 `控件缩写_业务名称` 要求，比如 `TextView` 的 `id` : `tv_login`
 * 保持代码可阅读性的前提下，尽量使代码行缩进减小
