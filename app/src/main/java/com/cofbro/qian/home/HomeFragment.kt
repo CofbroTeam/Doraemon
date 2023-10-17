@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentHomeBinding
-import com.cofbro.qian.main.CourseListAdapter
+import com.cofbro.qian.home.CourseListAdapter
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px

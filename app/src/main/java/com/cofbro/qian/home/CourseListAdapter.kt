@@ -1,4 +1,4 @@
-package com.cofbro.qian.main
+package com.cofbro.qian.home
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -9,9 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemCourseListBinding
-import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getJSONArrayExt
