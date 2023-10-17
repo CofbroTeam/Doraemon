@@ -92,14 +92,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/my_book" />
+            app:srcCompat="@drawable/tab_profile"/>
 
         <TextView
             android:id="@+id/textView43"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="我的预约"
+            android:text="签到日志"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/imageView"
             app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -126,14 +126,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/book_record" />
+            app:srcCompat="@drawable/tab_profile"/>
 
         <TextView
             android:id="@+id/textView44"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="预约记录"
+            android:text="关联账号"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/imageView2"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
@@ -160,7 +160,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/notification" />
+            app:srcCompat="@drawable/tab_profile"/>
 
         <TextView
             android:id="@+id/textView45"
@@ -173,19 +173,19 @@
             app:layout_constraintStart_toEndOf="@+id/imageView19"
             app:layout_constraintTop_toTopOf="@+id/imageView19" />
 
-        <TextView
-            android:id="@+id/textView37"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/app_green_circle_bg"
-            android:gravity="center"
-            android:text="10"
-            android:textColor="@color/white"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/textView37"-->
+<!--            android:layout_width="18dp"-->
+<!--            android:layout_height="18dp"-->
+<!--            android:layout_marginEnd="10dp"-->
+<!--            android:background="@drawable/app_green_circle_bg"-->
+<!--            android:gravity="center"-->
+<!--            android:text="10"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="10sp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -208,7 +208,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/support" />
+            app:srcCompat="@drawable/tab_profile" />
 
         <TextView
             android:id="@+id/textView46"
@@ -242,14 +242,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/my_book" />
+            app:srcCompat="@drawable/tab_profile"/>
 
         <TextView
             android:id="@+id/textView47"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="修改密码"
+            android:text="默认设置"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/imageView21"
             app:layout_constraintStart_toEndOf="@+id/imageView21"
