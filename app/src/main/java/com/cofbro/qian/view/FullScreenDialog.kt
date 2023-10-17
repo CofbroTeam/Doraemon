@@ -20,6 +20,8 @@ class FullScreenDialog(context: Context) : AlertDialog(context, R.style.Dialog_F
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(getLayoutResId())
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
+        window?.decorView?.setPadding(0,0,0,0)
         window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         window?.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -36,6 +38,7 @@ class FullScreenDialog(context: Context) : AlertDialog(context, R.style.Dialog_F
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
         window?.attributes = layoutParams
+
     }
 
     private fun getLayoutResId(): Int = R.layout.dialog_full_screen
