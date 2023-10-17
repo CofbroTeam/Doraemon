@@ -17,7 +17,7 @@
 ## 🗒️ 各级页面
 | **登录页** | **课程列表页** | **签到列表页** | **定位签到页** |
 |:---:|:---:|:---:|:---:|
-| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85"/> </div> |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c" width = 350 height = 480/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3" width = 350 height = 480/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8" width = 350 height = 480/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85" width = 350 height = 480/> </div> |
 
 ## ✨ 特点
 👏 **Doraemon** 拥有清晰明了的 UI 界面以及易于操作的特点。除此之外，还具备：
