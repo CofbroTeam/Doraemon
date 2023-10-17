@@ -19,10 +19,10 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="Dialog_Fullscreen" parent="Picture.Theme.AlertDialog">
+    <style name="Dialog_Fullscreen" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:background">#FFFFFF</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>
