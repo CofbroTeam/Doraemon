@@ -35,8 +35,15 @@ object NetworkUtils {
         val cookies = CacheUtils.cache["cookies"] ?: ""
         return Request.Builder().url(url)
             .addHeader("Accept-Language", "zh-Hans-CN;q=1, zh-Hant-CN;q=0.9")
-            .addHeader("Cookie", cookies)
-
+            .addHeader("Cookie", "source=\"\"; spaceFid=1840; spaceRoleId=\"\"; k8s=904e21e4291765cccbe96edcca0fafd672d9c8a8; route=2fe558bdb0a1aea656e6ca70ad0cad20; lv=1; fid=1840; _uid=191970813; UID=191970813; vc=FE33F1E68D32575DE45D383055F41CD9; vc2=74A6E443CF1DD58EA5028500409E081A; xxtenc=6c17eaa61e93f279ff6c0784a7f75d7a; uf=b2d2c93beefa90dc93c9630a50f043aeda1b3f5cd81016ee88537765d90e85eed80373d8c33a22b8e8295aa74966e5c2913b662843f1f4ad6d92e371d7fdf6444fff2d625c300bdece71fc6e59483dd394fca3980c580733cbd6d59a598485af619d55f25c3dc3b8; _d=1697465883951; vc3=b8QOBvCvXmT0%2F%2BQTcHs8W2h3vYbGBtBDwYNCBCsg3YOAwQTvqrSoYg%2Fq5w4MQUJCsnudFqSE2RLj3mATAxndRNwskv8pbWEJeMGaezzK9K3hqx8XGc0AgV1K88H6kXZmNllYt2591uTYCl7shBh%2FHXBoSlO4TKqo4Z4v9I7GCBU%3Da80205f6d60d6ff12d235de8c33474a3; cx_p_token=8d7658ade3a2fa33491661346593d00e; p_auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxOTE5NzA4MTMiLCJsb2dpblRpbWUiOjE2OTc0NjU4ODM5NTMsImV4cCI6MTY5ODA3MDY4M30.DnYMx7xzNlqQYdR4PYOaAwZg2YMEl1hC_bPkBOJNYT8; DSSTASH_LOG=C_38-UN_97-US_191970813-T_1697465883953; fanyamoocs=CF009EED2A0703198351C072BAF36DBE; thirdRegist=0; jrose=823C7B9179E294E2029410810C89063E.mooc-1132841633-zs9cn; _dd191970813=1697551298299")
+            .addHeader("Referer", "https://mooc1-2.chaoxing.com/visit/interaction?s=a5913ee5215774a303a05e9c9358f603")
+            .addHeader("Sec-Ch-Ua-Mobile", "?0")
+            .addHeader("Sec-Ch-Ua-", "Windows")
+            .addHeader("Sec-Fetch-Site", "same-origin")
+            .addHeader("navigate", "Sec-Fetch-Mode")
+            .addHeader("Sec-Fetch-User", "?1")
+            .addHeader("Sec-Ch-Ua", "Google Chrome\";v=\"117\", \"Not;A=Brand\";v=\"8\", \"Chromium\";v=\"117")
+            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
 
             //.addHeader("Cookie", "uf=b2d2c93beefa90dc93c9630a50f043aeda1b3f5cd81016ee4953b6cc0fb961400c42a7f8a90a57ebec4865a2458c6765913b662843f1f4ad6d92e371d7fdf6444fff2d625c300bdece71fc6e59483dd394fca398UID=191970731; vc=A36D3FA84461C0CAF4688A251F03960D; vc2=464A347B391020FA611A3EDB588C71A1; vc3=cVlD6V2OXwxsPLfG%2Fh83Pp8%2FleLwQwSkYnay0mmdy%2BrPn9Aa%2F9XhCKgMmWk6JZdaYmfzQDOsfHXoEqlTMaSYhHOmPRj8jPB2WeTp75Wd1VUeYbmfyb1TKftVS2W%2F50FFAQSaQ3eJcCPcr89o4uGw%2FXAilX6aeQGrLVxO6ck57fU%3Df79d6f53e19dd2e175ec704a14d872c5;")
             .addHeader(

@@ -223,6 +223,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private fun toMapActivity(aid: String, preUrl: String) {
+        hideLoadingView()
         val intent = Intent(requireActivity(), MapActivity::class.java)
         intent.putExtra("aid", aid)
         intent.putExtra("preUrl", preUrl)
@@ -236,6 +237,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private fun toScanActivity() {
+        hideLoadingView()
         val intent = Intent(requireActivity(), ScanActivity::class.java)
         startActivityForResult(intent, requestCode)
     }
@@ -272,6 +274,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
 
     private fun toPhotoSignActivity(aid: String) {
+        hideLoadingView()
         val intent = Intent(requireActivity(), PhotoSignActivity::class.java)
         intent.putExtra("aid", aid)
         startActivity(intent)
