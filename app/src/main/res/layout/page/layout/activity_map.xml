@@ -6,36 +6,64 @@
     android:layout_height="match_parent"
     tools:context=".mapsetting.MapActivity">
 
-    <TextView
-        android:id="@+id/main_keywords"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="35dp"
-        android:clickable="true"
-        android:completionThreshold="1"
-        android:drawableLeft="@drawable/close"
-        android:dropDownVerticalOffset="1.0dip"
-        android:gravity="center_vertical"
-        android:hint="关键字搜索"
-        android:imeOptions="actionDone"
-        android:inputType="text|textAutoComplete"
-        android:maxLength="20"
-        android:paddingLeft="10dp"
-        android:singleLine="true"
-        android:textColor="#000000"
-        android:textSize="16.0sp"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/et_location_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/map_search"
+            tools:layout_editor_absoluteX="4dp"
+            tools:layout_editor_absoluteY="35dp">
+
+        </ImageView>
+
+        <TextView
+            android:id="@+id/main_keywords"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:background="@drawable/text_back"
+            android:clickable="true"
+            android:completionThreshold="1"
+            android:dropDownVerticalOffset="1.0dip"
+            android:gravity="center_vertical"
+            android:hint="查找地点"
+            android:textStyle="bold"
+            android:imeOptions="actionDone"
+            android:inputType="text|textAutoComplete"
+            android:maxLength="20"
+            android:paddingLeft="10dp"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textSize="16.0sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
+
 
     <EditText
         android:id="@+id/et_location_name"
-        android:layout_width="0dp"
+        android:layout_width="411dp"
         android:layout_height="70dp"
-        android:hint="输入需要想要展示的位置名称，然后点击确定"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/edit_back"
+        android:hint="输入需要想要为老师展示的位置名称(可选)"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_keywords" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
 
     <com.amap.api.maps2d.MapView
         android:id="@+id/maps"
@@ -43,20 +71,23 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/selectButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_location_name"
         app:layout_constraintVertical_bias="1.0" />
-
 
     <Button
         android:id="@+id/selectButton"
         android:layout_width="250dp"
         android:layout_height="67dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="28dp"
+
+        android:background="@drawable/button_back"
         android:text="确定"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.416"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/maps" />
 </androidx.constraintlayout.widget.ConstraintLayout>
