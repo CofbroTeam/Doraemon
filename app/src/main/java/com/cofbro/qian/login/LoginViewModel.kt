@@ -19,7 +19,8 @@ class LoginViewModel : BaseViewModel<LoginRepository>() {
     fun login(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.login(loginLiveData, loadingMsg = LOGIN_MESSAGE) {
-                NetworkUtils.request(url)
+                val request = NetworkUtils.buildServerRequest(url)
+                NetworkUtils.request(request)
             }
 
         }

@@ -12,6 +12,7 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,9 +38,9 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         viewModel.loginLiveData.observe(this) {
             val data = it.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
-                val body = JSONObject.parseObject(data.body?.string())
+                val body = data.body?.string()?.safeParseToJson()
                 val headers = data.headers
-                if (body.getBoolean("status")) {
+                if (body?.getBoolean("status") == true) {
                     val list: List<String> = headers.values("Set-Cookie")
                     val cookies = StringBuilder()
                     var uid: String? = null
