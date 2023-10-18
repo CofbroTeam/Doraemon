@@ -33,6 +33,7 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityMapBinding
+import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
@@ -141,6 +142,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         Log.v("sign:aid:",viewModel.aid)
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
         viewModel.uid = CacheUtils.cache["uid"] ?: ""
+
+        /**
+         * 传递数据
+         */
     }
 
     override fun onResume() {
@@ -406,7 +411,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             val intent = Intent(this, InputTipsActivity::class.java)
             intent.putExtra("code", REQUEST_CODE);
             intent.putExtra("aid",viewModel.aid)
-            Log.v("sign:",viewModel.aid)
+            /**
+             * 保存并传递数据
+             */
             startActivity(intent)
         }
 
@@ -428,8 +435,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         /**
                          * 回到TaskFragment
                          */
-                        val intent = Intent(applicationContext,WrapperActivity::class.java)
+                        val intent = Intent(applicationContext,MainActivity::class.java)
                        startActivity(intent)
+                        /**
+                         * 回去缺少网络请求
+                         */
+
                     }
 
 

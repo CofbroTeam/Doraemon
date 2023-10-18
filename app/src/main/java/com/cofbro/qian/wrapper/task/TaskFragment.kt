@@ -226,6 +226,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val intent = Intent(requireActivity(), MapActivity::class.java)
         intent.putExtra("aid", aid)
         intent.putExtra("preUrl", preUrl)
+        /*
+        跳转保存数据
+         */
+        intent.putExtra("courseId",activity?.courseId)
+        intent.putExtra("classId",activity?.classId)
+        intent.putExtra("cpi",activity?.cpi)
         startActivity(intent)
     }
 
