@@ -104,7 +104,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                     val defaultPadding = dp2px(requireContext(), 15)
                     val toolbarHeight = binding?.appToolBar?.height ?: 0
                     if (parent.layoutManager?.getPosition(view) == 0) {
-                        Log.v("itemCount1:", adapter?.itemCount.toString())
                         return outRect.set(
                             defaultPadding,
                             toolbarHeight + dp2px(requireContext(), 5),
@@ -112,7 +111,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                             defaultPadding
                         )
                     } else if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(1) ) {
-                        Log.v("itemCount2:", adapter?.itemCount.toString())
                         return outRect.set(
                             defaultPadding,
                             0,
