@@ -257,7 +257,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/tv_login"
+        android:id="@+id/tv_logout"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="24dp"

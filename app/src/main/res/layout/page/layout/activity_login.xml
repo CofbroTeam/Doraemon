@@ -57,7 +57,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ip_password" />
 
     <TextView
-        android:id="@+id/tv_login"
+        android:id="@+id/tv_logout"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="36dp"
@@ -78,8 +78,8 @@
         android:layout_marginTop="8dp"
         android:text="Don't have an account?"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/tv_login"
-        app:layout_constraintTop_toBottomOf="@+id/tv_login" />
+        app:layout_constraintStart_toStartOf="@+id/tv_logout"
+        app:layout_constraintTop_toBottomOf="@+id/tv_logout" />
 
     <TextView
         android:id="@+id/tv_create_now"
@@ -98,8 +98,8 @@
         android:layout_height="1dp"
         android:layout_marginTop="24dp"
         android:background="#ccc"
-        app:layout_constraintEnd_toEndOf="@+id/tv_login"
-        app:layout_constraintStart_toStartOf="@+id/tv_login"
+        app:layout_constraintEnd_toEndOf="@+id/tv_logout"
+        app:layout_constraintStart_toStartOf="@+id/tv_logout"
         app:layout_constraintTop_toBottomOf="@+id/tv_create_now" />
 
     <TextView
@@ -127,7 +127,7 @@
         android:text="学号登录"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/tv_login"
-        app:layout_constraintStart_toStartOf="@+id/tv_login"
+        app:layout_constraintEnd_toEndOf="@+id/tv_logout"
+        app:layout_constraintStart_toStartOf="@+id/tv_logout"
         app:layout_constraintTop_toBottomOf="@+id/view" />
 </androidx.constraintlayout.widget.ConstraintLayout>
