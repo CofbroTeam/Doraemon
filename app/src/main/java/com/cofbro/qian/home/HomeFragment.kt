@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentHomeBinding
-import com.cofbro.qian.main.CourseListAdapter
+import com.cofbro.qian.home.CourseListAdapter
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
@@ -104,7 +104,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                     val defaultPadding = dp2px(requireContext(), 15)
                     val toolbarHeight = binding?.appToolBar?.height ?: 0
                     if (parent.layoutManager?.getPosition(view) == 0) {
-                        Log.v("itemCount1:", adapter?.itemCount.toString())
                         return outRect.set(
                             defaultPadding,
                             toolbarHeight + dp2px(requireContext(), 5),
@@ -112,7 +111,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                             defaultPadding
                         )
                     } else if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(1) ) {
-                        Log.v("itemCount2:", adapter?.itemCount.toString())
                         return outRect.set(
                             defaultPadding,
                             0,
