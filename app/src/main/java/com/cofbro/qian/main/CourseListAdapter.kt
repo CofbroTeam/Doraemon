@@ -21,11 +21,8 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     private var data: JSONObject? = null
     private var listener: AdapterListener? = null
 
-    init {
-        calculateCourseCount()
-    }
-
     private fun calculateCourseCount() {
+        val courseCount = 0
         data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
             array.forEach {
                 val jsonObject = (it as? JSONObject)
