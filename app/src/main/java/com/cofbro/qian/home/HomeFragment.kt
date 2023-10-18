@@ -110,7 +110,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                             defaultPadding,
                             defaultPadding
                         )
-                    } else if (parent.layoutManager?.getPosition(view) == mAdapter?.courseCount) {
+                    } else if (parent.layoutManager?.getPosition(view) ==
+                        mAdapter?.courseCount) {
                         return outRect.set(
                             defaultPadding,
                             0,
