@@ -16,8 +16,25 @@ import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 
 class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewHolder>() {
+    private var totalCount= 0
+    var courseCount = 0
     private var data: JSONObject? = null
     private var listener: AdapterListener? = null
+
+    private fun calculateCourseCount() {
+         courseCount = 0
+        data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
+            array.forEach {
+                val jsonObject = (it as? JSONObject)
+                // 是否是课程，否则不展示
+                val cataName = jsonObject?.getStringExt(Constants.CourseList.CATA_NAME) ?: ""
+                if (cataName == "课程") {
+                    courseCount++
+                }
+            }
+            totalCount = array.size
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -26,10 +43,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     }
 
     override fun getItemCount(): Int {
-        data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
-            return (array.size - 1).takeIf { it >= 0 } ?: 0
-        }
-        return 0
+        return courseCount
     }
 
     override fun onBindViewHolder(holder: CourseListViewHolder, position: Int) {
@@ -39,10 +53,15 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     inner class CourseListViewHolder(private val binding: ItemCourseListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
-            // position + 1 -> 数据中的第一个item不是课程
-            data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.get(position + 1)?.let {
+            // position  -> 数据中的第一个item不是课程
+            data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.get(position + totalCount - courseCount)?.let {
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
+                // 是否是课程，否则不展示
+//                val cataName = jsonObject?.getStringExt(Constants.CourseList.CATA_NAME) ?: ""
+//                if (cataName.isEmpty() || cataName != "课程") {
+//                    jsonObject =
+//                }
                 // cpi，后面签到需用此参数
                 val cpi = jsonObject?.getStringExt(Constants.CourseList.CPI) ?: ""
                 // 班级id
@@ -94,6 +113,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     @SuppressLint("NotifyDataSetChanged")
     fun setData(t: JSONObject) {
         data = t
+        calculateCourseCount()
         notifyDataSetChanged()
     }
 

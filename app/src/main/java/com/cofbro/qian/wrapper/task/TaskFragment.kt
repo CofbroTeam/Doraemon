@@ -268,6 +268,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
 
     private fun toPhotoSignActivity(aid: String) {
+        hideLoadingView()
         val intent = Intent(requireActivity(), PhotoSignActivity::class.java)
         intent.putExtra("aid", aid)
         startActivity(intent)

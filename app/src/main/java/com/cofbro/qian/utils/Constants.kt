@@ -214,6 +214,7 @@ object Constants {
      * }
      */
     object CourseList {
+        const val CATA_NAME = "cataName"
         const val CHANNEL_LIST = "channelList"
         const val CPI = "cpi"
         const val KEY = "key"
