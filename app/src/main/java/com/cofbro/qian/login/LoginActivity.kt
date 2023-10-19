@@ -2,6 +2,7 @@ package com.cofbro.qian.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
@@ -17,12 +18,17 @@ import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
+class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
+    private var extents:Boolean = CacheUtils.cacheB["extents"]?:false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
+
         /**
          * 常规登录
          */
@@ -32,7 +38,7 @@ class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, 
             initEvent()
         }else{
             /**
-             * 拓展登录
+             * 拓展登录不能进入？
              */
             autoClearFocus()
             login()
@@ -80,13 +86,13 @@ class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, 
                         CacheUtils.cache["uid"] = uid ?: ""
                         CacheUtils.cache["cookies"] = cookies.toString()
                         CacheUtils.cache["fid"] = fid ?: ""
+                        CacheUtils.cacheB["extents"] = false
                         val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
-                        if(CacheUtils.cacheUser["userLists"]?.isEmpty() == true){
-                            CacheUtils.cacheUser["userLists"] = arrayListOf()
+                        CacheUtils.cacheUser["userLists"] = arrayListOf()
                             /**
                              * 创建单例
                              */
-                        }
+
                         CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息列表添加
                         // 保存用户信息
                         saveUserInfo()
@@ -103,20 +109,13 @@ class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, 
                         lifecycleScope.launch(Dispatchers.Main) {
 
                             val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
-                            if(CacheUtils.cacheUser["userLists"]?.isEmpty() == true){
-                                CacheUtils.cacheUser["userLists"] = arrayListOf()
-                                /**
-                                 * 创建单例
-                                 */
-                            }
-
                             CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
                             ToastUtils.show("添加用户成功！")
-                            val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
-                            /**
-                             * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
-                             */
-                            startActivity(intent)
+//                            val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
+//                            /**
+//                             * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
+//                             */
+//                            startActivity(intent)
                             finish()
                         }
 

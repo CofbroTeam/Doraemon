@@ -47,6 +47,7 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
                                 CacheUtils.cache["uid"] = user.uid
                                 CacheUtils.cache["cookies"] = user.cookie
                                 CacheUtils.cache["fid"] = user.fid
+
                                 saveUserInfo(user,context)
                                 ToastUtil.show(context,"切换成功")
                             }
@@ -83,7 +84,8 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
             /**
              * 跳转登录界面，并保存信息回到manager 并判定是否为拓展账号
              */
-            val intent = Intent(this,LoginActivity(extents = true)::class.java)
+            val intent = Intent(this,LoginActivity::class.java)
+            CacheUtils.cacheB["extents"] = true
             startActivity(intent)
         }
         binding?.deleteaccount?.setOnClickListener {
