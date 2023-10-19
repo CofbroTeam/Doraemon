@@ -80,6 +80,14 @@ class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, 
                         CacheUtils.cache["uid"] = uid ?: ""
                         CacheUtils.cache["cookies"] = cookies.toString()
                         CacheUtils.cache["fid"] = fid ?: ""
+                        val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
+                        if(CacheUtils.cacheUser["userLists"]?.isEmpty() == true){
+                            CacheUtils.cacheUser["userLists"] = arrayListOf()
+                            /**
+                             * 创建单例
+                             */
+                        }
+                        CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息列表添加
                         // 保存用户信息
                         saveUserInfo()
                         lifecycleScope.launch(Dispatchers.Main) {
