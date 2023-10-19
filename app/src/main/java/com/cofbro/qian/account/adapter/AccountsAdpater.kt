@@ -2,8 +2,10 @@ package com.cofbro.qian.account.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.amap.api.services.help.Tip
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -16,6 +18,8 @@ import com.cofbro.qian.utils.dp2px
 
 class AccountsAdpater(val context: Context, var accounts: MutableList<User>):RecyclerView.Adapter<AccountsAdpater.AccountsHolder>() {
     private var itemClick: ((user:User) -> Unit)? = null
+    private var delete = false
+    private var deleteLister: ((position:Int) -> Unit)? = null
     inner class AccountsHolder(private val binding: ItemAccountsListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         /*
@@ -32,9 +36,14 @@ class AccountsAdpater(val context: Context, var accounts: MutableList<User>):Rec
                 .apply(options)
                 .into(binding.ivTaskImage)
             binding.tvTitle.text = item.user
+            binding.delete.visibility = if (delete){View.GONE}else{View.VISIBLE}
+            binding.delete.setOnClickListener {
+                deleteLister?.invoke(position)
+            }
             itemView.setOnClickListener {
                 itemClick?.invoke(item)
             }
+
         }
 
         }
@@ -54,5 +63,11 @@ class AccountsAdpater(val context: Context, var accounts: MutableList<User>):Rec
     }
     fun setItemClickListener(itemClickListener: (user:User) -> Unit) {
         itemClick = itemClickListener
+    }
+    fun setDeletDisable(ClickListener: ((position:Int) -> Unit)? ){
+       deleteLister = ClickListener
+    }
+    fun showDeletButton(){
+        delete = true
     }
 }

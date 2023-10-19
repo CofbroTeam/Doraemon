@@ -10,6 +10,7 @@ import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.account.adapter.AccountsAdpater
 import com.cofbro.qian.databinding.ActivityAccountmanagerBinding
 import com.cofbro.qian.login.LoginActivity
+import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.profile.LogoutDialog
 import com.cofbro.qian.utils.CacheUtils
 
@@ -30,26 +31,38 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
     private fun initView(){
         binding?.accounts?.apply {
             AccountsAdpater = AccountsAdpater(context = applicationContext,viewModel.accountsList)
-            AccountsAdpater?.setItemClickListener {user->
-                /**
-                 * 设计点击切换账号,更换cache,弹出dialog
-                 */
-                viewModel.dialog = LogoutDialog(applicationContext, confirmText = "确定切换账户吗？").apply {
-                    setConfirmClickListener {
-                        CacheUtils.cache["uid"] = user.uid
-                        CacheUtils.cache["cookies"] = user.cookie
-                        CacheUtils.cache["fid"] = user.fid
-                        saveUserInfo(user,context)
-                    }
-                    setCancelClickListener {
-                        this.dismiss()
-                    }
-                }
+            AccountsAdpater?.apply {
+                setDeletDisable {
+                    /**
+                     * 删除个人信息 并清除list
+                     */
+                    CacheUtils.cacheUser["userList"]?.removeAt(it)
+                    this.accounts.removeAt(it)
 
+                }
+                setItemClickListener {user->
+                        /**
+                         * 设计点击切换账号,更换cache,弹出dialog
+                         */
+                        viewModel.dialog = LogoutDialog(applicationContext, confirmText = "确定切换账户吗？").apply {
+                            setConfirmClickListener {
+                                CacheUtils.cache["uid"] = user.uid
+                                CacheUtils.cache["cookies"] = user.cookie
+                                CacheUtils.cache["fid"] = user.fid
+                                saveUserInfo(user,context)
+                                ToastUtil.show(context,"切换成功")
+                            }
+                            setCancelClickListener {
+                                this.dismiss()
+                            }
+                        }
+
+                    }
             }
             adapter = AccountsAdpater
             layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
         }
 
 
@@ -74,6 +87,15 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
              */
             val intent = Intent(this,LoginActivity(extents = true)::class.java)
             startActivity(intent)
+        }
+        binding?.deleteaccount?.setOnClickListener {
+            /**
+             * 显示delete按钮 修改list
+             */
+            AccountsAdpater?.apply {
+                showDeletButton()
+            }
+
         }
     }
 
