@@ -6,13 +6,14 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/confirmText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="确定退出并删除数据吗"
-        android:textSize="18sp"
-        android:textColor="#2196F3"
         android:gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:text="确定退出并删除数据吗"
+        android:textColor="#2196F3"
+        android:textSize="18sp" />
 
     <ImageView
         android:layout_width="100dp"

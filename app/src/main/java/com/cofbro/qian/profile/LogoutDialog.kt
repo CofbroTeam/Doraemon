@@ -8,7 +8,7 @@ import com.amap.api.services.help.Tip
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.DialogLogoutBinding
 
-class LogoutDialog(context: Context):AlertDialog(context,R.style.Dialog_Fullscreen) {
+class LogoutDialog(context: Context,var confirmText:String = "确定退出并删除数据吗"):AlertDialog(context,R.style.Dialog_Fullscreen) {
     lateinit var binding:DialogLogoutBinding
     private var CancelClick: ((itemTip: String) -> Unit?)? = null
     private var ConfirmClick: ((itemTip:String) -> Unit?)? = null
@@ -23,6 +23,8 @@ class LogoutDialog(context: Context):AlertDialog(context,R.style.Dialog_Fullscre
         binding.btnConfirm.setOnClickListener {
             ConfirmClick?.invoke("se")
         }
+        binding.confirmText.text = confirmText
+
 
     }
 

@@ -9,6 +9,7 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.account.manager.AccountManagerActivity
+import com.cofbro.qian.account.manager.User
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
@@ -89,14 +90,23 @@ class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, 
                         }
                     }else{
                         /**
-                         * 拓展登录
+                         * 拓展登录 class User(user:String,pwd:String,uid:String,cookie:String,fid:String)
                          */
                         lifecycleScope.launch(Dispatchers.Main) {
 
+                            val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
+                            if(CacheUtils.cacheUser["userLists"]?.isEmpty() == true){
+                                CacheUtils.cacheUser["userLists"] = arrayListOf()
+                                /**
+                                 * 创建单例
+                                 */
+                            }
+
+                            CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
                             ToastUtils.show("添加用户成功！")
                             val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
                             /**
-                             * 传递用户信息？是否需要CashUtil
+                             * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
                              */
                             startActivity(intent)
                             finish()
