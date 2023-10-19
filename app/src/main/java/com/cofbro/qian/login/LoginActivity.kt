@@ -2,8 +2,7 @@ package com.cofbro.qian.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
+
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
@@ -36,10 +35,14 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
             tryLogin()
             initObserver()
             initEvent()
+            autoClearFocus()
+            login()
         }else{
             /**
              * 拓展登录不能进入？
              */
+            initObserver()
+            initEvent()
             autoClearFocus()
             login()
         }
@@ -109,14 +112,26 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         lifecycleScope.launch(Dispatchers.Main) {
 
                             val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
-                            CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
-                            ToastUtils.show("添加用户成功！")
-//                            val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
-//                            /**
-//                             * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
-//                             */
-//                            startActivity(intent)
-                            finish()
+                            /**
+                             * 判断是否含有userInfo uid判断
+                             */
+                            if(CacheUtils.cacheUser["userLists"]?.contains(userInfo) == true){
+                                ToastUtils.show("已经有该用户了")
+                                /*
+                                clear
+                                 */
+
+                            }else{
+                                CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
+                                ToastUtils.show("添加用户成功！")
+                                val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
+                                /**
+                                 * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
+                                 */
+                                startActivity(intent)
+                                finish()
+                            }
+
                         }
 
                     }
