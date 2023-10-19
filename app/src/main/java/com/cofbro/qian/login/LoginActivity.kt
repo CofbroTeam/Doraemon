@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
+import com.cofbro.qian.account.manager.AccountManagerActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
@@ -17,13 +18,27 @@ import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LoginActivity(extents: Boolean =false) : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
+class LoginActivity(val extents: Boolean =false) : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        tryLogin()
-        initObserver()
-        initEvent()
+        /**
+         * 常规登录
+         */
+        if (!extents){
+            tryLogin()
+            initObserver()
+            initEvent()
+        }else{
+            /**
+             * 拓展登录
+             */
+            autoClearFocus()
+            login()
+        }
+
+
+
     }
 
     private fun tryLogin() {
@@ -57,29 +72,56 @@ class LoginActivity(extents: Boolean =false) : BaseActivity<LoginViewModel, Acti
                     } else {
                         ToastUtils.show("Cookies获取失败!")
                     }
-                    CacheUtils.cache["uid"] = uid ?: ""
-                    CacheUtils.cache["cookies"] = cookies.toString()
-                    CacheUtils.cache["fid"] = fid ?: ""
-                    // 保存用户信息
-                    saveUserInfo()
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        ToastUtils.show("登录成功！")
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                    if(!extents){
+                        /**
+                         * 正常登陆
+                         */
+                        CacheUtils.cache["uid"] = uid ?: ""
+                        CacheUtils.cache["cookies"] = cookies.toString()
+                        CacheUtils.cache["fid"] = fid ?: ""
+                        // 保存用户信息
+                        saveUserInfo()
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            ToastUtils.show("登录成功！")
+                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }else{
+                        /**
+                         * 拓展登录
+                         */
+                        lifecycleScope.launch(Dispatchers.Main) {
+
+                            ToastUtils.show("添加用户成功！")
+                            val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
+                            /**
+                             * 传递用户信息？是否需要CashUtil
+                             */
+                            startActivity(intent)
+                            finish()
+                        }
+
                     }
+
                 } else {
-                    ToastUtils.show("账号或密码错误!")
+                    if(!extents){
+                        ToastUtils.show("账号或密码错误!")
+                    }else{
+                        ToastUtils.show("账号或密码错误!添加用户失败")
+                    }
+
                 }
             }
         }
     }
 
     private fun saveUserInfo() {
-        if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()) {
+        if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()&&!extents) {
             saveUsedSp("username", mUsername!!)
             saveUsedSp("password", mPassword!!)
         }
+
     }
 
     private fun initEvent() {
