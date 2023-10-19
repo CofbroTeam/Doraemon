@@ -18,8 +18,6 @@ import com.cofbro.qian.utils.CacheUtils
  * 关联账号，实现一起签到
  */
 class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAccountmanagerBinding>(){
-   private var AccountsAdpater: AccountsAdpater? = null
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initArgs()
         initView()
@@ -30,11 +28,11 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
     }
     private fun initView(){
         binding?.accounts?.apply {
-            AccountsAdpater = AccountsAdpater(context = applicationContext,viewModel.accountsList)
-            AccountsAdpater?.apply {
+            viewModel.AccountsAdpater = AccountsAdpater(context = applicationContext,viewModel.accountsList)
+            viewModel.AccountsAdpater?.apply {
                 setDeletDisable {
                     /**
-                     * 删除个人信息 并清除list
+                     * 删除个人信息 并清除list 保护用户数据
                      */
                     CacheUtils.cacheUser["userList"]?.removeAt(it)
                     this.accounts.removeAt(it)
@@ -59,7 +57,7 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
 
                     }
             }
-            adapter = AccountsAdpater
+            adapter = viewModel.AccountsAdpater
             layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
@@ -92,7 +90,7 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
             /**
              * 显示delete按钮 修改list
              */
-            AccountsAdpater?.apply {
+            viewModel.AccountsAdpater?.apply {
                 showDeletButton()
             }
 
