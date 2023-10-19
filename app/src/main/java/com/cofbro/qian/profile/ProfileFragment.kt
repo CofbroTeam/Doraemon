@@ -12,6 +12,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.saveUsedSp
+import com.cofbro.qian.account.manager.AccountManagerActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentProfileBinding
 import com.cofbro.qian.login.LoginActivity
@@ -76,7 +77,8 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
             viewModel.logout_dialog?.show()
         }
         binding?.cowithprofiles?.setOnClickListener {
-
+            val intent = Intent(requireActivity(), AccountManagerActivity::class.java)
+            startActivity(intent)
         }
     }
     private fun clearUserInfo(context: Context){

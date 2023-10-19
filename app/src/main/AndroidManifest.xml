@@ -56,6 +56,7 @@
         </activity>
         <activity android:name=".main.MainActivity" />
         <activity android:name=".scan.ScanActivity" />
+        <activity android:name=".account.manager.AccountManagerActivity"></activity>
         <activity
             android:name=".wrapper.WrapperActivity"
             android:exported="true">

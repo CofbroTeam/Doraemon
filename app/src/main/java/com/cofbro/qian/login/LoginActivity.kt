@@ -17,7 +17,7 @@ import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
+class LoginActivity(extents: Boolean =false) : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
