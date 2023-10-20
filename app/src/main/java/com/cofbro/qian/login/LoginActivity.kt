@@ -56,7 +56,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private fun preGetUserLists(){
         val userLists = getJsonArraySp("userLists")
         CacheUtils.cacheUser["userLists"] = arrayListOf()
-
+        userLists?.toString()?.let { Log.v("ss", it) }
 
         /**
          * 创建单例
@@ -67,13 +67,13 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
             val array =  org.json.JSONArray(userLists)
             for (i in 0 until array.length()) {
                 val element = array[i].toString().safeParseToJson()
-                val uid = element.getString("uid")
                 val user = User(user = element.getString("user"), pwd = element.getString("pwd"), cookie = element.getString("cookie"), uid = element.getString("uid"), fid = element.getString("fid"))
-                if(CacheUtils.cacheUser["userLists"]?.contains(user) == false){
+                if( ConfirmIfSingleUser(CacheUtils.cacheUser["userLists"],user.uid)){
                     CacheUtils.cacheUser["userLists"]?.add(user)
+                }else{
+                    continue
                 }
 
-               Log.v("e",uid)
              //用户信息列表添加
             }
         }
@@ -117,6 +117,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         /**
                          * 正常登陆
                          */
+                        // 保存用户信息
                         saveUserInfo()
                         CacheUtils.cache["uid"] = uid ?: ""
                         CacheUtils.cache["cookies"] = cookies.toString()
@@ -124,9 +125,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         CacheUtils.cacheB["extents"] = false
 
                         val userInfo = User(getBySp("username")?:"",getBySp("password")?:"",uid?:"",cookies.toString(),fid?:"")
+                        if(ConfirmIfSingleUser( CacheUtils.cacheUser["userLists"],uid)){
+                            CacheUtils.cacheUser["userLists"]?.add(userInfo)
+                        }
 
-                        CacheUtils.cacheUser["userLists"]?.add(userInfo)
-                        // 保存用户信息
 
                         lifecycleScope.launch(Dispatchers.Main) {
                             ToastUtils.show("登录成功！")
@@ -179,7 +181,6 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     fun ConfirmIfSingleUser(arrayList: MutableList<User>?,uid:String?):Boolean{
         arrayList?.forEach {
             if(it.uid == uid){
-
                 return false
             }
         }
