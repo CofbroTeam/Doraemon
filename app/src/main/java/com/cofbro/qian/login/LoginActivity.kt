@@ -2,9 +2,9 @@ package com.cofbro.qian.login
 
 import android.content.Intent
 import android.os.Bundle
-
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import com.alibaba.fastjson.JSONObject
+import com.alibaba.fastjson.JSON
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
@@ -14,12 +14,13 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.getJsonArraySp
 import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONStringer
+
 
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
@@ -27,7 +28,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var extents:Boolean = CacheUtils.cacheB["extents"]?:false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
-
+        preGetUserLists()
         /**
          * 常规登录
          */
@@ -45,6 +46,34 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
             initEvent()
             autoClearFocus()
             login()
+        }
+
+
+
+    }
+    private fun preGetUserLists(){
+        val userLists = getJsonArraySp("userLists")
+        CacheUtils.cacheUser["userLists"] = arrayListOf()
+
+
+        /**
+         * 创建单例
+         */
+
+
+        if (!userLists.isNullOrEmpty()){
+            val array =  org.json.JSONArray(userLists)
+            for (i in 0 until array.length()) {
+                val element = array[i].toString().safeParseToJson()
+                val uid = element.getString("uid")
+                val user = User(user = element.getString("user"), pwd = element.getString("pwd"), cookie = element.getString("cookie"), uid = element.getString("uid"), fid = element.getString("fid"))
+                if(CacheUtils.cacheUser["userLists"]?.contains(user) == false){
+                    CacheUtils.cacheUser["userLists"]?.add(user)
+                }
+
+               Log.v("e",uid)
+             //用户信息列表添加
+            }
         }
 
 
@@ -90,13 +119,9 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         CacheUtils.cache["cookies"] = cookies.toString()
                         CacheUtils.cache["fid"] = fid ?: ""
                         CacheUtils.cacheB["extents"] = false
-                        val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
-                        CacheUtils.cacheUser["userLists"] = arrayListOf()
-                            /**
-                             * 创建单例
-                             */
+                        val userInfo = User(getBySp("username")?:"",getBySp("password")?:"",uid?:"",cookies.toString(),fid?:"")
 
-                        CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息列表添加
+                        CacheUtils.cacheUser["userLists"]?.add(userInfo)
                         // 保存用户信息
                         saveUserInfo()
                         lifecycleScope.launch(Dispatchers.Main) {
@@ -111,7 +136,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                          */
                         lifecycleScope.launch(Dispatchers.Main) {
 
-                            val userInfo = User(mUsername?:"",mPassword?:"",uid?:"",cookies.toString(),fid?:"")
+                            val userInfo = User(binding?.ipUsername?.getTextString()?:"",binding?.ipPassword?.getTextString()?:"",uid?:"",cookies.toString(),fid?:"")
                             /**
                              * 判断是否含有userInfo uid判断
                              */

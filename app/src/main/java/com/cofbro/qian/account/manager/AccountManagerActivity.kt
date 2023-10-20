@@ -3,8 +3,10 @@ package com.cofbro.qian.account.manager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alibaba.fastjson.JSONArray
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.account.adapter.AccountsAdpater
@@ -13,15 +15,25 @@ import com.cofbro.qian.login.LoginActivity
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.profile.LogoutDialog
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.getJsonArraySp
+import com.cofbro.qian.utils.saveJsonArraySp
+import com.google.gson.JsonArray
 
 /**
  * 关联账号，实现一起签到
  */
 class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAccountmanagerBinding>(){
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        preGetUserLists()
         initArgs()
         initView()
         initViewClick()
+    }
+    private fun preGetUserLists(){
+        val userLists = getJsonArraySp("userLists")
+        if (!userLists.isNullOrEmpty()){
+            Log.v("userLists:",userLists)
+        }
     }
     private fun initArgs(){
          viewModel.accountsList = CacheUtils.cacheUser["userLists"]?: arrayListOf()
@@ -34,7 +46,7 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
                     /**
                      * 删除个人信息 并清除list 保护用户数据
                      */
-                    CacheUtils.cacheUser["userList"]?.removeAt(it)
+                    CacheUtils.cacheUser["userLists"]?.removeAt(it)
                     this.accounts.removeAt(it)
 
                 }
@@ -87,6 +99,7 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
             val intent = Intent(this,LoginActivity::class.java)
             CacheUtils.cacheB["extents"] = true
             startActivity(intent)
+            finish()
         }
         binding?.deleteaccount?.setOnClickListener {
             /**
@@ -98,5 +111,14 @@ class AccountManagerActivity :  BaseActivity<AccountManagerViewModel, ActivityAc
 
         }
     }
+
+    /**
+     * 为节省储存效率，在destroy时进行getSharedPreferences
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        CacheUtils.cacheUser["userLists"]?.let { saveJsonArraySp("userLists", it) }
+    }
+
 
 }
