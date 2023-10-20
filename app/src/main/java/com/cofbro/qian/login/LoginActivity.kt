@@ -117,7 +117,6 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         /**
                          * 正常登陆
                          */
-                        // 保存用户信息
                         saveUserInfo()
                         CacheUtils.cache["uid"] = uid ?: ""
                         CacheUtils.cache["cookies"] = cookies.toString()
