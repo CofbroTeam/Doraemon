@@ -13,6 +13,7 @@ import com.cofbro.qian.account.manager.User
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
+import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.getJsonArraySp
 import com.cofbro.qian.utils.safeParseToJson
@@ -28,11 +29,12 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var extents:Boolean = CacheUtils.cacheB["extents"]?:false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
-        preGetUserLists()
+
         /**
          * 常规登录
          */
         if (!extents){
+            preGetUserLists()
             tryLogin()
             initObserver()
             initEvent()
@@ -115,15 +117,17 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         /**
                          * 正常登陆
                          */
+                        saveUserInfo()
                         CacheUtils.cache["uid"] = uid ?: ""
                         CacheUtils.cache["cookies"] = cookies.toString()
                         CacheUtils.cache["fid"] = fid ?: ""
                         CacheUtils.cacheB["extents"] = false
+
                         val userInfo = User(getBySp("username")?:"",getBySp("password")?:"",uid?:"",cookies.toString(),fid?:"")
 
                         CacheUtils.cacheUser["userLists"]?.add(userInfo)
                         // 保存用户信息
-                        saveUserInfo()
+
                         lifecycleScope.launch(Dispatchers.Main) {
                             ToastUtils.show("登录成功！")
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
@@ -140,13 +144,13 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                             /**
                              * 判断是否含有userInfo uid判断
                              */
-                            if(CacheUtils.cacheUser["userLists"]?.contains(userInfo) == true){
-                                ToastUtils.show("已经有该用户了")
-                                /*
-                                clear
+                            if(!ConfirmIfSingleUser(CacheUtils.cacheUser["userLists"],uid)){
+                                /**
+                                 * 做处理？
                                  */
-
-                            }else{
+                                ToastUtils.show("已有该账号")
+                            }
+                            else{
                                 CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
                                 ToastUtils.show("添加用户成功！")
                                 val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
@@ -172,6 +176,17 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
             }
         }
     }
+    fun ConfirmIfSingleUser(arrayList: MutableList<User>?,uid:String?):Boolean{
+        arrayList?.forEach {
+            if(it.uid == uid){
+
+                return false
+            }
+        }
+        return true
+
+    }
+
 
     private fun saveUserInfo() {
         if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()&&!extents) {
