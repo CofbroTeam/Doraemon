@@ -21,10 +21,7 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/back"
+            android:background="@drawable/mapback"
             android:scaleType="center"
              />
 
@@ -38,6 +35,7 @@
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
+            android:background="@drawable/text_back"
             app:queryHint="请输入关键字"
             app:searchIcon="@null" />
     </LinearLayout>

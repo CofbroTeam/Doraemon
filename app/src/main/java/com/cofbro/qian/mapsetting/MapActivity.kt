@@ -1,14 +1,15 @@
 package com.cofbro.qian.mapsetting
 
 
+
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -41,8 +42,6 @@ import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.showSignResult
-import com.cofbro.qian.wrapper.WrapperActivity
-import com.cofbro.qian.wrapper.task.TaskFragment
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -372,7 +371,25 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun initViewClick() {
-        //binding?.cleanKeywords?.setOnClickListener(this)
+        val translateAnimation: Animation =
+            AnimationUtils.loadAnimation(mContext, R.anim.translate_animation)
+        translateAnimation.fillAfter = false
+
+        translateAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+
+            }
+            override fun onAnimationEnd(animation: Animation) {
+                val intent = Intent(this@MapActivity, InputTipsActivity::class.java)
+                intent.putExtra("code", REQUEST_CODE);
+                intent.putExtra("aid",viewModel.aid)
+                /**
+                 * 保存并传递数据
+                 */
+                startActivity(intent)
+            }
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
         binding?.selectButton?.setOnClickListener {
             if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
@@ -407,15 +424,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 }
             }
         }
-        binding?.mainKeywords?.setOnClickListener {
-            val intent = Intent(this, InputTipsActivity::class.java)
-            intent.putExtra("code", REQUEST_CODE);
-            intent.putExtra("aid",viewModel.aid)
-            /**
-             * 保存并传递数据
-             */
-            startActivity(intent)
+        binding?.linearLayoutmap?.apply {
+            setOnClickListener {
+                startAnimation(translateAnimation)
+            }
+
         }
+
 
     }
 
