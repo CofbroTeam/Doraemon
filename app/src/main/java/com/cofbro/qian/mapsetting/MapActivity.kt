@@ -534,7 +534,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 } else {
                     addTipMarker(tip)
                 }
-                binding?.mainKeywords?.text = tip[0]
+                if(binding?.mainKeywords?.text?.isNotEmpty() == true){
+                    binding?.selectButton?.visibility = View.VISIBLE
+                    binding?.etLocationName?.visibility = View.VISIBLE
+                    binding?.mainKeywords?.text = tip[0]
+                }
+
                 if (tip[0] != "") {
                     //binding?.cleanKeywords?.visibility = View.VISIBLE
                 }

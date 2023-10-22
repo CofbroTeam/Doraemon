@@ -85,7 +85,7 @@
 
                         android:background="@drawable/button_back"
                         android:text="签到"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -96,7 +96,7 @@
                         android:layout_height="70dp"
                         android:background="@drawable/edit_back"
                         android:hint="输入需要想要为老师展示的位置名称(可选)"
-
+                        android:visibility="gone"
                         android:textColorHint="@color/ps_color_blue"
                         app:layout_constraintBottom_toTopOf="@+id/selectButton"
                         app:layout_constraintEnd_toEndOf="parent"
