@@ -141,6 +141,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         Log.v("sign:aid:",viewModel.aid)
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
         viewModel.uid = CacheUtils.cache["uid"] ?: ""
+        Log.v("ui:", viewModel.preUrl)
 
         /**
          * 传递数据
@@ -371,25 +372,19 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun initViewClick() {
-        val translateAnimation: Animation =
-            AnimationUtils.loadAnimation(mContext, R.anim.translate_animation)
-        translateAnimation.fillAfter = false
-
-        translateAnimation.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-
-            }
-            override fun onAnimationEnd(animation: Animation) {
-                val intent = Intent(this@MapActivity, InputTipsActivity::class.java)
-                intent.putExtra("code", REQUEST_CODE);
-                intent.putExtra("aid",viewModel.aid)
-                /**
-                 * 保存并传递数据
-                 */
-                startActivity(intent)
-            }
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
+//        val translateAnimation: Animation =
+//            AnimationUtils.loadAnimation(mContext, R.anim.translate_animation)
+//        translateAnimation.fillAfter = false
+//
+//        translateAnimation.setAnimationListener(object : Animation.AnimationListener {
+//            override fun onAnimationStart(animation: Animation) {
+//
+//            }
+//            override fun onAnimationEnd(animation: Animation) {
+//
+//            }
+//            override fun onAnimationRepeat(animation: Animation) {}
+//        })
         binding?.selectButton?.setOnClickListener {
             if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
@@ -424,9 +419,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 }
             }
         }
-        binding?.linearLayoutmap?.apply {
+        binding?.mainKeywords?.apply {
             setOnClickListener {
-                startAnimation(translateAnimation)
+                val intent = Intent(this@MapActivity, InputTipsActivity::class.java)
+                intent.putExtra("code", REQUEST_CODE);
+                intent.putExtra("aid",viewModel.aid)
+                /**
+                 * 保存并传递数据
+                 */
+                startActivity(intent)
             }
 
         }
@@ -439,8 +440,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
+
                 withContext(Dispatchers.Main) {
-                    data?.showSignResult()
                     /**
                      * 回到TaskActivity
                      */
@@ -450,8 +451,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         /**
                          * 回到TaskFragment
                          */
-                        val intent = Intent(applicationContext,MainActivity::class.java)
-                       startActivity(intent)
+                        if (data!!.contains("签到过了")){
+                            ToastUtil.show(applicationContext,"签到已成功")
+                            val intent = Intent(applicationContext,MainActivity::class.java)
+                            startActivity(intent)
+                        }
+
                         /**
                          * 回去缺少网络请求
                          */
@@ -500,7 +505,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.toString()
                 withContext(Dispatchers.Main) {
-                    data?.showSignResult()
+
                 }
             }
         }
@@ -534,7 +539,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 } else {
                     addTipMarker(tip)
                 }
-                if(binding?.mainKeywords?.text?.isNotEmpty() == true){
+                if(tip[0].isNotEmpty()){
                     binding?.selectButton?.visibility = View.VISIBLE
                     binding?.etLocationName?.visibility = View.VISIBLE
                     binding?.mainKeywords?.text = tip[0]

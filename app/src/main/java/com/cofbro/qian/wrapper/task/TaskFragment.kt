@@ -135,6 +135,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
+                Log.v("data:",data!!)
                 withContext(Dispatchers.Main) {
                     hideLoadingView()
                     data?.showSignResult()
