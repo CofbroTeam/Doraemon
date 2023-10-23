@@ -2,6 +2,8 @@ package com.cofbro.qian.mapsetting.viewmodel
 
 import android.app.Dialog
 import androidx.lifecycle.viewModelScope
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.services.poisearch.PoiResultV2
@@ -24,11 +26,20 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var query: PoiSearchV2.Query? = null // Poi查询条件类
     var poiSearch: PoiSearchV2? = null // POI搜索
     var mPoiMarker: Marker? = null
+    var default_mark:Marker? = null //签到位置
+    var default_Sign_Lating:LatLng? = null
     var currentTipPoint: LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
     var Tip_address: String? = null
     var Tip_name: String? = null
     var Tip_City: String? = null
-
+    // 声明AMapLocationClient类对象
+    var  mLocationClient: AMapLocationClient? = null;
+    var mLocationOption: AMapLocationClientOption? = null
+    var default_My_Lating:LatLng? = null
+    var preUrl= ""
+    var signUrl= ""
+    var uid = ""
+    var aid = ""
     fun sign(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(signLiveData) {

@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="appColor">#3170ff</color>
     <color name="statusBarColor">#f3f9ff</color>
+    <color name="textColor">#171D42</color>
 </resources>

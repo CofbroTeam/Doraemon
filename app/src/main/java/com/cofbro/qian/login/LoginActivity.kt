@@ -207,7 +207,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         binding?.tvLogin?.setOnClickListener {
             mUsername = binding?.ipUsername?.getTextString()
             mPassword = binding?.ipPassword?.getTextString()
-
+            Log.d("chy", "username: $mUsername password: $mPassword")
             if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()) {
                 viewModel.login(URL.getLoginPath(mUsername!!, mPassword!!))
             }

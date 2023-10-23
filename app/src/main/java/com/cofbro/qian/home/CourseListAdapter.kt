@@ -1,4 +1,4 @@
-package com.cofbro.qian.main
+package com.cofbro.qian.home
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -17,7 +17,7 @@ import com.cofbro.qian.utils.getStringExt
 
 class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewHolder>() {
     private var totalCount= 0
-    var courseCount = 0
+    private var courseCount = 0
     private var data: JSONObject? = null
     private var listener: AdapterListener? = null
 

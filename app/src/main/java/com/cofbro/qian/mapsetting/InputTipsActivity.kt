@@ -25,14 +25,19 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
     InputtipsListener, View.OnClickListener {
     var aid:String? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        val intent = intent
-        aid = intent.getStringExtra("aid")
-        if (aid != null) {
-            Log.v("result_op:", aid!!)
-        }
+
+
+        initArgs()
         initSearchView()
         initViewClick()
 
+    }
+    private fun initArgs(){
+        val intent = intent
+        aid = intent.getStringExtra("aid")
+        /**
+         * 传递数据
+         */
     }
     private fun  initViewClick(){
         binding?.back?.setOnClickListener(this)
@@ -69,7 +74,6 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                 layoutManager = LinearLayoutManager(this@InputTipsActivity, RecyclerView.VERTICAL,false)
             }
             viewModel.mIntipAdapter?.setItemClickListener {
-                Log.v("ssx","ssx")
                 if (viewModel.mCurrentTipList != null) {
                     /**
                      *  实现跳转
@@ -78,8 +82,10 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                     val intent = Intent(this, MapActivity::class.java)
 
                     intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
-                    intent.putExtra("aids",aid)
-                    aid?.let { it1 -> Log.v("result:jump:", it1) }
+                    intent.putExtra("aid",aid)
+                    /**
+                     * 保存并传递数据
+                     */
                     startActivity(intent)
                 }
             }
