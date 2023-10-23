@@ -11,4 +11,7 @@
     <string name="tab_home">主页</string>
     <string name="tab_friend">好友</string>
     <string name="tab_profile">我的</string>
+
+    <string name="add_file">添加附件</string>
+    <string name="submit_file">提 交</string>
 </resources>
