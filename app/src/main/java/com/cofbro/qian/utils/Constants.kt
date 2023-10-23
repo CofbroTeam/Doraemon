@@ -368,4 +368,24 @@ object Constants {
         // 图片唯一标识
         const val OBJECT_ID = "objectId"
     }
+
+    object RecycleJson {
+        const val FILE_NAME = "home_json_data"
+    }
+
+
+    object DataLoad {
+        const val FIRST_LOAD = "first_load"
+        const val UNLOAD = "unload"
+        const val LOADED = "loaded"
+    }
+
+    object Work {
+        const val SUBMIT_URL = "url"
+        const val PREFIX_URL = "prefixPostUrl"
+        const val DESCRIPTION = "description"
+        const val WORK_TYPE = "workType"
+        const val TITLE = "title"
+        const val OBJECT_ID = "objectid"
+    }
 }

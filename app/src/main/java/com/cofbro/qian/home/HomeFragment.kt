@@ -14,11 +14,16 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
+import com.cofbro.hymvvmutils.base.BaseResponse
+import com.cofbro.hymvvmutils.base.DataState
+import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentHomeBinding
 import com.cofbro.qian.home.CourseListAdapter
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.Downloader
+import com.cofbro.qian.utils.NetworkUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.safeParseToJson
@@ -27,6 +32,11 @@ import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.Protocol
+import okhttp3.Response
+import okhttp3.ResponseBody
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
     private var scrolledDx = 0
@@ -34,10 +44,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
     private var mAdapter: CourseListAdapter? = null
     private var data: JSONObject? = null
 
+
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initView()
-        doNetwork()
         initObserver()
+        loadJsonLocally()
+        //doNetwork()
     }
 
 //    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -63,6 +75,38 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
         mAdapter = CourseListAdapter()
         targetScrollDx = dp2px(requireContext(), 76)
         binding?.rvCourseList?.apply {
+            // 增加间距
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val defaultPadding = dp2px(requireContext(), 15)
+                    val toolbarHeight = binding?.appToolBar?.height ?: 0
+                    if (parent.layoutManager?.getPosition(view) == 0) {
+                        return outRect.set(
+                            defaultPadding,
+                            toolbarHeight + dp2px(requireContext(), 5),
+                            defaultPadding,
+                            defaultPadding
+                        )
+                    } else if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(
+                            1
+                        )
+                    ) {
+                        return outRect.set(
+                            defaultPadding,
+                            0,
+                            defaultPadding,
+                            dp2px(requireContext(), 80)
+                        )
+                    }
+                    return outRect.set(defaultPadding, 0, defaultPadding, defaultPadding)
+                }
+            })
+
             // 滑动监听
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -92,35 +136,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                 }
 
             }
-
-            // 增加间距
-            addItemDecoration(object : RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    val defaultPadding = dp2px(requireContext(), 15)
-                    val toolbarHeight = binding?.appToolBar?.height ?: 0
-                    if (parent.layoutManager?.getPosition(view) == 0) {
-                        return outRect.set(
-                            defaultPadding,
-                            toolbarHeight + dp2px(requireContext(), 5),
-                            defaultPadding,
-                            defaultPadding
-                        )
-                    } else if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(1) ) {
-                        return outRect.set(
-                            defaultPadding,
-                            0,
-                            defaultPadding,
-                            dp2px(requireContext(), 80)
-                        )
-                    }
-                    return outRect.set(defaultPadding, 0, defaultPadding, defaultPadding)
-                }
-            })
         }
 
         /**
@@ -160,30 +175,30 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
         // 课程列表
         viewModel.loadCourseListLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val s = it.data?.body?.string()
+                val s = it.data?.body?.string() ?: ""
+                Downloader.download(requireContext(), Constants.RecycleJson.FILE_NAME, s)
                 withContext(Dispatchers.Main) {
-                    s?.let {
-                        val jsonObject = it.safeParseToJson()
-                        mAdapter?.setData(jsonObject)
-                        data = jsonObject
-                        binding?.rvCourseList?.adapter = mAdapter
-                        binding?.rvCourseList?.layoutManager =
-                            LinearLayoutManager(
-                                requireContext(),
-                                LinearLayoutManager.VERTICAL,
-                                false
-                            )
-                        mAdapter?.setOnItemClickListener(object :
-                            CourseListAdapter.AdapterListener {
-                            override fun onItemClick(
-                                courseId: String,
-                                classId: String,
-                                cpi: String
-                            ) {
-                                toWrapperActivity(courseId, classId, cpi)
-                            }
-                        })
-                    }
+                    val jsonObject = s.safeParseToJson()
+                    mAdapter?.setData(jsonObject)
+                    data = jsonObject
+                    binding?.rvCourseList?.adapter = mAdapter
+                    binding?.rvCourseList?.layoutManager =
+                        LinearLayoutManager(
+                            requireContext(),
+                            LinearLayoutManager.VERTICAL,
+                            false
+                        )
+                    mAdapter?.setOnItemClickListener(object :
+                        CourseListAdapter.AdapterListener {
+                        override fun onItemClick(
+                            courseId: String,
+                            classId: String,
+                            cpi: String
+                        ) {
+                            toWrapperActivity(courseId, classId, cpi)
+                        }
+                    })
+
                 }
             }
         }
@@ -235,5 +250,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
             putExtra("cpi", cpi)
         }
         startActivity(intent)
+    }
+
+    private fun loadJsonLocally() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val dataString = Downloader.acquire(requireContext(), Constants.RecycleJson.FILE_NAME)
+            val firstLoad = CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] ?: Constants.DataLoad.UNLOAD
+            if (dataString.isEmpty() || firstLoad == Constants.DataLoad.UNLOAD) {
+                doNetwork()
+                CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] = Constants.DataLoad.LOADED
+                return@launch
+            }
+            val response = Response.Builder()
+                .request(NetworkUtils.buildClientRequest(URL.getAllCourseListPath()))
+                .header("refer","")
+                .protocol(Protocol.HTTP_1_1)
+                .body(ResponseBody.create("application/json".toMediaTypeOrNull(), dataString))
+                .code(200).message("OK").build()
+            val baseResponse = BaseResponse<Response>()
+            baseResponse.data = response
+            baseResponse.dataState = DataState.STATE_INITIALIZE
+            viewModel.loadCourseListLiveData.postValue(baseResponse)
+        }
     }
 }

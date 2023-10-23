@@ -17,11 +17,13 @@ fun String.showSignResult() {
 }
 
 fun getStatusBarHeight(context: Context): Int {
-    var result = 0
-    val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
-    if (resourceId > 0) {
-        result = context.resources.getDimensionPixelSize(resourceId)
-    }
+    var result = dp2px(context, 37)
+    try {
+        val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (resourceId > 0) {
+            result = context.resources.getDimensionPixelSize(resourceId)
+        }
+    } catch (_: Exception){}
     return result
 }
 

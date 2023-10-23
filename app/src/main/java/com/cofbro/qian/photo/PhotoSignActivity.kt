@@ -10,7 +10,7 @@ import com.cofbro.qian.databinding.ActivityPhotoSignBinding
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.GlideEngine
-import com.cofbro.qian.utils.ImageDownloader
+import com.cofbro.qian.utils.Downloader
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.showSignResult
 import com.cofbro.qian.view.FullScreenDialog
@@ -97,7 +97,7 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                     override fun onResult(result: ArrayList<LocalMedia>?) {
                         result?.get(0)?.let {
                             lifecycleScope.launch(Dispatchers.IO) {
-                                ImageDownloader.download(
+                                Downloader.download(
                                     this@PhotoSignActivity,
                                     it.path
                                 ) { success, filepath ->
