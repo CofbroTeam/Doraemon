@@ -212,6 +212,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // 手势签到，签到码签到
             Constants.SIGN.GESTURE, Constants.SIGN.SIGN_CODE -> {
                 viewModel.preSign(preSignUrl)
+                Log.v("pre:",preSignUrl)
                 signNormally(id)
             }
             // 定位签到
@@ -255,7 +256,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signNormally(aid: String) {
         // https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/preSign?activeId=2000072607796
         activity?.let {
+            val i = URL.getNormalSignPath(it.courseId, it.classId, aid)
+            Log.v("norm,",i)
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
+
         }
     }
 
