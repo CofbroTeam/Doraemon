@@ -82,6 +82,18 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
 
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            binding?.scanner?.startCamera() // 打开后置摄像头开始预览，但是并未开始识别
+            binding?.scanner?.startSpotAndShowRect() // 显示扫描框，并开始识别
+        }
+    }
+
     private fun checkPermissions(
         activity: Activity,
         permissions: Array<String>,
