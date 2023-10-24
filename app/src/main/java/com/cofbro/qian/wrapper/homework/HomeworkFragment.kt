@@ -99,8 +99,6 @@ class HomeworkFragment : BaseFragment<HomeworkViewModel, FragmentHomeworkBinding
 
     private fun doNetwork() {
         activity?.let {
-            //viewModel.queryHomeworkList("https://mooc1.chaoxing.com/mooc-ans/mooc2/work/task?courseId=237515217&classId=83807809&cpi=197696127&workId=29941278&answerId=52683919&enc=497eb7d24c417919a6180702d2d5f69e")
-            //viewModel.queryHomeworkList("https://mooc1.chaoxing.com/mooc2/work/list?courseId=237515217&classId=83807809&cpi=197696127&ut=s&enc=d4a913c7c07aec123ece0a00a31d061d")
             // 得到enc
             lifecycleScope.launch(Dispatchers.IO) {
                 requestForEnc()

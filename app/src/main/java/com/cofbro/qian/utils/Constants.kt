@@ -370,7 +370,8 @@ object Constants {
     }
 
     object RecycleJson {
-        const val FILE_NAME = "home_json_data"
+        const val HOME_JSON_DATA = "home_json_data"
+        const val ACCOUNT_JSON_DATA = "account_data"
     }
 
 

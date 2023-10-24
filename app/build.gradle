@@ -93,4 +93,6 @@ dependencies {
     implementation 'io.github.lucksiege:ucrop:v3.10.9'
     // 自定义相机
     implementation 'io.github.lucksiege:camerax:v3.10.9'
+    //
+    implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
 }

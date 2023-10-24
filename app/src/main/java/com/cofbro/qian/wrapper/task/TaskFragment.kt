@@ -210,6 +210,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
             // 手势签到，签到码签到
             Constants.SIGN.GESTURE, Constants.SIGN.SIGN_CODE -> {
+                //val url = "https://mobilelearn.chaoxing.com/newsign/preSign?courseId=238084018&classId=85191193&activePrimaryId=3000075057651&general=1&sys=1&ls=1&appType=15&uid=191970813&ut=s"
                 viewModel.preSign(preSignUrl)
                 signNormally(id)
             }
@@ -252,7 +253,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private suspend fun signNormally(aid: String) {
-        // https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/preSign?activeId=2000072607796
         activity?.let {
             viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
         }

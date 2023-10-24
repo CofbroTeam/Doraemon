@@ -48,7 +48,7 @@
                 android:background="@drawable/app_white_blur_top_to_bottom">
 
                 <EditText
-                    android:id="@+id/editText"
+                    android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginStart="16dp"
@@ -65,25 +65,41 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/tv_binding"
+                    android:layout_width="0dp"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/app_comm_radius_bg"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="绑定账号"
+                    app:layout_constraintEnd_toEndOf="@+id/et_password"
+                    app:layout_constraintStart_toStartOf="@+id/et_password"
+                    app:layout_constraintTop_toBottomOf="@+id/et_password" />
+
+                <TextView
                     android:id="@+id/tv_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="注意：账号密码请务必输入正确，否则将会绑定失败"
                     android:textColor="@android:color/holo_red_light"
-                    app:layout_constraintEnd_toEndOf="@+id/editText"
-                    app:layout_constraintStart_toStartOf="@+id/editText"
-                    app:layout_constraintTop_toBottomOf="@+id/editText" />
+                    app:layout_constraintEnd_toEndOf="@+id/et_password"
+                    app:layout_constraintStart_toStartOf="@+id/et_password"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_binding" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout5"
                     android:layout_width="0dp"
                     android:layout_height="130dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/app_white_small_radius_bg"
                     android:paddingStart="9dp"
                     android:paddingEnd="9dp"
-                    app:layout_constraintEnd_toEndOf="@+id/editText"
-                    app:layout_constraintStart_toStartOf="@+id/editText"
+                    app:layout_constraintEnd_toEndOf="@+id/et_password"
+                    app:layout_constraintStart_toStartOf="@+id/et_password"
                     app:layout_constraintTop_toBottomOf="@+id/tv_tips">
 
                     <TextView

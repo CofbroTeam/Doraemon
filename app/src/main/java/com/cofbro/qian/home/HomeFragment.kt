@@ -16,10 +16,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.BaseResponse
 import com.cofbro.hymvvmutils.base.DataState
-import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentHomeBinding
-import com.cofbro.qian.home.CourseListAdapter
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
@@ -32,7 +30,6 @@ import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Protocol
 import okhttp3.Response
@@ -176,7 +173,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
         viewModel.loadCourseListLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val s = it.data?.body?.string() ?: ""
-                Downloader.download(requireContext(), Constants.RecycleJson.FILE_NAME, s)
+                Downloader.download(requireContext(), Constants.RecycleJson.HOME_JSON_DATA, s)
                 withContext(Dispatchers.Main) {
                     val jsonObject = s.safeParseToJson()
                     mAdapter?.setData(jsonObject)
@@ -254,7 +251,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
 
     private fun loadJsonLocally() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val dataString = Downloader.acquire(requireContext(), Constants.RecycleJson.FILE_NAME)
+            val dataString = Downloader.acquire(requireContext(), Constants.RecycleJson.HOME_JSON_DATA)
             val firstLoad = CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] ?: Constants.DataLoad.UNLOAD
             if (dataString.isEmpty() || firstLoad == Constants.DataLoad.UNLOAD) {
                 doNetwork()
