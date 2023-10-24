@@ -1,10 +1,10 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 设置透明背景色 -->
-    <solid android:color="#F9FCDF" />
+    <solid android:color="#D5D0A4" />
 
     <!-- 设置一个黑色边框 -->
     <stroke
-        android:width="2px"
+        android:width="1px"
         android:color="#000000" />
     <!-- 设置四个圆角的半径 -->
     <corners
@@ -18,5 +18,6 @@
         android:left="5dp"
         android:right="5dp"
         android:top="5dp" />
+
 
 </shape>

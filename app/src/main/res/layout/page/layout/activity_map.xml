@@ -20,11 +20,12 @@
             android:layout_height="match_parent">
 
             <androidx.core.widget.NestedScrollView
+                android:id="@+id/nestedScrollView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@drawable/text_back"
+                android:background="#F6FAFA"
+                android:layout_height="400dp"
                 app:behavior_hideable="false"
-                app:behavior_peekHeight="100dp"
+                app:behavior_peekHeight="200dp"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +35,7 @@
 
                     <LinearLayout
                         android:id="@+id/linearLayoutmap"
-                        android:layout_width="352dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:clickable="true"
@@ -48,7 +49,7 @@
                             android:id="@+id/search"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-
+                            android:visibility="gone"
                             android:src="@drawable/map_search"
                             tools:layout_editor_absoluteX="4dp"
                             tools:layout_editor_absoluteY="35dp">
@@ -57,10 +58,10 @@
 
                         <TextView
                             android:id="@+id/main_keywords"
-                            android:layout_width="300dp"
+                            android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            android:background="@drawable/text_back"
 
+                            android:drawableLeft="@drawable/search_24"
                             android:completionThreshold="1"
                             android:dropDownVerticalOffset="1.0dip"
                             android:gravity="center_vertical"
@@ -80,27 +81,106 @@
                     </LinearLayout>
 
 
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/constraintLayout"
+                        android:layout_width="match_parent"
+
+                        android:layout_height="100dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="2dp"
+                        app:layout_constraintBottom_toTopOf="@+id/et_location_name"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/linearLayoutmap"
+                        app:layout_constraintVertical_bias="0.0">
+
+                        <TextView
+                            android:id="@+id/textView8"
+                            android:layout_width="95dp"
+                            android:layout_height="26dp"
+                            android:text="签到提示"
+                            android:textColor="@color/black"
+                            android:textAlignment="center"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/textView4"
+                            android:layout_width="70dp"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="9dp"
+                            android:layout_marginBottom="16dp"
+                            android:text="点击搜索签到"
+                            android:textStyle="bold"
+                            android:background="@drawable/bk_textview"
+                            android:textAlignment="center"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/textView2"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView8">
+
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/textView2"
+                            android:layout_width="70dp"
+                            android:layout_height="50dp"
+                            android:text="位置名称可选"
+                            android:textStyle="bold"
+                            android:background="@drawable/bk_textview"
+                            android:textAlignment="center"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                            app:layout_constraintEnd_toStartOf="@+id/textView5"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/textView4"
+                            app:layout_constraintTop_toTopOf="@+id/textView4">
+
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/textView5"
+                            android:layout_width="70dp"
+                            android:layout_height="50dp"
+                            android:text="点击签到定位位置"
+                            android:textStyle="bold"
+                            android:background="@drawable/bk_textview"
+                            android:textAlignment="center"
+                            app:layout_constraintBottom_toBottomOf="@+id/textView2"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/textView2"
+                            app:layout_constraintTop_toTopOf="@+id/textView2">
+
+                        </TextView>
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
                     <EditText
                         android:id="@+id/et_location_name"
                         android:layout_width="match_parent"
                         android:layout_height="70dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/edit_back"
+                        android:layout_marginTop="23dp"
+                        android:layout_marginBottom="8dp"
+
                         android:hint="输入需要想要为老师展示的位置名称(可选)"
                         android:textColorHint="#9B9DA1"
                         android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@+id/selectButton"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.497"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/linearLayoutmap" />
+                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
                     <Button
                         android:id="@+id/selectButton"
                         android:layout_width="match_parent"
                         android:layout_height="100dp"
-                        android:layout_marginTop="25dp"
-                        android:layout_marginBottom="1dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/button_back"
                         android:text="签到"
                         android:visibility="gone"
@@ -111,6 +191,15 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.core.widget.NestedScrollView>
+
+            <View
+                android:layout_width="50dp"
+                android:layout_height="4dp"
+                android:background="#4DDDD2"
+                app:layout_anchor="@+id/nestedScrollView"
+                app:layout_anchorGravity="top|center">
+
+            </View>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
