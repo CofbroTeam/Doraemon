@@ -16,11 +16,8 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.account.adapter.AccountsAdapter
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityAccountmanagerBinding
-import com.cofbro.qian.utils.Constants
-import com.cofbro.qian.utils.Downloader
+import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.dp2px
-import com.cofbro.qian.utils.getIntExt
-import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
@@ -32,7 +29,6 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInLeftAnimator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 /**
@@ -52,18 +48,6 @@ class AccountManagerActivity :
         initView()
         initObserver()
         initEvent()
-
-//        preGetUserLists()
-//        initArgs()
-//        initView()
-//        initViewClick()
-    }
-
-    private fun loadAccountData() {
-        data = Downloader.acquire(this, Constants.RecycleJson.ACCOUNT_JSON_DATA).safeParseToJson()
-        data?.let {
-            mAdapter?.setData(it)
-        }
     }
 
 
@@ -209,16 +193,12 @@ class AccountManagerActivity :
                     if (temp.startsWith("UID")) uid = temp.substring(4)
                     if (temp.startsWith("fid")) fid = temp.substring(4)
                 }
-                val jsonObject = parseToJSONObject(uid, fid)
-                notifyDataSetChanged(jsonObject)
-                Downloader.download(
-                    this,
-                    Constants.RecycleJson.ACCOUNT_JSON_DATA,
-                    jsonObject?.toJSONString() ?: ""
-                )
-                ToastUtils.show("绑定成功！")
-                clearText()
-                hideLoadingView()
+                val jsonObject = buildAccount(uid, fid)
+                if (jsonObject != null) {
+                    notifyDataSetChanged(jsonObject)
+                    updateAccountData()
+                }
+                responseUI(jsonObject)
             } catch (_: Exception) {
             }
         } else {
@@ -226,40 +206,26 @@ class AccountManagerActivity :
         }
     }
 
+    private fun responseUI(jsonObject: JSONObject?) {
+        if (jsonObject != null) {
+            ToastUtils.show("绑定成功！")
+            clearText()
+        } else {
+            ToastUtils.show("账号已存在！")
+        }
+        hideLoadingView()
+    }
+
     private fun clearText() {
         binding?.etUsername?.text?.clear()
         binding?.etPassword?.text?.clear()
     }
 
-    private fun parseToJSONObject(uid: String, fid: String): JSONObject? {
-        val path = filesDir.path + File.separatorChar + Constants.RecycleJson.ACCOUNT_JSON_DATA
-        val file = File(path)
-        val jsonObject = JSONObject()
-        jsonObject["username"] = mUsername
-        jsonObject["password"] = mPassword
-        jsonObject["uid"] = uid
-        jsonObject["fid"] = fid
-        jsonObject["picUrl"] = URL.getAvtarImgPath(uid)
-        if (file.exists()) {
-            val newSize = data?.getIntExt("size") ?: 0
-            val array = data?.getJSONArrayExt("users") ?: JSONArray()
-            array[newSize] = jsonObject
-            data?.set("users", array)
-            data?.set("size", newSize + 1)
-        } else {
-            data = JSONObject()
-            val array = JSONArray()
-            array[0] = jsonObject
-            data!!["history"] = "true"
-            data!!["size"] = 1
-            data!!["users"] = array
-        }
-        return data
-    }
-
     private fun notifyDataSetChanged(data: JSONObject?) {
         data?.let {
-            mAdapter?.setData(it)
+            lifecycleScope.launch(Dispatchers.Main) {
+                mAdapter?.setData(it)
+            }
         }
     }
 
@@ -292,14 +258,28 @@ class AccountManagerActivity :
         }
     }
 
+    private fun loadAccountData() {
+        data = AccountManager.loadAllAccountData(this)
+        data?.let {
+            mAdapter?.setData(it)
+        }
+    }
+
+    private fun buildAccount(uid: String, fid: String): JSONObject? {
+        val userArray = data?.getJSONArray("users") ?: JSONArray()
+        userArray.forEach {
+            val itemData = it as? JSONObject
+            if (itemData?.getStringExt("uid") == uid) {
+                return null
+            }
+        }
+        return AccountManager.buildAccount(this, data, mUsername, mPassword, uid, fid)
+    }
+
     private fun updateAccountData() {
         val data = mAdapter?.getData()?.toJSONString() ?: ""
         lifecycleScope.launch(Dispatchers.IO) {
-            Downloader.download(
-                this@AccountManagerActivity,
-                Constants.RecycleJson.ACCOUNT_JSON_DATA,
-                data
-            )
+            AccountManager.updateAccountData(this@AccountManagerActivity, data)
         }
     }
 
