@@ -5,11 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar"
+        android:background="#ffffff"
+        android:layout_width="match_parent"
+        android:layout_height="77dp">
+
+        <ImageView
+            android:id="@+id/tv_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/back" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="绑定账号"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tv_back"
+            app:layout_constraintTop_toTopOf="@+id/tv_back" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
+        android:layout_marginTop="77dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff" />
+        android:layout_height="match_parent"/>
 
 
     <androidx.core.widget.NestedScrollView
@@ -37,14 +66,15 @@
                 android:layout_marginBottom="-25dp"
                 android:background="@drawable/app_white_small_radius_bg"
                 android:elevation="8dp"
-                android:hint="点击输入账号"
+                android:hint="点击输入待绑定的账号"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp"
                 android:textSize="16sp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cs_content"
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/app_white_blur_top_to_bottom">
 
                 <EditText
@@ -56,7 +86,7 @@
                     android:layout_marginEnd="16dp"
                     android:background="@drawable/app_white_small_radius_bg"
                     android:elevation="8dp"
-                    android:hint="点击输入密码"
+                    android:hint="点击输入待绑定账号的密码"
                     android:paddingStart="15dp"
                     android:paddingEnd="15dp"
                     android:textSize="16sp"
@@ -70,11 +100,11 @@
                     android:layout_height="45dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/app_comm_radius_bg"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
                     android:gravity="center"
                     android:text="绑定账号"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/et_password"
                     app:layout_constraintStart_toStartOf="@+id/et_password"
                     app:layout_constraintTop_toBottomOf="@+id/et_password" />
@@ -236,6 +266,77 @@
                             app:layout_constraintStart_toStartOf="@+id/textView8"
                             app:layout_constraintTop_toBottomOf="@+id/textView8" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/app_white_small_radius_bg"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout5">
+
+                    <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:src="@drawable/ic_tip"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="长按账号可以解除绑定哦~"
+                        android:textColor="@color/black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView5"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/app_white_small_radius_bg"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout6">
+
+                    <ImageView
+                        android:id="@+id/imageView19"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:src="@drawable/ic_tip"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="请勿重复添加并删除账号~"
+                        android:textColor="@color/black"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView19"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -243,50 +344,3 @@
 
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout><!--<LinearLayout-->
-    <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="match_parent"-->
-    <!--    android:orientation="vertical"-->
-    <!--    android:padding="16dp"-->
-
-    <!--    android:layout_marginTop="40dp"-->
-    <!--    android:background="#f0f5ff">-->
-
-    <!--    <TextView-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="账号管理"-->
-    <!--        android:textSize="28sp"-->
-    <!--        android:textColor="#0077cc"-->
-    <!--        android:layout_gravity="center_horizontal"-->
-    <!--        android:layout_marginBottom="24dp"/>-->
-
-    <!--    <androidx.recyclerview.widget.RecyclerView-->
-    <!--        android:id="@+id/accounts"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="500dp">-->
-
-    <!--    </androidx.recyclerview.widget.RecyclerView>-->
-
-    <!--    <Button-->
-    <!--        android:id="@+id/addaccount"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="48dp"-->
-    <!--        android:layout_marginTop="24dp"-->
-    <!--        android:layout_marginBottom="16dp"-->
-    <!--        android:background="#0077cc"-->
-    <!--        android:text="添加账号"-->
-    <!--        android:textColor="#ffffff"-->
-    <!--        android:textSize="16sp" />-->
-
-    <!--    <Button-->
-    <!--        android:id="@+id/deleteaccount"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="48dp"-->
-    <!--        android:layout_marginBottom="16dp"-->
-    <!--        android:background="#ff4d4d"-->
-    <!--        android:text="删除选中账号"-->
-    <!--        android:textColor="#ffffff"-->
-    <!--        android:textSize="16sp" />-->
-
-    <!--</LinearLayout>-->
