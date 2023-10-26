@@ -36,10 +36,6 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:icon,android:theme,android:roundIcon"
         tools:targetApi="31">
-        <activity
-            android:name=".wrapper.did.DoHomeworkActivity"
-            android:exported="false" />
-
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="787057d8a10578894fc4719a3bd274dc"/>
@@ -53,17 +49,12 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".wrapper.did.DoHomeworkActivity"/>
         <activity android:name=".main.MainActivity" />
         <activity android:name=".scan.ScanActivity" />
-        <activity
-            android:name=".wrapper.WrapperActivity"
-            android:exported="true">
-
-            <!-- <intent-filter> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name=".account.manager.AccountManagerActivity"/>
+        <activity android:name=".wrapper.WrapperActivity"/>
         <activity android:name=".profile.ProfileFragment" />
         <activity android:name=".mapsetting.InputTipsActivity" />
         <activity android:name=".mapsetting.MapActivity" />

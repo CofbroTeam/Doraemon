@@ -1,6 +1,8 @@
 package com.cofbro.qian.utils
 
 import android.content.Context
+import com.alibaba.fastjson.JSONArray
+import com.alibaba.fastjson.JSONObject
 import com.hjq.toast.ToastUtils
 
 
@@ -26,4 +28,17 @@ fun getStatusBarHeight(context: Context): Int {
     } catch (_: Exception){}
     return result
 }
+
+fun Context.saveJsonArraySp(key: String, value: List<*>){
+    val json = JSONArray()
+    json.addAll(value)
+    val editor = getSharedPreferences("sp_data", Context.MODE_PRIVATE).edit()
+    editor.putString(key, json.toJSONString()).apply()
+
+}
+fun Context.getJsonArraySp(key: String): String? {
+    val sp = getSharedPreferences("sp_data", Context.MODE_PRIVATE)
+    return sp.getString(key, "")
+}
+
 

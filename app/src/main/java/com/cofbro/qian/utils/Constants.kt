@@ -370,7 +370,8 @@ object Constants {
     }
 
     object RecycleJson {
-        const val FILE_NAME = "home_json_data"
+        const val HOME_JSON_DATA = "home_json_data"
+        const val ACCOUNT_JSON_DATA = "account_data"
     }
 
 
@@ -387,5 +388,16 @@ object Constants {
         const val WORK_TYPE = "workType"
         const val TITLE = "title"
         const val OBJECT_ID = "objectid"
+    }
+
+    object Account {
+        const val UID = "uid"
+        const val FID = "fid"
+        const val USERNAME = "username"
+        const val PASSWORD = "password"
+        const val PIC_URL = "picUrl"
+        const val USERS = "users"
+        const val SIZE = "size"
+        const val HISTORY = "history"
     }
 }
