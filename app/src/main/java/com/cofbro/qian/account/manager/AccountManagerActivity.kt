@@ -17,6 +17,7 @@ import com.cofbro.qian.account.adapter.AccountsAdapter
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityAccountmanagerBinding
 import com.cofbro.qian.utils.AccountManager
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
@@ -31,9 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-/**
- * 关联账号，实现一起签到
- */
 class AccountManagerActivity :
     BaseActivity<AccountManagerViewModel, ActivityAccountmanagerBinding>() {
     private var behavior: BottomSheetBehavior<NestedScrollView>? = null
@@ -246,7 +244,7 @@ class AccountManagerActivity :
         TipDialog(this).apply {
             setPositiveClickListener {
                 dismiss()
-                val uid = itemData?.getStringExt("uid") ?: ""
+                val uid = itemData?.getStringExt(Constants.Account.UID) ?: ""
                 mAdapter?.remove(uid)
                 updateAccountData()
             }
@@ -266,10 +264,10 @@ class AccountManagerActivity :
     }
 
     private fun buildAccount(uid: String, fid: String): JSONObject? {
-        val userArray = data?.getJSONArray("users") ?: JSONArray()
+        val userArray = data?.getJSONArray(Constants.Account.USERS) ?: JSONArray()
         userArray.forEach {
             val itemData = it as? JSONObject
-            if (itemData?.getStringExt("uid") == uid) {
+            if (itemData?.getStringExt(Constants.Account.UID) == uid) {
                 return null
             }
         }

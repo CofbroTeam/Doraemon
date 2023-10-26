@@ -21,24 +21,24 @@ object AccountManager {
         val path = context.filesDir.path + File.separatorChar + Constants.RecycleJson.ACCOUNT_JSON_DATA
         val file = File(path)
         val jsonObject = JSONObject()
-        jsonObject["username"] = username
-        jsonObject["password"] = password
-        jsonObject["uid"] = uid
-        jsonObject["fid"] = fid
-        jsonObject["picUrl"] = URL.getAvtarImgPath(uid)
+        jsonObject[Constants.Account.USERNAME] = username
+        jsonObject[Constants.Account.PASSWORD] = password
+        jsonObject[Constants.Account.UID] = uid
+        jsonObject[Constants.Account.FID] = fid
+        jsonObject[Constants.Account.PIC_URL] = URL.getAvtarImgPath(uid)
         if (file.exists()) {
-            val newSize = data?.getIntExt("size") ?: 0
-            val array = data?.getJSONArrayExt("users") ?: JSONArray()
+            val newSize = data?.getIntExt(Constants.Account.SIZE) ?: 0
+            val array = data?.getJSONArrayExt(Constants.Account.USERS) ?: JSONArray()
             array[newSize] = jsonObject
-            data?.set("users", array)
-            data?.set("size", newSize + 1)
+            data?.set(Constants.Account.USERS, array)
+            data?.set(Constants.Account.SIZE, newSize + 1)
         } else {
             data = JSONObject()
             val array = JSONArray()
             array[0] = jsonObject
-            data["history"] = "true"
-            data["size"] = 1
-            data["users"] = array
+            data[Constants.Account.HISTORY] = "true"
+            data[Constants.Account.SIZE] = 1
+            data[Constants.Account.USERS] = array
         }
         return data
     }

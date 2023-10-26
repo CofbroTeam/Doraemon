@@ -4,82 +4,28 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import com.alibaba.fastjson.JSON
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
-import com.cofbro.qian.account.manager.AccountManagerActivity
-import com.cofbro.qian.account.manager.User
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.main.MainActivity
-import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.utils.CacheUtils
-import com.cofbro.qian.utils.getJsonArraySp
 import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONStringer
 
 
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
-    private var extents:Boolean = CacheUtils.cacheB["extents"]?:false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-
-
-        /**
-         * 常规登录
-         */
-        if (!extents){
-            preGetUserLists()
-            tryLogin()
-            initObserver()
-            initEvent()
-            autoClearFocus()
-            login()
-        }else{
-            /**
-             * 拓展登录不能进入？
-             */
-            initObserver()
-            initEvent()
-            autoClearFocus()
-            login()
-        }
-
-
-
-    }
-    private fun preGetUserLists(){
-        val userLists = getJsonArraySp("userLists")
-        CacheUtils.cacheUser["userLists"] = arrayListOf()
-        userLists?.toString()?.let { Log.v("ss", it) }
-
-        /**
-         * 创建单例
-         */
-
-
-        if (!userLists.isNullOrEmpty()){
-            val array =  org.json.JSONArray(userLists)
-            for (i in 0 until array.length()) {
-                val element = array[i].toString().safeParseToJson()
-                val user = User(user = element.getString("user"), pwd = element.getString("pwd"), cookie = element.getString("cookie"), uid = element.getString("uid"), fid = element.getString("fid"))
-                if( ConfirmIfSingleUser(CacheUtils.cacheUser["userLists"],user.uid)){
-                    CacheUtils.cacheUser["userLists"]?.add(user)
-                }else{
-                    continue
-                }
-
-             //用户信息列表添加
-            }
-        }
-
-
-
+        tryLogin()
+        initObserver()
+        initEvent()
+        autoClearFocus()
+        login()
     }
 
     private fun tryLogin() {
@@ -91,8 +37,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun initObserver() {
-        viewModel.loginLiveData.observe(this) {
-            val data = it.data ?: return@observe
+        viewModel.loginLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string()?.safeParseToJson()
                 val headers = data.headers
@@ -113,83 +59,25 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                     } else {
                         ToastUtils.show("Cookies获取失败!")
                     }
-                    if(!extents){
-                        /**
-                         * 正常登陆
-                         */
-                        saveUserInfo()
-                        CacheUtils.cache["uid"] = uid ?: ""
-                        CacheUtils.cache["cookies"] = cookies.toString()
-                        CacheUtils.cache["fid"] = fid ?: ""
-                        CacheUtils.cacheB["extents"] = false
-
-                        val userInfo = User(getBySp("username")?:"",getBySp("password")?:"",uid?:"",cookies.toString(),fid?:"")
-                        if(ConfirmIfSingleUser( CacheUtils.cacheUser["userLists"],uid)){
-                            CacheUtils.cacheUser["userLists"]?.add(userInfo)
-                        }
-
-
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            ToastUtils.show("登录成功！")
-                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        }
-                    }else{
-                        /**
-                         * 拓展登录 class User(user:String,pwd:String,uid:String,cookie:String,fid:String)
-                         */
-                        lifecycleScope.launch(Dispatchers.Main) {
-
-                            val userInfo = User(binding?.ipUsername?.getTextString()?:"",binding?.ipPassword?.getTextString()?:"",uid?:"",cookies.toString(),fid?:"")
-                            /**
-                             * 判断是否含有userInfo uid判断
-                             */
-                            if(!ConfirmIfSingleUser(CacheUtils.cacheUser["userLists"],uid)){
-                                /**
-                                 * 做处理？
-                                 */
-                                ToastUtils.show("已有该账号")
-                            }
-                            else{
-                                CacheUtils.cacheUser["userLists"]?.add(userInfo)//用户信息
-                                ToastUtils.show("添加用户成功！")
-                                val intent = Intent(this@LoginActivity, AccountManagerActivity::class.java)
-                                /**
-                                 * 传递用户信息？是否需要CashUtil ....需要，储存方式arraylist()
-                                 */
-                                startActivity(intent)
-                                finish()
-                            }
-
-                        }
-
+                    saveUserInfo()
+                    CacheUtils.cache["uid"] = uid ?: ""
+                    CacheUtils.cache["cookies"] = cookies.toString()
+                    CacheUtils.cache["fid"] = fid ?: ""
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        ToastUtils.show("登录成功！")
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     }
-
                 } else {
-                    if(!extents){
-                        ToastUtils.show("账号或密码错误!")
-                    }else{
-                        ToastUtils.show("账号或密码错误!添加用户失败")
-                    }
-
+                    ToastUtils.show("账号或密码错误!")
                 }
             }
         }
     }
-    fun ConfirmIfSingleUser(arrayList: MutableList<User>?,uid:String?):Boolean{
-        arrayList?.forEach {
-            if(it.uid == uid){
-                return false
-            }
-        }
-        return true
-
-    }
-
 
     private fun saveUserInfo() {
-        if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()&&!extents) {
+        if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()) {
             saveUsedSp("username", mUsername!!)
             saveUsedSp("password", mPassword!!)
         }
