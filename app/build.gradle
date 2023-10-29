@@ -32,6 +32,15 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    android {
+        lint {
+            baseline = file("lint-baseline.xml")
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 
     sourceSets {
         main {
@@ -78,11 +87,11 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     // refreshLayout
     implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation  'io.github.scwang90:refresh-layout-kernel:2.0.5'
-    implementation  'io.github.scwang90:refresh-header-classics:2.0.5'
-    implementation  'io.github.scwang90:refresh-footer-classics:2.0.5'
-    implementation  'io.github.scwang90:refresh-header-radar:2.0.6'
-    implementation  'io.github.scwang90:refresh-header-material:2.0.6'
+    implementation 'io.github.scwang90:refresh-layout-kernel:2.0.5'
+    implementation 'io.github.scwang90:refresh-header-classics:2.0.5'
+    implementation 'io.github.scwang90:refresh-footer-classics:2.0.5'
+    implementation 'io.github.scwang90:refresh-header-radar:2.0.6'
+    implementation 'io.github.scwang90:refresh-header-material:2.0.6'
     // jsoup
     implementation 'org.jsoup:jsoup:1.10.2'
     // 图片加载库

@@ -26,8 +26,8 @@ object URL {
         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
 
     // 普通签到
-    fun getNormalSignPath(courseId: String, classId: String, aid: String): String =
-        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
+    fun getNormalSignPath(courseId: String, classId: String, aid: String, signCode: String = ""): String =
+        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid&signCode=$signCode"
 
     fun getLocationSignPath(
         address: String,

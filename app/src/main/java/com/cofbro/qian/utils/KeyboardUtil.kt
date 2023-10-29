@@ -2,6 +2,7 @@ package com.cofbro.qian.utils
 
 import android.R
 import android.app.Activity
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Build
@@ -10,9 +11,12 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.WindowInsets
 import android.view.WindowInsetsAnimation
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.core.view.WindowInsetsCompat
+import java.security.AccessController.getContext
 import kotlin.math.abs
 
 
@@ -21,6 +25,11 @@ object KeyboardUtil {
     private var onGlobalLayoutListener: OnGlobalLayoutListener? = null
     private var mNavHeight = 0
     private var sDecorViewDelta = 0
+
+    fun showKeyboard(context: Context, editText: EditText) {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+    }
     private fun getDecorViewInvisibleHeight(activity: Activity): Int {
         val decorView = activity.window.decorView
             ?: return sDecorViewInvisibleHeightPre
