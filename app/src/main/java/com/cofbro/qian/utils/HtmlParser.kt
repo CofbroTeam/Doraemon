@@ -54,4 +54,9 @@ object HtmlParser {
         val doc = Jsoup.parse(html)
         return doc.getElementById("workEnc").`val`() ?: ""
     }
+
+    fun parseToUsername(html: String): String {
+        val doc = Jsoup.parse(html)
+        return doc.getElementsByClass("user-con")?.text() ?: "未查询到姓名"
+    }
 }
