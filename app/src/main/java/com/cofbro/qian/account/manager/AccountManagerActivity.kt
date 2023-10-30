@@ -263,9 +263,7 @@ class AccountManagerActivity :
         lifecycleScope.launch(Dispatchers.IO) {
             data = AccountManager.loadAllAccountData(this@AccountManagerActivity)
             data?.let {
-                withContext(Dispatchers.Main) {
-                    notifyAdapterDataChanged(data)
-                }
+                notifyAdapterDataChanged(data)
             }
         }
     }
