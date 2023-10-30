@@ -499,6 +499,17 @@ class InputView : View {
                     if (inputString.isNotEmpty()) {
                         inputString = inputString.substring(0, inputString.length - 1)
                     }
+                } else {
+                    /** 不同机型处理输入是通过 commitText或者 sendKeyEvent执行(目前还没发现两种都执行的机型)
+                     *  一般都是 commitText,如果上面 commitText没执行,就会到这里
+                     */
+                    // 如果不是删除按键
+                    val unicodeChar = event.unicodeChar
+                    val character = unicodeChar.toChar().toString()
+                    val temp = inputString + character
+                    if (temp.length < DEFAULT_TEXT_COUNT) {
+                        inputString = temp
+                    }
                 }
             }
             postInvalidate()
