@@ -27,12 +27,15 @@ object AccountManager {
         jsonObject[Constants.Account.FID] = fid
         jsonObject[Constants.Account.PIC_URL] = URL.getAvtarImgPath(uid)
         if (file.exists()) {
-            val newSize = data?.getIntExt(Constants.Account.SIZE) ?: 0
+            val newSize = data?.getIntExt(Constants.Account.SIZE).takeIf {
+                it != -1
+            } ?: 0
             val array = data?.getJSONArrayExt(Constants.Account.USERS) ?: JSONArray()
             array[newSize] = jsonObject
             data?.set(Constants.Account.USERS, array)
             data?.set(Constants.Account.SIZE, newSize + 1)
         } else {
+            file.createNewFile()
             data = JSONObject()
             val array = JSONArray()
             array[0] = jsonObject

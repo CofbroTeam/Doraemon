@@ -30,6 +30,7 @@ import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
 import jp.wasabeef.recyclerview.animators.ScaleInLeftAnimator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class AccountManagerActivity :
@@ -62,8 +63,12 @@ class AccountManagerActivity :
                 vibrate()
                 showTipDialog(itemData)
             }
+
+            setDataChangedListener {
+                updateAccountData(it)
+            }
         }
-        mAdapter?.setData(data)
+        notifyAdapterDataChanged(data)
         binding?.recyclerView?.apply {
             itemAnimator = ScaleInLeftAnimator()
             adapter = ScaleInAnimationAdapter(mAdapter!!).apply {
@@ -112,7 +117,7 @@ class AccountManagerActivity :
             }
         }
 
-        binding?.etUsername?.setOnFocusChangeListener { v, hasFocus ->
+        binding?.etUsername?.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 behavior?.state = BottomSheetBehavior.STATE_EXPANDED
             }
@@ -193,8 +198,7 @@ class AccountManagerActivity :
                 }
                 val jsonObject = buildAccount(uid, fid)
                 if (jsonObject != null) {
-                    notifyDataSetChanged(jsonObject)
-                    updateAccountData()
+                    notifyAdapterDataChanged(jsonObject)
                 }
                 responseUI(jsonObject)
             } catch (_: Exception) {
@@ -219,7 +223,7 @@ class AccountManagerActivity :
         binding?.etPassword?.text?.clear()
     }
 
-    private fun notifyDataSetChanged(data: JSONObject?) {
+    private fun notifyAdapterDataChanged(data: JSONObject?) {
         data?.let {
             lifecycleScope.launch(Dispatchers.Main) {
                 mAdapter?.setData(it)
@@ -246,7 +250,6 @@ class AccountManagerActivity :
                 dismiss()
                 val uid = itemData?.getStringExt(Constants.Account.UID) ?: ""
                 mAdapter?.remove(uid)
-                updateAccountData()
             }
             setNegativeClickListener {
                 dismiss()
@@ -257,9 +260,11 @@ class AccountManagerActivity :
     }
 
     private fun loadAccountData() {
-        data = AccountManager.loadAllAccountData(this)
-        data?.let {
-            mAdapter?.setData(it)
+        lifecycleScope.launch(Dispatchers.IO) {
+            data = AccountManager.loadAllAccountData(this@AccountManagerActivity)
+            data?.let {
+                notifyAdapterDataChanged(data)
+            }
         }
     }
 
@@ -274,10 +279,10 @@ class AccountManagerActivity :
         return AccountManager.buildAccount(this, data, mUsername, mPassword, uid, fid)
     }
 
-    private fun updateAccountData() {
-        val data = mAdapter?.getData()?.toJSONString() ?: ""
+    private fun updateAccountData(data: JSONObject?) {
+        val newData = data?.toJSONString() ?: ""
         lifecycleScope.launch(Dispatchers.IO) {
-            AccountManager.updateAccountData(this@AccountManagerActivity, data)
+            AccountManager.updateAccountData(this@AccountManagerActivity, newData)
         }
     }
 
