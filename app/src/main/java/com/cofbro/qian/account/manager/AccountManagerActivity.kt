@@ -95,9 +95,9 @@ class AccountManagerActivity :
                     val defaultPadding = dp2px(this@AccountManagerActivity, 16)
                     return outRect.set(
                         defaultPadding,
-                        0,
+                        dp2px(this@AccountManagerActivity, 12),
                         defaultPadding,
-                        dp2px(this@AccountManagerActivity, 12)
+                        0
                     )
                 }
             })
@@ -138,7 +138,7 @@ class AccountManagerActivity :
         binding?.recyclerView?.apply {
             val rvLayout = layoutParams as? MarginLayoutParams
             rvLayout?.let {
-                it.topMargin = toolbarHeight + dp2px(this@AccountManagerActivity, 5)
+                it.topMargin = toolbarHeight
                 layoutParams = it
             }
         }

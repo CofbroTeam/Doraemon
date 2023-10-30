@@ -75,6 +75,28 @@ object Downloader {
         return result
     }
 
+    fun delete(context: Context, filename: String) {
+        val file = File(context.filesDir.path + File.separatorChar + filename)
+        if (file.exists()) {
+            deleteFolder(file)
+        }
+    }
+
+    private fun deleteFolder(folder: File) {
+        val files = folder.listFiles()
+        if (files != null) {
+            for (file in files) {
+                if (file.isDirectory) {
+                    deleteFolder(file)
+                } else {
+                    file.delete()
+                }
+            }
+        }
+        // 删除本身
+        folder.delete()
+    }
+
     fun getFileType(filename: String): String {
         return filename.split(".").getOrNull(1) ?: "pdf"
     }

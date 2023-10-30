@@ -21,6 +21,7 @@ import com.cofbro.qian.databinding.FragmentHomeBinding
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
+import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.NetworkUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
@@ -46,6 +47,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
         initView()
         initObserver()
         loadJsonLocally()
+        requestForUserInfo()
         //doNetwork()
     }
 
@@ -208,11 +210,30 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
             }
             ToastUtils.show("签到成功!")
         }
+
+        // 用户姓名
+        viewModel.userInfoLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string() ?: ""
+                withContext(Dispatchers.Main) {
+                    val username = HtmlParser.parseToUsername(data)
+                    CacheUtils.cache[Constants.USER.USERNAME] = username
+                }
+            }
+        }
     }
 
     private fun doNetwork() {
         // 加载课程列表
         viewModel.loadCourseList(URL.getAllCourseListPath())
+    }
+
+    private fun requestForUserInfo() {
+        // 加载用户信息
+        if (CacheUtils.cache[Constants.USER.USERNAME].isNullOrEmpty()) {
+            // 保证只请求一次
+            viewModel.requestForUserInfo(URL.getUserInfo())
+        }
     }
 
     private fun getDataItemCount(): Int {
