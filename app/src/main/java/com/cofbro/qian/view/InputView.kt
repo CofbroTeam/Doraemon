@@ -385,8 +385,8 @@ class InputView : View {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (!ifShowBitmap) {
-            requestFocus()
             if (isKeyboardHidden(this)) showKeyboard()
+            requestFocus()
             return true
         }
         when (event?.action) {
