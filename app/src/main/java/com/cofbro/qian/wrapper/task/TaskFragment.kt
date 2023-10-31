@@ -19,12 +19,12 @@ import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
-import com.cofbro.qian.utils.KeyboardUtil
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
 import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
+import com.cofbro.qian.view.GestureInputDialog
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +39,13 @@ import kotlinx.coroutines.withContext
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     // 代签账号的uid
     private var uidTogether = ""
+
     // 代签账号的cookie
     private var cookies = ""
+
     // 签到的aid
     private var id = ""
+
     // 签到密码
     private var code = ""
     private var codeDialog: AlertDialog? = null
@@ -251,13 +254,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signNormally(id)
                 }
             }
-            // 手势签到，签到码签到
-            Constants.SIGN.GESTURE, Constants.SIGN.SIGN_CODE -> {
+            // 签到码签到
+            Constants.SIGN.SIGN_CODE -> {
                 withContext(Dispatchers.Main) {
                     hideLoadingView()
                     showCodeDialog(id)
                 }
             }
+
+            // 手势签到
+            Constants.SIGN.GESTURE -> {
+                withContext(Dispatchers.Main) {
+                    hideLoadingView()
+                    showGestureDialog(id)
+                }
+            }
+
             // 定位签到
             Constants.SIGN.LOCATION -> {
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -304,7 +316,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private suspend fun signTogether(aid: String, signCode: String = "") {
         activity?.let {
-            viewModel.signTogether(URL.getNormalSignPath(it.courseId, it.classId, aid, signCode), cookies)
+            viewModel.signTogether(
+                URL.getNormalSignPath(it.courseId, it.classId, aid, signCode),
+                cookies
+            )
         }
     }
 
@@ -362,11 +377,32 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    private suspend fun showGestureDialog(id: String) {
+        GestureInputDialog(requireContext()).apply {
+            /** attention --- 要先调用 show()创建 dialog实例再设置监听，不然会空指针（对象为空） */
+            show()
+            setInputEndListener { inputPwd ->
+                // 由于回调出来的密码是 Int数组，需遍历转成字符串
+                var mCode = ""
+                inputPwd.forEach {
+                    mCode += it.toString()
+                }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    code = mCode
+                    viewModel.preSign(preSignUrl)
+                    // 签到
+                    signNormally(id, code)
+                    dismiss()
+                }
+            }
+        }
+    }
+
     private suspend fun signWithAccounts() {
         val data = AccountManager.loadAllAccountData(requireContext())
         val users = data.getJSONArray("users")
         users?.let {
-            it.forEach {item ->
+            it.forEach { item ->
                 val user = item as? JSONObject ?: JSONObject()
                 tryLogin(user)
                 delay(1200)
