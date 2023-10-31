@@ -28,6 +28,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var mPoiMarker: Marker? = null
     var default_mark:Marker? = null //签到位置
     var default_Sign_Lating:LatLng? = null
+    var default_Sign_Location:String? = null //签到位置
     var currentTipPoint: LatLng = LatLng(0.0, 0.0)//获取当前的经纬度
     var Tip_address: String? = null
     var Tip_name: String? = null
@@ -40,6 +41,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var signUrl= ""
     var uid = ""
     var aid = ""
+    var statuscontent = ""
     fun sign(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(signLiveData) {

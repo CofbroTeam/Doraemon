@@ -386,6 +386,11 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 //            override fun onAnimationRepeat(animation: Animation) {}
 //        })
         binding?.selectButton?.setOnClickListener {
+            if(viewModel.statuscontent == "签到成功"){
+                ToastUtil.show(applicationContext,"签到已成功")
+                val intent = Intent(applicationContext,MainActivity::class.java)
+                startActivity(intent)
+            }
             if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
                 Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
@@ -399,6 +404,26 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     } else {
                         ToastUtils.show("请稍后")
                     }
+                }else{
+                    /**
+                     * 没有任何输入，直接上传默认地址 首先判断是否签到成功 bug:presign无默认位置
+                     */
+                    if(viewModel.default_Sign_Location?.isNotEmpty() == true){
+                        val defaultUrl = URL.getLocationSignPath(
+                            address = viewModel.default_Sign_Location,
+                            aid = viewModel.aid,
+                            uid = viewModel.uid,
+                            lat = viewModel.default_Sign_Lating?.latitude.toString(),
+                            long = viewModel.default_Sign_Lating?.longitude.toString()
+                        )
+                        sign(defaultUrl)
+                    }else{
+                        /**
+                         * 判断是否签到成功，或者本来就没有签到位置
+                         */
+
+                    }
+
                 }
             } else {
                 //Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
@@ -455,6 +480,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             ToastUtil.show(applicationContext,"签到已成功")
                             val intent = Intent(applicationContext,MainActivity::class.java)
                             startActivity(intent)
+                        }else{
+                            ToastUtil.show(applicationContext,"签到已成功")
+                            val intent = Intent(applicationContext,MainActivity::class.java)
+                            startActivity(intent)
                         }
 
                         /**
@@ -473,23 +502,40 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 val data = it.data?.body?.string()
                 data?.let {
                     val html = Jsoup.parse(it)
+                    val locationText = html.getElementById("locationText")?.`val`()
                     val latitude = html.getElementById("locationLatitude")?.`val`()
                     val longitude = html.getElementById("locationLongitude")?.`val`()
+                    val statuscontent = html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
                     if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
                         viewModel.currentTipPoint = LatLng(latitude.toDouble(),longitude.toDouble())
                         addLatLngMarker(LatLng(viewModel.currentTipPoint.latitude,
                             viewModel.currentTipPoint.longitude
                         ),default = true)
+                        viewModel.default_Sign_Location = locationText
+                        viewModel.statuscontent = statuscontent
                         viewModel.default_Sign_Lating = LatLng(latitude.toDouble(),longitude.toDouble())
+                        /**
+                         * 老师未设置位置 设置提醒
+                         */
+                        if(locationText?.isEmpty() == true && statuscontent!="签到成功"){
+                            ToastUtil.show(applicationContext,"老师未设置位置，默认位置为自己位置")
+                            viewModel.default_Sign_Lating = viewModel.default_My_Lating
+
+                        }
+
                         CacheUtils.cache["default_Sign_latitude"] = latitude
                         CacheUtils.cache["default_Sign_longitude"] = longitude
+
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
+
                         if (lat.isNotEmpty()&&long.isNotEmpty()){
                             viewModel.currentTipPoint = LatLng(lat.toDouble(),lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(),long.toDouble()),default = true)
                             viewModel.default_Sign_Lating = LatLng(lat.toDouble(),lat.toDouble())
+                            viewModel.default_Sign_Location = locationText
+                            viewModel.statuscontent = statuscontent
                             CacheUtils.cache["default_Sign_latitude"] = lat
                             CacheUtils.cache["default_Sign_longitude"] = long
                         }
