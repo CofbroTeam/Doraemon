@@ -48,6 +48,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     // 签到密码
     private var code = ""
+
+    // 手势签到的dialog
+    private var gestureInputDialog: GestureInputDialog? = null
     private var codeDialog: AlertDialog? = null
     private var activeId = ""
     private var signTypeData: JSONObject? = null
@@ -146,22 +149,20 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
         }
 
+        viewModel.preSignLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it?.data?.body?.string()
+            }
+        }
+
         // 签到
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string() ?: ""
                 withContext(Dispatchers.Main) {
-                    hideLoadingView()
-                    data.showSignResult()
+                    responseUI(data)
                     // 开始代签
-                    codeDialog?.let {
-                        it.dismiss()
-                        val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
-                        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
-                            // 如果本账号签到成功，则开始自动签到其他绑定账号
-                            signWithAccounts()
-                        }
-                    }
+                    startSignTogether(data)
                 }
             }
         }
@@ -184,9 +185,27 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogetherLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string() ?: ""
-                Log.d("chy", "signTogether: ${data}")
             }
         }
+    }
+
+    private suspend fun startSignTogether(data: String) {
+        // 开始代签
+        codeDialog?.let {
+            val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
+            if (signWith && (data.contains("success") || data.contains("签到成功"))) {
+                // 如果本账号签到成功，则开始自动签到其他绑定账号
+                signWithAccounts()
+            }
+        }
+    }
+
+    private fun responseUI(data: String) {
+        hideLoadingView()
+        data.showSignResult()
+        // 清除dialog
+        gestureInputDialog?.dismiss()
+        codeDialog?.dismiss()
     }
 
     private fun doNetwork() {
@@ -199,7 +218,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 查询所有活动
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
-        Log.v("sign_task", URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
     }
 
     private fun sign(itemData: JSONObject) {
@@ -379,20 +397,18 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private suspend fun showGestureDialog(id: String) {
         GestureInputDialog(requireContext()).apply {
-            /** attention --- 要先调用 show()创建 dialog实例再设置监听，不然会空指针（对象为空） */
             show()
             setInputEndListener { inputPwd ->
                 // 由于回调出来的密码是 Int数组，需遍历转成字符串
-                var mCode = ""
+                var inputCode = ""
                 inputPwd.forEach {
-                    mCode += it.toString()
+                    inputCode += it.toString()
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
-                    code = mCode
+                    code = inputCode
                     viewModel.preSign(preSignUrl)
                     // 签到
                     signNormally(id, code)
-                    dismiss()
                 }
             }
         }

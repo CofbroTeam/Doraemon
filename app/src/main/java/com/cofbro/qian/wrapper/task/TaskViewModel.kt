@@ -10,7 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
-    private val preSignLiveData = ResponseMutableLiveData<Response>()
+    val preSignLiveData = ResponseMutableLiveData<Response>()
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
     val signTypeLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
