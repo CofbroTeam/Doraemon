@@ -8,6 +8,10 @@
         android:id="@+id/scanner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:qrcv_animTime="1000"
         app:qrcv_barCodeTipText="将条码放入框内，即可自动扫描"
         app:qrcv_barcodeRectHeight="120dp"
@@ -35,7 +39,19 @@
         app:qrcv_scanLineSize="0.5dp"
         app:qrcv_tipTextColor="@color/black"
         app:qrcv_tipTextSize="12sp"
-        app:qrcv_verticalBias="0.5"/>
+        app:qrcv_verticalBias="0.5" >
+    </cn.bingoogolapple.qrcode.zxing.ZXingView>
+
+    <ImageView
+        android:id="@+id/iv_to_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_photo" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

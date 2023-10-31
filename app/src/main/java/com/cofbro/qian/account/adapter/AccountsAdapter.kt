@@ -10,7 +10,9 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.databinding.ItemAccountsListBinding
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 
@@ -60,11 +62,13 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(position: Int) {
-            val itemData = accountData?.getJSONArrayExt("users")?.getOrNull(position) ?: JSONObject()
+            val itemData =
+                accountData?.getJSONArrayExt(Constants.Account.USERS)?.getOrNull(position)
+                    ?: JSONObject()
             (itemData as? JSONObject).let { itemValue ->
-                val picUrl = itemValue?.getStringExt("picUrl") ?: ""
-                val username = itemValue?.getStringExt("username") ?: ""
-                val uid = itemValue?.getStringExt("uid") ?: ""
+                val picUrl = itemValue?.getStringExt(Constants.Account.PIC_URL) ?: ""
+                val username = itemValue?.getStringExt(Constants.Account.USERNAME) ?: ""
+                val uid = itemValue?.getStringExt(Constants.Account.UID) ?: ""
 
                 // 绑定数据
                 val options = RequestOptions().transform(
@@ -99,7 +103,7 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(t: JSONObject?) {
+    fun setAccounts(t: JSONObject?) {
         accountData = t
         notifyDataSetChanged()
         onDataChanged?.invoke(accountData)
@@ -109,28 +113,45 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
         return accountData
     }
 
-    fun remove(uid: String) {
+    fun removeAccount(uid: String) {
         var index = 0
-        val array = accountData?.getJSONArrayExt("users")
+        val array = accountData?.getJSONArrayExt(Constants.Account.USERS)
         array?.let {
             it.forEachIndexed { i, any ->
                 val data = any as? JSONObject
-                if (data?.getStringExt("uid") == uid) {
+                if (data?.getStringExt(Constants.Account.UID) == uid) {
                     index = i
                 }
             }
             if (index < it.size) {
                 array.removeAt(index)
-                accountData?.set("size", array.size)
-                accountData?.set("users", array)
+                accountData?.set(Constants.Account.SIZE, array.size)
+                accountData?.set(Constants.Account.USERS, array)
                 notifyItemRemoved(index)
                 onDataChanged?.invoke(accountData)
             }
         }
     }
 
-    fun add(data: JSONObject, position: Int) {
-        notifyItemInserted(position)
+    fun addAccount() {
+//        if (accountData == null) accountData = JSONObject()
+//        val array = accountData?.getJSONArrayExt(Constants.Account.USERS) ?: JSONArray()
+//        array.add(position, data)
+//        accountData?.set(Constants.Account.SIZE, array.size)
+//        accountData?.set(Constants.Account.USERS, array)
+        val size = accountData?.getJSONArrayExt(Constants.Account.USERS)?.size ?: 0
+        if (size == 0) return
+        notifyItemInserted(size - 1)
+    }
+
+    fun notifyItemInserted() {
+        val size = accountData?.getIntExt(Constants.Account.SIZE).takeIf {
+            it != -1
+        } ?: 0
+        if (size > 0) {
+            notifyItemInserted(size - 1)
+            onDataChanged?.invoke(accountData)
+        }
     }
 
 }

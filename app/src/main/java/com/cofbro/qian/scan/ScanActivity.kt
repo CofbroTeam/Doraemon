@@ -4,17 +4,36 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Vibrator
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import cn.bingoogolapple.qrcode.core.QRCodeView
 import com.cofbro.qian.databinding.ActivityScanBinding
+import com.cofbro.qian.utils.Downloader
+import com.cofbro.qian.utils.GlideEngine
+import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getStatusBarHeight
+import com.king.wechat.qrcode.WeChatQRCodeDetector
+import com.luck.picture.lib.basic.PictureSelector
+import com.luck.picture.lib.config.SelectMimeType
+import com.luck.picture.lib.entity.LocalMedia
+import com.luck.picture.lib.interfaces.OnResultCallbackListener
+import com.luck.picture.lib.utils.SandboxTransformUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.opencv.OpenCV
+import java.io.File
 
 
 class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
+    private var photoPath = ""
     private var binding: ActivityScanBinding? = null
     private val PERMISSION_SCAN = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -32,15 +51,29 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
         checkPermissions(this, PERMISSION_SCAN, 1)
         binding = ActivityScanBinding.inflate(layoutInflater, null, false)
         setContentView(binding?.root)
+        OpenCV.initAsync(this)
+        WeChatQRCodeDetector.init(this)
+        initView()
+        initEvent()
         binding?.scanner?.setDelegate(this)
+    }
+
+    private fun initEvent() {
+        binding?.ivToPhoto?.setOnClickListener {
+            toGalleryAndDecode()
+        }
+    }
+
+    private fun initView() {
+        val margin = getStatusBarHeight(this) + dp2px(this, 6)
+        val params = binding?.ivToPhoto?.layoutParams as? MarginLayoutParams
+        params?.topMargin = margin
+        binding?.ivToPhoto?.layoutParams = params
     }
 
     override fun onScanQRCodeSuccess(result: String?) {
         vibrate()
-        val intent = Intent()
-        intent.putExtra("result", result)
-        setResult(RESULT_OK, intent)
-        finish()
+        sendResult(result)
     }
 
     override fun onCameraAmbientBrightnessChanged(isDark: Boolean) {
@@ -112,8 +145,76 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
         return true
     }
 
+    private fun toGalleryAndDecode() {
+        PictureSelector
+            .create(this)
+            .openGallery(SelectMimeType.ofImage())
+            .setSandboxFileEngine { context, srcPath, mineType, call ->
+                if (call != null) {
+                    val sandboxPath =
+                        SandboxTransformUtils.copyPathToSandbox(context, srcPath, mineType)
+                    call.onCallback(srcPath, sandboxPath);
+                }
+            }
+            .setImageEngine(GlideEngine.createGlideEngine())
+            .setMaxSelectNum(1)
+            .forResult(object : OnResultCallbackListener<LocalMedia> {
+                override fun onResult(result: ArrayList<LocalMedia>?) {
+                    result?.get(0)?.let {
+                        downloadPhoto(it.path)
+                    }
+                }
+
+                override fun onCancel() {}
+            })
+    }
+
+    private fun downloadPhoto(path: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            Downloader.download(this@ScanActivity, path) { success, filepath ->
+                if (success) {
+                    photoPath = filepath
+                    val bitmap = BitmapFactory.decodeFile(photoPath)
+                    //识别二维码
+                    val results = WeChatQRCodeDetector.detectAndDecode(bitmap).getOrNull(0) ?: ""
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        sendResult(results)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deletePhoto(filepath: String) {
+        val file = File(filepath)
+        if (file.exists()) {
+            file.delete()
+        }
+    }
+
+    private fun sendResult(result: String?) {
+        val intent = Intent()
+        intent.putExtra("result", result)
+        setResult(RESULT_OK, intent)
+        deletePhoto(photoPath)
+        finish()
+    }
+
     private fun vibrate() {
         val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(200)
+    }
+
+    private fun createBitmap(photoPath: String): Bitmap {
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(photoPath, options)
+        val imageWidth = options.outWidth
+        val imageHeight = options.outHeight
+        var sampleSize = 1
+        sampleSize = imageWidth.coerceAtMost(imageHeight)
+        options.inSampleSize = sampleSize
+        options.inJustDecodeBounds = false
+        return BitmapFactory.decodeFile(photoPath, options)
     }
 }

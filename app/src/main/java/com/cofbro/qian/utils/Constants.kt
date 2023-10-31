@@ -400,4 +400,8 @@ object Constants {
         const val SIZE = "size"
         const val HISTORY = "history"
     }
+
+    object USER {
+        const val USERNAME = "username"
+    }
 }

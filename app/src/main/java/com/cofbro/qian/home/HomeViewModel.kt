@@ -12,6 +12,16 @@ import okhttp3.Response
 class HomeViewModel : BaseViewModel<DefaultRepository>() {
     val loadCourseListLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
+    val userInfoLiveData = ResponseMutableLiveData<Response>()
+
+    fun requestForUserInfo(url: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.request(userInfoLiveData, false) {
+                val request = NetworkUtils.buildClientRequest(url)
+                NetworkUtils.request(request)
+            }
+        }
+    }
 
 
     fun loadCourseList(url: String) {

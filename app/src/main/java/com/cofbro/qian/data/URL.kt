@@ -51,4 +51,6 @@ object URL {
 
     fun getHomeworkListPath(courseId: String, classId: String, cpi: String, workEnc: String): String =
         "https://mooc1.chaoxing.com/mooc2/work/list?courseId=$courseId&classId=$classId&cpi=$cpi&ut=s&enc=$workEnc"
+
+    fun getUserInfo(): String = "http://i.chaoxing.com/base"
 }
