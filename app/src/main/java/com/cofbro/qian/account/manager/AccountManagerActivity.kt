@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
-import android.view.animation.AnticipateOvershootInterpolator
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,8 +25,7 @@ import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.TipDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.hjq.toast.ToastUtils
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter
-import jp.wasabeef.recyclerview.animators.ScaleInLeftAnimator
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,15 +68,16 @@ class AccountManagerActivity :
         }
         notifyAdapterDataChanged(data)
         binding?.recyclerView?.apply {
-            itemAnimator = ScaleInLeftAnimator()
-            adapter = ScaleInAnimationAdapter(mAdapter!!).apply {
-                // Change the durations.
-                setDuration(1000)
-                // Change the interpolator.
-                setInterpolator(AnticipateOvershootInterpolator())
-                // Disable the first scroll mode.
-                setFirstOnly(false)
-            }
+            itemAnimator = OvershootInLeftAnimator()
+            adapter = mAdapter
+//            adapter = ScaleInAnimationAdapter(mAdapter!!).apply {
+//                // Change the durations.
+//                setDuration(1000)
+//                // Change the interpolator.
+//                setInterpolator(AnticipateOvershootInterpolator())
+//                // Disable the first scroll mode.
+//                setFirstOnly(false)
+//            }
             layoutManager = LinearLayoutManager(
                 this@AccountManagerActivity,
                 LinearLayoutManager.VERTICAL,
@@ -152,6 +151,9 @@ class AccountManagerActivity :
                 if (body?.getBoolean("status") == true) {
                     val cookies: List<String>? = headers?.values("Set-Cookie")
                     saveCookies(cookies)
+                } else {
+                    hideLoadingView()
+                    ToastUtils.show("账号或密码错误！")
                 }
             }
         }
@@ -182,7 +184,7 @@ class AccountManagerActivity :
         }
     }
 
-    private fun saveCookies(cookies: List<String>?) {
+    private suspend fun saveCookies(cookies: List<String>?) {
         if (cookies?.isNotEmpty() == true) {
             val result = StringBuilder()
             var uid = ""
@@ -197,10 +199,12 @@ class AccountManagerActivity :
                     if (temp.startsWith("fid")) fid = temp.substring(4)
                 }
                 val jsonObject = buildAccount(uid, fid)
-                if (jsonObject != null) {
-                    notifyAdapterDataChanged(jsonObject)
+                withContext(Dispatchers.Main) {
+                    jsonObject?.let {
+                        mAdapter?.notifyItemInserted()
+                    }
+                    responseUI(jsonObject)
                 }
-                responseUI(jsonObject)
             } catch (_: Exception) {
             }
         } else {
@@ -226,7 +230,7 @@ class AccountManagerActivity :
     private fun notifyAdapterDataChanged(data: JSONObject?) {
         data?.let {
             lifecycleScope.launch(Dispatchers.Main) {
-                mAdapter?.setData(it)
+                mAdapter?.setAccounts(it)
             }
         }
     }
@@ -249,7 +253,7 @@ class AccountManagerActivity :
             setPositiveClickListener {
                 dismiss()
                 val uid = itemData?.getStringExt(Constants.Account.UID) ?: ""
-                mAdapter?.remove(uid)
+                mAdapter?.removeAccount(uid)
             }
             setNegativeClickListener {
                 dismiss()
@@ -263,7 +267,7 @@ class AccountManagerActivity :
         lifecycleScope.launch(Dispatchers.IO) {
             data = AccountManager.loadAllAccountData(this@AccountManagerActivity)
             data?.let {
-                notifyAdapterDataChanged(data)
+                notifyAdapterDataChanged(it)
             }
         }
     }
@@ -276,7 +280,10 @@ class AccountManagerActivity :
                 return null
             }
         }
-        return AccountManager.buildAccount(this, data, mUsername, mPassword, uid, fid)
+        val account = AccountManager.buildAccount(mUsername, mPassword, uid, fid)
+        // data和adapter.accountData同源
+        data = AccountManager.bindAccounts(this, data, account)
+        return account
     }
 
     private fun updateAccountData(data: JSONObject?) {
