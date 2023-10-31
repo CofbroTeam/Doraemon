@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -146,12 +145,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     hideLoadingView()
                 }
                 val data = it.data?.body?.string()
-            }
-        }
-
-        viewModel.preSignLiveData.observe(this) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val data = it?.data?.body?.string()
             }
         }
 
