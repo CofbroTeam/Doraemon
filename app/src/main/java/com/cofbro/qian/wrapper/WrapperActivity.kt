@@ -16,6 +16,7 @@ class WrapperActivity : AppCompatActivity() {
     var courseId = ""
     var classId = ""
     var cpi = ""
+    var courseName = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +60,7 @@ class WrapperActivity : AppCompatActivity() {
         courseId = intent.getStringExtra("courseId") ?: ""
         classId = intent.getStringExtra("classId") ?: ""
         cpi = intent.getStringExtra("cpi") ?: ""
+        courseName = intent.getStringExtra("courseName") ?: ""
     }
 
     private fun initView() {

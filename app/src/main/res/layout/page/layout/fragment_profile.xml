@@ -72,7 +72,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cs_profile_my_booking"
+        android:id="@+id/sign_records"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
@@ -106,7 +106,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cowithprofiles"
+        android:id="@+id/bind_accounts"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
@@ -115,7 +115,7 @@
         android:background="@drawable/app_white_radius_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cs_profile_my_booking">
+        app:layout_constraintTop_toBottomOf="@+id/sign_records">
 
         <ImageView
             android:id="@+id/imageView2"
@@ -149,7 +149,7 @@
         android:background="@drawable/app_white_radius_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cowithprofiles">
+        app:layout_constraintTop_toBottomOf="@+id/bind_accounts">
 
         <ImageView
             android:id="@+id/imageView19"

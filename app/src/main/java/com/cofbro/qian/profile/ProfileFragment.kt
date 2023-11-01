@@ -18,6 +18,7 @@ import com.cofbro.qian.account.manager.AccountManagerActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentProfileBinding
 import com.cofbro.qian.login.LoginActivity
+import com.cofbro.qian.record.SignRecordActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
@@ -96,7 +97,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
             viewModel.logoutDialog?.setCancelable(false)
             viewModel.logoutDialog?.show()
         }
-        binding?.cowithprofiles?.setOnClickListener {
+        binding?.bindAccounts?.setOnClickListener {
             val intent = Intent(requireActivity(), AccountManagerActivity::class.java)
             startActivity(intent)
         }
@@ -104,6 +105,11 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         binding?.signWithButton?.setOnClickListener {
             val switch = it as SwitchCompat
             requireActivity().saveUsedSp("signWith", switch.isChecked.toString())
+        }
+
+        binding?.signRecords?.setOnClickListener {
+            val intent = Intent(requireActivity(), SignRecordActivity::class.java)
+            startActivity(intent)
         }
     }
     private fun clearUserInfo(context: Context){

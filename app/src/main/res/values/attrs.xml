@@ -15,4 +15,11 @@
         <attr name="rightPointColor" format="reference|color"/>
         <attr name="pointSize" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="TicketView">
+        <attr name="ticketRadius" format="dimension" />
+        <attr name="crannyRadius" format="dimension"/>
+        <attr name="leftBackground" format="reference|color"/>
+        <attr name="rightBackground" format="reference|color"/>
+    </declare-styleable>
 </resources>

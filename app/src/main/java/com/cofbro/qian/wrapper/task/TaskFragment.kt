@@ -18,6 +18,7 @@ import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
@@ -30,16 +31,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Response
 
 /**
  * @author cofbro
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
-    // 代签账号的uid
-    private var uidTogether = ""
-
-    // 代签账号的cookie
+    private var alreadySign = false
     private var cookies = ""
 
     // 签到的aid
@@ -81,6 +80,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private fun initArgs() {
         activity = requireActivity() as WrapperActivity
+        SignRecorder.init(requireContext())
     }
 
     private fun initView() {
@@ -144,7 +144,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 if (it.data == null) {
                     hideLoadingView()
                 }
-                val data = it.data?.body?.string()
             }
         }
 
@@ -153,6 +152,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string() ?: ""
                 withContext(Dispatchers.Main) {
+                    // 表示签过到，可以再次io
+                    alreadySign = true
+                    signRecord(data)
                     responseUI(data)
                     // 开始代签
                     startSignTogether(data)
@@ -166,30 +168,36 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string()?.safeParseToJson()
                 val headers = data.headers
+                cookies = headers.values("Set-Cookie").toString()
                 if (body?.getBoolean("status") == true) {
-                    val list: List<String> = headers.values("Set-Cookie")
-                    cookies = list.toString()
-                    signWith(uidTogether, id, code)
+                    signWith(id, code, cookies)
                 }
             }
         }
 
         // 绑定签到
-        viewModel.signTogetherLiveData.observe(this) {
+        viewModel.signTogetherLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.string() ?: ""
+                val body = data.body?.string()
+//                val headers = data.headers
+//                val cookies = headers.values("Set-Cookie").toString()
+                 signRecord(body, cookies)
             }
         }
     }
 
+    override fun onStop() {
+        SignRecorder.writeJson(requireContext())
+        super.onStop()
+    }
+
     private suspend fun startSignTogether(data: String) {
         // 开始代签
-        codeDialog?.let {
-            val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
-            if (signWith && (data.contains("success") || data.contains("签到成功"))) {
-                // 如果本账号签到成功，则开始自动签到其他绑定账号
-                signWithAccounts()
-            }
+        val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
+        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
+            // 如果本账号签到成功，则开始自动签到其他绑定账号
+            signWithAccounts()
         }
     }
 
@@ -325,7 +333,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun signTogether(aid: String, signCode: String = "") {
+    private suspend fun signTogether(aid: String, signCode: String = "", cookies: String) {
         activity?.let {
             viewModel.signTogether(
                 URL.getNormalSignPath(it.courseId, it.classId, aid, signCode),
@@ -334,7 +342,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun signLoction(api: String) {
+    private suspend fun signLocation(api: String) {
         activity?.let {
             viewModel.sign(api)
         }
@@ -409,7 +417,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private suspend fun signWithAccounts() {
         val data = AccountManager.loadAllAccountData(requireContext())
-        val users = data.getJSONArray("users")
+        val users = data.getJSONArray(Constants.Account.USERS)
         users?.let {
             it.forEach { item ->
                 val user = item as? JSONObject ?: JSONObject()
@@ -420,8 +428,20 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     }
 
+    private fun signRecord(body: String?, cookies: String = "") {
+        if (!alreadySign) return
+        val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+        val status = body?.contains("成功") ?: false
+        record(uid, status)
+    }
+
+    private fun record(uid: String, status: Boolean) {
+        val courseName = activity?.courseName ?: ""
+        val statusName = if (status) "成功" else "失败"
+        SignRecorder.record(requireContext(), uid, courseName, statusName)
+    }
+
     private fun tryLogin(user: JSONObject) {
-        uidTogether = user.getStringExt("uid")
         val username = user.getStringExt("username")
         val password = user.getStringExt("password")
         if (username.isNotEmpty() && password.isNotEmpty()) {
@@ -429,9 +449,15 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun signWith(uid: String, id: String, code: String = "") {
+    private suspend fun signWith(id: String, code: String = "", cookies: String) {
+        val uid = findUID(cookies)
         val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
         viewModel.preSign(signWithPreSign)
-        signTogether(id, code)
+        signTogether(id, code, cookies)
+    }
+
+    private fun findUID(cookies: String): String {
+        val uid = cookies.substringAfter("UID=")
+        return uid.substringBefore(";")
     }
 }
