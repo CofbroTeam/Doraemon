@@ -5,7 +5,8 @@ import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.hjq.toast.ToastUtils
 
-
+val monthArray =
+    arrayOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
 fun String.showSignResult() {
     var toast = ""
     toast = if (this.contains("success") || this.contains("签到成功")) {
@@ -27,6 +28,20 @@ fun getStatusBarHeight(context: Context): Int {
         }
     } catch (_: Exception){}
     return result
+}
+
+fun splitDateStr(date: String): List<String> {
+    val list = arrayListOf<String>()
+    val splitTime = date.split(" ").getOrNull(0) ?: ""
+    val dateSplit = splitTime.split("-")
+    val year = dateSplit.getOrNull(0) ?: ""
+    val month = dateSplit.getOrNull(1)?.toInt() ?: 0
+    val day = dateSplit.getOrNull(2) ?: ""
+    list.add(year)
+    list.add(monthArray[month - 1])
+    list.add(day)
+    list.add(month.toString())
+    return list
 }
 
 fun Context.saveJsonArraySp(key: String, value: List<*>){

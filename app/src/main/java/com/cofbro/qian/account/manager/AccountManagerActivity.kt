@@ -128,7 +128,7 @@ class AccountManagerActivity :
         binding?.toolbar?.apply {
             toolbarHeight = getStatusBarHeight(this@AccountManagerActivity) + dp2px(
                 this@AccountManagerActivity,
-                45
+                50
             )
             val csLayout = layoutParams
             csLayout.height = toolbarHeight

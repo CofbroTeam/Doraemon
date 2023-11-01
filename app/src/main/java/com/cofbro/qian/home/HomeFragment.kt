@@ -192,9 +192,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
                         override fun onItemClick(
                             courseId: String,
                             classId: String,
-                            cpi: String
+                            cpi: String,
+                            courseName: String
                         ) {
-                            toWrapperActivity(courseId, classId, cpi)
+                            toWrapperActivity(courseId, classId, cpi, courseName)
                         }
                     })
 
@@ -260,12 +261,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>() {
         // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
     }
 
-    private fun toWrapperActivity(courseId: String, classId: String, cpi: String) {
+    private fun toWrapperActivity(courseId: String, classId: String, cpi: String, courseName: String) {
         val intent = Intent(requireActivity(), WrapperActivity::class.java)
         intent.apply {
             putExtra("courseId", courseId)
             putExtra("classId", classId)
             putExtra("cpi", cpi)
+            putExtra("courseName", courseName)
         }
         startActivity(intent)
     }
