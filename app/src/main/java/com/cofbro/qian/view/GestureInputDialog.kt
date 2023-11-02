@@ -20,4 +20,18 @@ class GestureInputDialog(context: Context) : AlertDialog(context) {
     fun setInputEndListener(inputEndListener: (List<Int>) -> Unit) {
         findViewById<GestureInputView>(R.id.gestureInputView).setInputEndListener(inputEndListener)
     }
+
+    fun setState(isGesturePwdRight: Boolean) {
+        val state = if (isGesturePwdRight) GestureInputView.DotState.Right
+        else GestureInputView.DotState.Wrong
+        findViewById<GestureInputView>(R.id.gestureInputView).setState(state)
+    }
+
+    fun initData() {
+        findViewById<GestureInputView>(R.id.gestureInputView).initData()
+    }
+
+    fun setIsTouchAble(isTouchAble: Boolean) {
+        findViewById<GestureInputView>(R.id.gestureInputView).isTouchAble = isTouchAble
+    }
 }

@@ -10,13 +10,12 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import com.google.android.material.internal.ViewUtils.dpToPx
 
 class GestureInputView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-    private var isCanTouched = true
+    var isTouchAble = true
 
     @SuppressLint("RestrictedApi")
     private var mRadius = dpToPx(context, 30) // 背景点的半径
@@ -140,12 +139,15 @@ class GestureInputView(context: Context, attrs: AttributeSet) : View(context, at
 
     /** MotionEvent.ACTION_MOVE */
     private fun actionMove(x: Float, y: Float) {
-        if (!isCanTouched) return
+        if (!isTouchAble) return
         mStopX = x
         mStopY = y
         invalidate()
         val currentTouchedDot = whichDotIsTouched(x, y)
         if (currentTouchedDot != null && currentTouchedDot != formerTouchedDot) { // 在点内
+            mInputPwd.forEach {
+                if (it == currentTouchedDot.order) return
+            }
             vibrate()
             mStartX = currentTouchedDot.cx
             mStartY = currentTouchedDot.cy
@@ -174,33 +176,15 @@ class GestureInputView(context: Context, attrs: AttributeSet) : View(context, at
 
     /** MotionEvent.ACTION_UP */
     private fun actionUp() {
-        isCanTouched = false
+        isTouchAble = false
         mStartX = null
         mStartY = null
         mStopX = null
         mStopY = null
 
-        /** 根据密码是否正确的返回值来设置状态 */
-        /** 为什么 TaskFragment里面没有是否签到成功的返回值！！！ */
-        /*mInputEndListener?.let {
-            if (it(mInputPwd)) {
-                // 正确
-                setState(DotState.Right)
-                mLinePaint.color = Color.parseColor("#6600ff00")
-            } else {
-                // 错误
-                setState(DotState.Wrong)
-                mLinePaint.color = Color.parseColor("#66ff0000")
-                CoroutineScope(Dispatchers.Default).launch {
-                    // 延迟一秒后清空，接受用户重新输入
-                    delay(1000)
-                    initData()
-                }
-            }
-        }*/
-
-        // 既然没有返回手势对错，那就直接传不管了
-        mInputEndListener?.invoke(mInputPwd)
+        mInputEndListener?.let {
+            it(mInputPwd)
+        }
     }
 
     /** 判断哪个点被触摸 */
@@ -226,7 +210,7 @@ class GestureInputView(context: Context, attrs: AttributeSet) : View(context, at
                 color = mStatePaintColor
                 style = Paint.Style.FILL_AND_STROKE
             }
-            canvas?.drawCircle(mDots[n].cx, mDots[n].cy, mDots[n].radius / 3, mStatePaint)
+            canvas?.drawCircle(mDots[n].cx, mDots[n].cy, mDots[n].radius, mStatePaint)
         }
     }
 
@@ -242,21 +226,26 @@ class GestureInputView(context: Context, attrs: AttributeSet) : View(context, at
     }
 
     /** 给已经被触摸的点赋予自定义状态 */
-    private fun setState(state: DotState) {
+    fun setState(state: DotState) {
         for (dot in mDots) {
             if (dot.state == DotState.Selected) {
                 dot.state = state
             }
         }
+        if (state == DotState.Right) {
+            mLinePaint.color = Color.parseColor("#6600ff00")
+        } else if (state == DotState.Wrong) {
+            mLinePaint.color = Color.parseColor("#66ff0000")
+        }
         invalidate() // 重新绘制更新状态
     }
 
     /** 密码错误后要做的事:初始化数据... */
-    private fun initData() {
+    fun initData() {
         mLinePaint.color = Color.parseColor("#66000000")
         isNeedInitAllDots = true
         formerTouchedDot = null
-        isCanTouched = true
+        isTouchAble = true
         mInputPwd.clear()
         mPath.reset()
         invalidate()
