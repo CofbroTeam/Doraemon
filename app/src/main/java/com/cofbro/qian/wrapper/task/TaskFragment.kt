@@ -201,12 +201,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private fun responseUI(data: String) {
+    private suspend fun responseUI(data: String) {
         hideLoadingView()
         data.showSignResult()
         // 清除dialog
-        gestureInputDialog?.dismiss()
         codeDialog?.dismiss()
+        responseGestureDialog(data)
     }
 
     private fun doNetwork() {
@@ -396,10 +396,26 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    private suspend fun responseGestureDialog(data: String) {
+        gestureInputDialog?.let {
+            if (data.contains("success") || data.contains("成功")) {
+                it.setState(true)
+                delay(500)
+                it.dismiss()
+            } else {
+                it.setState(false)
+                delay(500)
+                it.initData()
+                it.setIsTouchAble(true)
+            }
+        }
+    }
+
     private suspend fun showGestureDialog(id: String) {
-        GestureInputDialog(requireContext()).apply {
+        gestureInputDialog = GestureInputDialog(requireContext()).apply {
             show()
             setInputEndListener { inputPwd ->
+                this.setIsTouchAble(false)
                 // 由于回调出来的密码是 Int数组，需遍历转成字符串
                 var inputCode = ""
                 inputPwd.forEach {
