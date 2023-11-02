@@ -115,8 +115,10 @@
                             android:layout_marginTop="9dp"
                             android:layout_marginBottom="16dp"
                             android:text="点击搜索签到"
+
+                            android:textColor="@color/purple_200"
                             android:textStyle="bold"
-                            android:background="@drawable/bk_textview"
+                            android:background="@drawable/avatar_default"
                             android:textAlignment="center"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/textView2"
@@ -132,7 +134,8 @@
                             android:layout_height="50dp"
                             android:text="位置名称可选"
                             android:textStyle="bold"
-                            android:background="@drawable/bk_textview"
+                            android:background="@drawable/avatar_default"
+                            android:textColor="@color/purple_200"
                             android:textAlignment="center"
                             app:layout_constraintBottom_toBottomOf="@+id/textView4"
                             app:layout_constraintEnd_toStartOf="@+id/textView5"
@@ -143,20 +146,19 @@
                         </TextView>
 
                         <TextView
-
                             android:id="@+id/textView5"
                             android:layout_width="80dp"
                             android:layout_height="50dp"
                             android:text="可直接点击签到"
                             android:textStyle="bold"
-                            android:background="@drawable/bk_textview"
+                            android:background="@drawable/avatar_default"
+                            android:textColor="@color/purple_200"
                             android:textAlignment="center"
                             app:layout_constraintBottom_toBottomOf="@+id/textView2"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintStart_toEndOf="@+id/textView2"
                             app:layout_constraintTop_toTopOf="@+id/textView2">
-
                         </TextView>
 
 
