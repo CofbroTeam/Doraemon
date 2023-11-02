@@ -22,8 +22,8 @@ class GestureInputDialog(context: Context) : AlertDialog(context) {
     }
 
     fun setState(isGesturePwdRight: Boolean) {
-        val state = if (isGesturePwdRight) GestureInputView.DotState.Right
-        else GestureInputView.DotState.Wrong
+        val state =
+            if (isGesturePwdRight) GestureInputView.DotState.Right else GestureInputView.DotState.Wrong
         findViewById<GestureInputView>(R.id.gestureInputView).setState(state)
     }
 

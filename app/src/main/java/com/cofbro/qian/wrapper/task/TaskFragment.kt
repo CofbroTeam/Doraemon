@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +26,6 @@ import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.GestureInputDialog
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -61,9 +59,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var activity: WrapperActivity? = null
     private var taskAdapter: TaskAdapter? = null
     private var loadingDialog: Dialog? = null
-
-    // 手势签到的返回值
-    private var isGesturePwdRight: Boolean? = null
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -157,7 +152,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string() ?: ""
-                isGesturePwdRight = data.contains("success") || data.contains("签到成功")
                 withContext(Dispatchers.Main) {
                     responseUI(data)
                     // 开始代签
@@ -199,12 +193,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private fun responseUI(data: String) {
+    private suspend fun responseUI(data: String) {
         hideLoadingView()
         data.showSignResult()
         // 清除dialog
-        gestureInputDialog?.dismiss()
         codeDialog?.dismiss()
+        responseGestureDialog(data)
     }
 
     private fun doNetwork() {
@@ -394,8 +388,23 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    private suspend fun responseGestureDialog(data: String) {
+        gestureInputDialog?.let {
+            if (data.contains("success") || data.contains("成功")) {
+                it.setState(true)
+                delay(500)
+                it.dismiss()
+            } else {
+                it.setState(false)
+                delay(500)
+                it.initData()
+                it.setIsTouchAble(true)
+            }
+        }
+    }
+
     private suspend fun showGestureDialog(id: String) {
-        GestureInputDialog(requireContext()).apply {
+        gestureInputDialog = GestureInputDialog(requireContext()).apply {
             show()
             setInputEndListener { inputPwd ->
                 this.setIsTouchAble(false)
@@ -409,31 +418,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     viewModel.preSign(preSignUrl)
                     // 签到
                     signNormally(id, code)
-
-                    /** 以下代码是根据手势签到是否正确来改变 Dialog的 显示状态，来告诉用户是否签到成功，提升用户体验
-                     * 以下代码是否正常执行达到预期效果，并不会影响到签到的结果 */
-                    // 延迟等返回值，如果网络好，返回值的接收在 100ms内，如果超时直接 dismiss()
-                    delay(100)
-                    if (isGesturePwdRight != null) {
-                        if (isGesturePwdRight!!) {
-                            // setState dismiss
-                            this@apply.apply {
-                                setState(true)
-                                delay(500)
-                                dismiss()
-                            }
-                        } else {
-                            // setState init
-                            this@apply.apply {
-                                setState(false)
-                                delay(500)
-                                initData()
-                                setIsTouchAble(true)
-                            }
-                        }
-                    } else {
-                        dismiss()
-                    }
                 }
             }
         }
