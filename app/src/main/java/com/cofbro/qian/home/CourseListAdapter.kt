@@ -1,4 +1,4 @@
-package com.cofbro.qian.main
+package com.cofbro.qian.home
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -16,13 +16,13 @@ import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 
 class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewHolder>() {
-    private var totalCount= 0
-    var courseCount = 0
+    private var totalCount = 0
+    private var courseCount = 0
     private var data: JSONObject? = null
     private var listener: AdapterListener? = null
 
     private fun calculateCourseCount() {
-         courseCount = 0
+        courseCount = 0
         data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.let { array ->
             array.forEach {
                 val jsonObject = (it as? JSONObject)
@@ -54,7 +54,8 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
         RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             // position  -> 数据中的第一个item不是课程
-            data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)?.get(position + totalCount - courseCount)?.let {
+            data?.getJSONArray(Constants.CourseList.CHANNEL_LIST)
+                ?.get(position + totalCount - courseCount)?.let {
                 // 数据下发的item
                 val jsonObject = (it as? JSONObject)
                 // 是否是课程，否则不展示
@@ -76,7 +77,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                     // 课程id
                     val courseId = item?.getStringExt(Constants.CourseList.COURSE_ID) ?: ""
                     // 课程名称
-                    val courseName = item?.getStringExt(Constants.CourseList.COURSE_NAME)
+                    val courseName = item?.getStringExt(Constants.CourseList.COURSE_NAME) ?: ""
                     // 学校名称
                     val school = item?.getStringExt(Constants.CourseList.SCHOOLS, "未设置学校")
                     // 老师
@@ -98,7 +99,7 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
                         .apply(options)
                         .into(binding.ivClassAvtar)
                     itemView.setOnClickListener {
-                        listener?.onItemClick(courseId, classId, cpi)
+                        listener?.onItemClick(courseId, classId, cpi, courseName)
                     }
                 }
             }
@@ -118,6 +119,6 @@ class CourseListAdapter : RecyclerView.Adapter<CourseListAdapter.CourseListViewH
     }
 
     interface AdapterListener {
-        fun onItemClick(courseId: String, classId: String, cpi: String)
+        fun onItemClick(courseId: String, classId: String, cpi: String, courseName: String)
     }
 }

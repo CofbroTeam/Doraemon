@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
-import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
@@ -17,6 +16,7 @@ import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
@@ -24,6 +24,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         tryLogin()
         initObserver()
         initEvent()
+        autoClearFocus()
+        login()
     }
 
     private fun tryLogin() {
@@ -36,8 +38,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun initObserver() {
-        viewModel.loginLiveData.observe(this) {
-            val data = it.data ?: return@observe
+        viewModel.loginLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string()?.safeParseToJson()
                 val headers = data.headers
@@ -58,11 +60,10 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                     } else {
                         ToastUtils.show("Cookies获取失败!")
                     }
+                    saveUserInfo()
                     CacheUtils.cache["uid"] = uid ?: ""
                     CacheUtils.cache["cookies"] = cookies.toString()
                     CacheUtils.cache["fid"] = fid ?: ""
-                    // 保存用户信息
-                    saveUserInfo()
                     lifecycleScope.launch(Dispatchers.Main) {
                         ToastUtils.show("登录成功！")
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
@@ -81,6 +82,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
             saveUsedSp("username", mUsername!!)
             saveUsedSp("password", mPassword!!)
         }
+
     }
 
     private fun initEvent() {
@@ -94,7 +96,6 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         binding?.tvLogin?.setOnClickListener {
             mUsername = binding?.ipUsername?.getTextString()
             mPassword = binding?.ipPassword?.getTextString()
-
             if (!mUsername.isNullOrEmpty() && !mPassword.isNullOrEmpty()) {
                 viewModel.login(URL.getLoginPath(mUsername!!, mPassword!!))
             }

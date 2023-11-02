@@ -3,12 +3,13 @@ package com.cofbro.qian.login
 import androidx.lifecycle.viewModelScope
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
+import com.cofbro.qian.utils.DefaultRepository
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Response
 
-class LoginViewModel : BaseViewModel<LoginRepository>() {
+open class LoginViewModel : BaseViewModel<LoginRepository>() {
     companion object {
         private const val LOGIN_MESSAGE = "登录中"
     }

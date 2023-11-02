@@ -26,6 +26,7 @@ import com.cofbro.qian.view.InputView.Config.CURSOR_PADDING
 import com.cofbro.qian.view.InputView.Config.DEFAULT_HEIGHT
 import com.cofbro.qian.view.InputView.Config.DEFAULT_PADDING
 import com.cofbro.qian.view.InputView.Config.DEFAULT_TEXT_COUNT
+import com.cofbro.qian.view.InputView.Config.DEFAULT_TEXT_SIZE
 import com.cofbro.qian.view.InputView.Config.DEFAULT_WIDTH
 import com.cofbro.qian.view.InputView.Config.HINT_BACKGROUND_PADDING
 import com.cofbro.qian.view.InputView.Config.TEXT_INDENTED
@@ -43,7 +44,7 @@ class InputView : View {
         const val CURSOR_HEIGHT = 45f
 
         // 光标离左侧文字的间距
-        const val CURSOR_PADDING = 5f
+        const val CURSOR_PADDING = 10f
 
         // bitmap点击扩大范围
         const val CLICK_SCALE_RANGE = 8f
@@ -57,6 +58,9 @@ class InputView : View {
 
         // 默认可输入的最大字数
         const val DEFAULT_TEXT_COUNT = 23
+
+        // 默认字体大小
+        const val DEFAULT_TEXT_SIZE = 40f
     }
 
     // 记录第一次 down是否是在bitmap中
@@ -112,8 +116,8 @@ class InputView : View {
     }
     private val hintPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
-        textSize = 35f
         color = Color.parseColor("#cccccc")
+        textSize = DEFAULT_TEXT_SIZE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
@@ -126,21 +130,18 @@ class InputView : View {
         isAntiAlias = true
         isDither = true
     }
-
     private val cursorPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
         strokeWidth = 5f
-        color = Color.argb(0, 87, 209, 118)
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
         isDither = true
     }
-
     private val textPaint = Paint().apply {
         style = Paint.Style.FILL_AND_STROKE
-        textSize = 40f
         color = Color.BLACK
+        textSize = DEFAULT_TEXT_SIZE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         isAntiAlias = true
@@ -158,21 +159,25 @@ class InputView : View {
         defStyleAttr
     ) {
         init(attrs)
-
     }
 
     private fun init(attrs: AttributeSet?) {
         isFocusable = true
         isFocusableInTouchMode = true
         typedArray = context.obtainStyledAttributes(attrs, R.styleable.InputView)
-        hintText = typedArray.getString(R.styleable.InputView_hint).toString()
-        if (typedArray.getString(R.styleable.InputView_type)
-                .toString() == "password"
-        ) isPasswordType = true
-        ifShowBitmap = isPasswordType
-        bitmap = createBitmap(R.drawable.ic_eye_close)
+        cursorPaint.color =
+            typedArray.getColor(R.styleable.InputView_cursorColor, Color.parseColor("#0057D176"))
         hintBackgroundPaint.color =
             typedArray.getColor(R.styleable.InputView_hintBackground, Color.parseColor("#ffffff"))
+        hintText = typedArray.getString(R.styleable.InputView_hint).toString()
+        typedArray.getDimension(R.styleable.InputView_textSize, 40f).let {
+            hintPaint.textSize = it
+            textPaint.textSize = it
+        }
+        if (typedArray.getString(R.styleable.InputView_type) == "password") isPasswordType = true
+        ifShowBitmap = isPasswordType
+
+        bitmap = createBitmap(R.drawable.ic_eye_close)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -215,8 +220,11 @@ class InputView : View {
 
     // 画hint文字
     private fun drawHint(canvas: Canvas, str: String) {
-        if (inputString.isNotEmpty()) hintPaint.color = Color.parseColor("#34c759")
-        else hintPaint.color = Color.parseColor("#cccccc")
+        hintPaint.color = if (inputString.isNotEmpty()) {
+            Color.parseColor("#34c759")
+        } else {
+            Color.parseColor("#cccccc")
+        }
         canvas.drawText(
             str,
             0,
@@ -354,7 +362,7 @@ class InputView : View {
     }
 
     // 收起软键盘
-    private fun hideKeyboard() {
+    private fun hideKeyBoard() {
         val imm: InputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
@@ -374,21 +382,10 @@ class InputView : View {
         return inputString
     }
 
-    private fun isKeyboardHidden(view: View): Boolean {
-        val rect = Rect()
-        view.getWindowVisibleDisplayFrame(rect) // 获取 window可见区域高度，不包括键盘
-        val visibleHeight = rect.height()
-        val screenHeight = Resources.getSystem().displayMetrics.heightPixels // 获取 window高度，包括键盘
-        return visibleHeight >= screenHeight
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (!ifShowBitmap) {
-            // 键盘收=收起后，再次电机输入框，弹出键盘
-            if (isKeyboardHidden(this)) {
-                showKeyboard()
-            }
+            if (isKeyboardHidden(this)) showKeyboard()
             requestFocus()
             return true
         }
@@ -399,7 +396,7 @@ class InputView : View {
                     alreadyTouchDownInRect = true
                     isPasswordType = false
                 } else if (isKeyboardHidden(this)) {
-                    // 键盘收=收起后，再次电机输入框，弹出键盘
+                    // 点击位置不是小眼睛处且键盘处于隐藏状态,则显示键盘
                     showKeyboard()
                 } else {
                     requestFocus()
@@ -425,11 +422,16 @@ class InputView : View {
         return true
     }
 
-    override fun onFocusChanged(
-        gainFocus: Boolean,
-        direction: Int,
-        previouslyFocusedRect: Rect?
-    ) {
+    /** 优化键盘弹出被手动收起后再次点不弹出 */
+    private fun isKeyboardHidden(view: View): Boolean {
+        val rect = Rect()
+        view.getWindowVisibleDisplayFrame(rect) // 获取 window可见区域高度，不包括键盘
+        val visibleHeight = rect.height()
+        val screenHeight = Resources.getSystem().displayMetrics.heightPixels // 获取 window高度，包括键盘
+        return visibleHeight >= screenHeight
+    }
+
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         if (gainFocus) {
             showKeyboard()
@@ -437,7 +439,7 @@ class InputView : View {
             hintOffsetYAnimation(0f, (bottom - top) / 2f, 0f, 20f)
             startCursorAnimator()
         } else {
-            hideKeyboard()
+            hideKeyBoard()
             borderPaint.color = Color.parseColor("#dfeeff")
             hintOffsetYAnimation((bottom - top) / 2f, 0f, 20f, 0f)
             stopCursorAnimator()
@@ -497,6 +499,17 @@ class InputView : View {
                     if (inputString.isNotEmpty()) {
                         inputString = inputString.substring(0, inputString.length - 1)
                     }
+                } else {
+                    /** 不同机型处理输入是通过 commitText或者 sendKeyEvent执行(目前还没发现两种都执行的机型)
+                     *  一般都是 commitText,如果上面 commitText没执行,就会到这里
+                     */
+                    // 如果不是删除按键
+                    val unicodeChar = event.unicodeChar
+                    val character = unicodeChar.toChar().toString()
+                    val temp = inputString + character
+                    if (temp.length < DEFAULT_TEXT_COUNT) {
+                        inputString = temp
+                    }
                 }
             }
             postInvalidate()
@@ -504,11 +517,16 @@ class InputView : View {
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            Log.d(
+                "tag",
+                "deleteSurroundingText beforeLength=$beforeLength afterLength=$afterLength"
+            )
             return true
         }
 
         override fun finishComposingText(): Boolean {
             // 结束组合文本输入的时候，这个方法基本上会出现在切换输入法类型，点击回车（完成、搜索、发送、下一步）点击输入法右上角隐藏按钮会触发。
+            Log.d("tag", "finishComposingText")
             return true
         }
     }

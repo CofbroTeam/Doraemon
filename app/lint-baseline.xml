@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.1.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.0)" variant="fatal" version="8.1.0">
+
+    <issue
+        id="Instantiatable"
+        message="`ProfileFragment` must extend android.app.Activity"
+        errorLine1="        &lt;activity android:name=&quot;.profile.ProfileFragment&quot; />"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="58"
+            column="33"/>
+    </issue>
+
+</issues>

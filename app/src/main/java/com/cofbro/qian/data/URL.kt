@@ -26,8 +26,8 @@ object URL {
         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
 
     // 普通签到
-    fun getNormalSignPath(courseId: String, classId: String, aid: String): String =
-        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid"
+    fun getNormalSignPath(courseId: String, classId: String, aid: String, signCode: String = ""): String =
+        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid&signCode=$signCode"
 
     fun getLocationSignPath(
         address: String?,
@@ -46,4 +46,11 @@ object URL {
     fun getSignWithPhoto(aid: String, uid: String, objectId: String): String =
         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&uid=$uid&appType=15&fid=0&objectId=$objectId"
 
+    fun getWorkEncPath(courseId: String, classId: String, cpi: String): String =
+        "https://mooc1-2.chaoxing.com/mooc-ans/visit/stucoursemiddle?courseid=$courseId&clazzid=$classId&vc=1&cpi=$cpi&ismooc2=1&v=2"
+
+    fun getHomeworkListPath(courseId: String, classId: String, cpi: String, workEnc: String): String =
+        "https://mooc1.chaoxing.com/mooc2/work/list?courseId=$courseId&classId=$classId&cpi=$cpi&ut=s&enc=$workEnc"
+
+    fun getUserInfo(): String = "http://i.chaoxing.com/base"
 }

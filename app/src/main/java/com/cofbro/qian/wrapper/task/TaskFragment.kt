@@ -1,36 +1,55 @@
 package com.cofbro.qian.wrapper.task
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
+import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
 import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
+import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
+import com.cofbro.qian.view.GestureInputDialog
 import com.cofbro.qian.wrapper.WrapperActivity
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Response
 
 /**
  * @author cofbro
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var alreadySign = false
+    private var cookies = ""
+
+    // 签到的aid
+    private var id = ""
+
+    // 签到密码
+    private var code = ""
+
+    // 手势签到的dialog
+    private var gestureInputDialog: GestureInputDialog? = null
+    private var codeDialog: AlertDialog? = null
     private var activeId = ""
     private var signTypeData: JSONObject? = null
     private var preSignUrl = ""
@@ -55,15 +74,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
-            if (result != null) {
-                Log.v("LOG_RESULT:", result)
-            }
             signWithCamera(id)
         }
     }
 
     private fun initArgs() {
         activity = requireActivity() as WrapperActivity
+        SignRecorder.init(requireContext())
     }
 
     private fun initView() {
@@ -127,21 +144,69 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 if (it.data == null) {
                     hideLoadingView()
                 }
-                val data = it.data?.body?.string()
             }
         }
 
         // 签到
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.string()
-                Log.v("data:",data!!)
+                val data = it.data?.body?.string() ?: ""
                 withContext(Dispatchers.Main) {
-                    hideLoadingView()
-                    data?.showSignResult()
+                    // 表示签过到，可以再次io
+                    alreadySign = true
+                    signRecord(data)
+                    responseUI(data)
+                    // 开始代签
+                    startSignTogether(data)
                 }
             }
         }
+
+        // 尝试登录
+        viewModel.loginLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
+            lifecycleScope.launch(Dispatchers.IO) {
+                val body = data.body?.string()?.safeParseToJson()
+                val headers = data.headers
+                cookies = headers.values("Set-Cookie").toString()
+                if (body?.getBoolean("status") == true) {
+                    signWith(id, code, cookies)
+                }
+            }
+        }
+
+        // 绑定签到
+        viewModel.signTogetherLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
+            lifecycleScope.launch(Dispatchers.IO) {
+                val body = data.body?.string()
+//                val headers = data.headers
+//                val cookies = headers.values("Set-Cookie").toString()
+                 signRecord(body, cookies)
+            }
+        }
+    }
+
+    override fun onStop() {
+        SignRecorder.writeJson(requireContext())
+        super.onStop()
+    }
+
+    private suspend fun startSignTogether(data: String) {
+        // 开始代签
+        val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
+        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
+            // 如果本账号签到成功，则开始自动签到其他绑定账号
+            signWithAccounts()
+        }
+    }
+
+    private suspend fun responseUI(data: String) {
+        hideLoadingView()
+        data.showSignResult()
+        // 清除dialog
+        codeDialog?.dismiss()
+        responseGestureDialog(data)
     }
 
     private fun doNetwork() {
@@ -154,7 +219,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         // 查询所有活动
         val uid = CacheUtils.cache["uid"] ?: ""
         viewModel.queryActiveTaskList(URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
-        Log.v("sign_task", URL.gatActiveTaskListPath(courseId, classId, uid, cpi))
     }
 
     private fun sign(itemData: JSONObject) {
@@ -185,7 +249,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun realSign(itemData: JSONObject?) {
         val type = itemData?.getStringExt(Constants.SIGN.OTHER_ID)
         val ifPhoto = itemData?.getStringExt(Constants.SIGN.IF_PHOTO)
-        val id = itemData?.getStringExt(Constants.SIGN.ID) ?: ""
+        id = itemData?.getStringExt(Constants.SIGN.ID) ?: ""
         when (type) {
             // 二维码签到
             Constants.SIGN.SCAN_QR -> {
@@ -209,12 +273,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signNormally(id)
                 }
             }
-            // 手势签到，签到码签到
-            Constants.SIGN.GESTURE, Constants.SIGN.SIGN_CODE -> {
-                viewModel.preSign(preSignUrl)
-                Log.v("pre:",preSignUrl)
-                signNormally(id)
+            // 签到码签到
+            Constants.SIGN.SIGN_CODE -> {
+                withContext(Dispatchers.Main) {
+                    hideLoadingView()
+                    showCodeDialog(id)
+                }
             }
+
+            // 手势签到
+            Constants.SIGN.GESTURE -> {
+                withContext(Dispatchers.Main) {
+                    hideLoadingView()
+                    showGestureDialog(id)
+                }
+            }
+
             // 定位签到
             Constants.SIGN.LOCATION -> {
                 lifecycleScope.launch(Dispatchers.Main) {
@@ -232,9 +306,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         /*
         跳转保存数据
          */
-        intent.putExtra("courseId",activity?.courseId)
-        intent.putExtra("classId",activity?.classId)
-        intent.putExtra("cpi",activity?.cpi)
+        intent.putExtra("courseId", activity?.courseId)
+        intent.putExtra("classId", activity?.classId)
+        intent.putExtra("cpi", activity?.cpi)
         startActivity(intent)
     }
 
@@ -253,17 +327,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun signNormally(aid: String) {
-        // https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/preSign?activeId=2000072607796
+    private suspend fun signNormally(aid: String, signCode: String = "") {
         activity?.let {
-            val i = URL.getNormalSignPath(it.courseId, it.classId, aid)
-            Log.v("norm,",i)
-            viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid))
-
+            viewModel.sign(URL.getNormalSignPath(it.courseId, it.classId, aid, signCode))
         }
     }
 
-    private suspend fun signLoction(api: String) {
+    private suspend fun signTogether(aid: String, signCode: String = "", cookies: String) {
+        activity?.let {
+            viewModel.signTogether(
+                URL.getNormalSignPath(it.courseId, it.classId, aid, signCode),
+                cookies
+            )
+        }
+    }
+
+    private suspend fun signLocation(api: String) {
         activity?.let {
             viewModel.sign(api)
         }
@@ -296,5 +375,105 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private fun hideLoadingView() {
         loadingDialog?.dismiss()
         loadingDialog = null
+    }
+
+    private suspend fun showCodeDialog(id: String) {
+        codeDialog = CodingDialog(requireContext()).apply {
+            setCancelable(false)
+            setPositiveClickListener {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    code = it
+                    viewModel.preSign(preSignUrl)
+                    // 签到
+                    signNormally(id, code)
+                }
+            }
+
+            setNegativeClickListener {
+                dismiss()
+            }
+            show()
+        }
+    }
+
+    private suspend fun responseGestureDialog(data: String) {
+        gestureInputDialog?.let {
+            if (data.contains("success") || data.contains("成功")) {
+                it.setState(true)
+                delay(500)
+                it.dismiss()
+            } else {
+                it.setState(false)
+                delay(500)
+                it.initData()
+                it.setIsTouchAble(true)
+            }
+        }
+    }
+
+    private suspend fun showGestureDialog(id: String) {
+        gestureInputDialog = GestureInputDialog(requireContext()).apply {
+            show()
+            setInputEndListener { inputPwd ->
+                this.setIsTouchAble(false)
+                // 由于回调出来的密码是 Int数组，需遍历转成字符串
+                var inputCode = ""
+                inputPwd.forEach {
+                    inputCode += it.toString()
+                }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    code = inputCode
+                    viewModel.preSign(preSignUrl)
+                    // 签到
+                    signNormally(id, code)
+                }
+            }
+        }
+    }
+
+    private suspend fun signWithAccounts() {
+        val data = AccountManager.loadAllAccountData(requireContext())
+        val users = data.getJSONArray(Constants.Account.USERS)
+        users?.let {
+            it.forEach { item ->
+                val user = item as? JSONObject ?: JSONObject()
+                tryLogin(user)
+                delay(1200)
+            }
+        }
+
+    }
+
+    private fun signRecord(body: String?, cookies: String = "") {
+        if (!alreadySign) return
+        val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+        val status = body?.contains("成功") ?: false
+        record(uid, status)
+    }
+
+    private fun record(uid: String, status: Boolean) {
+        val courseName = activity?.courseName ?: ""
+        val statusName = if (status) "成功" else "失败"
+        SignRecorder.record(requireContext(), uid, courseName, statusName)
+    }
+
+    private fun tryLogin(user: JSONObject) {
+        val username = user.getStringExt("username")
+        val password = user.getStringExt("password")
+        if (username.isNotEmpty() && password.isNotEmpty()) {
+            viewModel.tryLogin(URL.getLoginPath(username, password))
+        }
+    }
+
+    private suspend fun signWith(id: String, code: String = "", cookies: String) {
+        val uid = findUID(cookies)
+        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+        viewModel.preSign(signWithPreSign)
+        signTogether(id, code, cookies)
+    }
+
+    private fun findUID(cookies: String): String {
+        val uid = cookies.substringAfter("UID=")
+        return uid.substringBefore(";")
     }
 }

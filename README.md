@@ -10,6 +10,8 @@
 
 </div></center>
 
+
+
 ---
 
 <div align="center" style="font-weight:bold"><b>学习通智能签到助手︱还你一个不被签到问题打扰、认真学习的梦</b></div>
@@ -18,6 +20,13 @@
 | **登录页** | **课程列表页** | **签到列表页** | **定位签到页** |
 |:---:|:---:|:---:|:---:|
 | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85"/> </div> |
+| **作业列表页** | **作业上传页** | **账号绑定页** | **个人页** |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fd5c12de-ebfa-49ea-ad36-acccaf9f07c8"/> </div>| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/81e06049-799c-41b5-841c-f2ed27746643"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/185a9037-2159-46fa-9481-1cba4497397d"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/7367d640-94fb-4ebb-809b-312bc4f28a8e"/> </div>
+| **签到日志页** | **敬请期待** | **敬请期待** | **敬请期待** |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/44685cee-c529-466f-88ce-224f452f02d5"/> </div>|
+
+
+
 
 ## ✨ 特点
 👏 **Doraemon** 拥有清晰明了的 UI 界面以及易于操作的特点。除此之外，还具备：
@@ -62,5 +71,5 @@
 * 开发时，自己拉一条分支出来，一般命名为 `features/业务名_你的昵称`
 * 提交代码，先提交到自己的分支，然后再提 `PR/Pull Request`
 
-## ❗免责声明
+## ❗ 免责声明
 本项目仅作为交流学习使用，通过本项目加深网络通信、接口编写、交互设计等方面知识的理解，请勿用作商业用途，任何人或组织使用项目中代码进行的任何违法行为与本人无关。如有触及相关平台规定或者权益，烦请联系我们删除。

@@ -368,4 +368,40 @@ object Constants {
         // 图片唯一标识
         const val OBJECT_ID = "objectId"
     }
+
+    object RecycleJson {
+        const val HOME_JSON_DATA = "home_json_data"
+        const val ACCOUNT_JSON_DATA = "account_data"
+    }
+
+
+    object DataLoad {
+        const val FIRST_LOAD = "first_load"
+        const val UNLOAD = "unload"
+        const val LOADED = "loaded"
+    }
+
+    object Work {
+        const val SUBMIT_URL = "url"
+        const val PREFIX_URL = "prefixPostUrl"
+        const val DESCRIPTION = "description"
+        const val WORK_TYPE = "workType"
+        const val TITLE = "title"
+        const val OBJECT_ID = "objectid"
+    }
+
+    object Account {
+        const val UID = "uid"
+        const val FID = "fid"
+        const val USERNAME = "username"
+        const val PASSWORD = "password"
+        const val PIC_URL = "picUrl"
+        const val USERS = "users"
+        const val SIZE = "size"
+        const val HISTORY = "history"
+    }
+
+    object USER {
+        const val USERNAME = "username"
+    }
 }
