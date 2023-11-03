@@ -16,11 +16,12 @@ object AccountManager {
         Downloader.download(context, Constants.RecycleJson.ACCOUNT_JSON_DATA, data)
     }
 
-    fun buildAccount(username: String, password: String, uid: String, fid: String): JSONObject {
+    fun buildAccount(username: String, password: String, uid: String, fid: String, cookies:String): JSONObject {
         val data = JSONObject()
         data[Constants.Account.USERNAME] = username
         data[Constants.Account.PASSWORD] = password
         data[Constants.Account.UID] = uid
+        data[Constants.Account.COOKIE] = cookies
         data[Constants.Account.FID] = fid
         data[Constants.Account.PIC_URL] = URL.getAvtarImgPath(uid)
         return data

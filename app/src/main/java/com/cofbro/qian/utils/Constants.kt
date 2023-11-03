@@ -393,6 +393,7 @@ object Constants {
     object Account {
         const val UID = "uid"
         const val FID = "fid"
+        const val COOKIE = "cookie"
         const val USERNAME = "username"
         const val PASSWORD = "password"
         const val PIC_URL = "picUrl"
