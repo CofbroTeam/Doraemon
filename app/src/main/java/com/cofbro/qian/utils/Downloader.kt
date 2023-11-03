@@ -82,7 +82,7 @@ object Downloader {
         }
     }
 
-    private fun deleteFolder(folder: File) {
+    fun deleteFolder(folder: File) {
         val files = folder.listFiles()
         if (files != null) {
             for (file in files) {
