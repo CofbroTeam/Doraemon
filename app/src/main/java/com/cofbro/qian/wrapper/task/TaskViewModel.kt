@@ -10,7 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
-    private val preSignLiveData = ResponseMutableLiveData<Response>()
+    val preSignLiveData = ResponseMutableLiveData<Response>()
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
     val signTypeLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
@@ -34,10 +34,18 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
             NetworkUtils.request(request)
         }
     }
-
-    suspend fun preSign(url: String) {
-        repository.request(preSignLiveData, false) {
+    suspend fun findSignType2(url: String) {
+        repository.request( ResponseMutableLiveData<Response>(), false) {
             val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun preSign(url: String, cookies: String = "") {
+        repository.request(preSignLiveData, false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
             NetworkUtils.request(request)
         }
     }

@@ -53,5 +53,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_photo" />
 
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_to_photo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_to_photo" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

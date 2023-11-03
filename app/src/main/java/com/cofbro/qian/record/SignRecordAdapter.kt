@@ -65,14 +65,7 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
             // 签到状态
             val status = record.getStringExt("status")
             binding.tvRecordStatus.text = status
-            if (status == "失败") {
-                binding.tvRecordStatus.setTextColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.red
-                    )
-                )
-            }
+            bindTextColor(status)
 
             // 课程名称
             binding.tvRecordCourseName.text = record.getStringExt("courseName")
@@ -84,6 +77,24 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
             binding.tvBookReocrdYear.text = dateArray[0]
             binding.tvBookReocrdMonth.text = dateArray[1]
             binding.tvBookReocrdDay.text = dateArray[2]
+        }
+
+        private fun bindTextColor(status: String) {
+            if (status == "失败") {
+                binding.tvRecordStatus.setTextColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.red
+                    )
+                )
+            } else {
+                binding.tvRecordStatus.setTextColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.white
+                    )
+                )
+            }
         }
     }
 

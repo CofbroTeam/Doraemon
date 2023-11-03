@@ -33,6 +33,11 @@ object SignRecorder {
 
     fun init(context: Context) {
         data = readRecords(context)
+        val size = data?.getIntExt(Constants.Recorder.SIZE) ?: 0
+        if (size >= 50) {
+            data = JSONObject()
+            clear(context)
+        }
     }
 
     /**
@@ -42,48 +47,52 @@ object SignRecorder {
     fun record(context: Context, username: String, courseName: String, status: String) {
         val time = getCurrentTime()
         val data = JSONObject()
-        data["uid"] = username
-        data["courseName"] = courseName
-        data["time"] = time
-        data["status"] = status
+        data[Constants.Recorder.UID] = username
+        data[Constants.Recorder.COURSE_NAME] = courseName
+        data[Constants.Recorder.TIME] = time
+        data[Constants.Recorder.STATUS] = status
         insertRecord(context, data)
     }
 
     fun readRecords(context: Context): JSONObject {
-        return Downloader.acquire(context, "sign_record")
+        return Downloader.acquire(context, Constants.Recorder.FILE_NAME)
             .safeParseToJson()
     }
 
     private fun insertRecord(context: Context, newData: JSONObject) {
-        val filepath = context.filesDir.path + File.separatorChar + "sign_record"
+        val filepath = context.filesDir.path + File.separatorChar + Constants.Recorder.FILE_NAME
         val file = File(filepath)
         if (file.exists()) {
-            val newSize = data?.getIntExt("size").takeIf {
+            val newSize = data?.getIntExt(Constants.Recorder.SIZE).takeIf {
                 it != -1
             } ?: 0
-            val array = data?.getJSONArrayExt("records") ?: JSONArray()
+            val array = data?.getJSONArrayExt(Constants.Recorder.RECORDS) ?: JSONArray()
             array[newSize] = newData
-            data?.set("records", array)
-            data?.set("size", newSize + 1)
+            data?.set(Constants.Recorder.RECORDS, array)
+            data?.set(Constants.Recorder.SIZE, newSize + 1)
         } else {
             file.createNewFile()
             data = JSONObject()
             val array = JSONArray()
             array[0] = newData
-            data?.set("size", 1)
-            data?.set("records", array)
+            data?.set(Constants.Recorder.SIZE, 1)
+            data?.set(Constants.Recorder.RECORDS, array)
         }
     }
 
     fun writeJson(context: Context) {
         try {
             data?.let {
-                val fileWriter = FileWriter(context.filesDir.path + "/sign_record")
+                val fileWriter = FileWriter(context.filesDir.path + File.separatorChar + Constants.Recorder.FILE_NAME)
                 data?.writeJSONString(fileWriter)
                 fileWriter.close()
             }
         } catch (_: Exception) {
         }
+    }
+
+    private fun clear(context: Context) {
+        Downloader.deleteFolder(File(context.filesDir.path + File.separatorChar + Constants.Recorder.FILE_NAME))
     }
 
     @SuppressLint("SimpleDateFormat")

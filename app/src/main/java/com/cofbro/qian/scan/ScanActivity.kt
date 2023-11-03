@@ -62,6 +62,10 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
         binding?.ivToPhoto?.setOnClickListener {
             toGalleryAndDecode()
         }
+
+        binding?.ivBack?.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initView() {

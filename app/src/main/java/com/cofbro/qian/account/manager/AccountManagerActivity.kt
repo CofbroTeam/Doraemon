@@ -198,7 +198,7 @@ class AccountManagerActivity :
                     if (temp.startsWith("UID")) uid = temp.substring(4)
                     if (temp.startsWith("fid")) fid = temp.substring(4)
                 }
-                val jsonObject = buildAccount(uid, fid)
+                val jsonObject = buildAccount(uid, fid, cookies.toString())
                 withContext(Dispatchers.Main) {
                     jsonObject?.let {
                         mAdapter?.notifyItemInserted()
@@ -272,7 +272,7 @@ class AccountManagerActivity :
         }
     }
 
-    private fun buildAccount(uid: String, fid: String): JSONObject? {
+    private fun buildAccount(uid: String, fid: String, cookies: String): JSONObject? {
         val userArray = data?.getJSONArray(Constants.Account.USERS) ?: JSONArray()
         userArray.forEach {
             val itemData = it as? JSONObject
@@ -280,7 +280,7 @@ class AccountManagerActivity :
                 return null
             }
         }
-        val account = AccountManager.buildAccount(mUsername, mPassword, uid, fid)
+        val account = AccountManager.buildAccount(mUsername, mPassword, uid, fid, cookies)
         // data和adapter.accountData同源
         data = AccountManager.bindAccounts(this, data, account)
         return account

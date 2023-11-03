@@ -210,7 +210,7 @@ class GestureInputView(context: Context, attrs: AttributeSet) : View(context, at
                 color = mStatePaintColor
                 style = Paint.Style.FILL_AND_STROKE
             }
-            canvas?.drawCircle(mDots[n].cx, mDots[n].cy, mDots[n].radius, mStatePaint)
+            canvas?.drawCircle(mDots[n].cx, mDots[n].cy, mDots[n].radius / 3, mStatePaint)
         }
     }
 

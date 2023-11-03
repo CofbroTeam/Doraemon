@@ -258,6 +258,8 @@
             android:id="@+id/sign_with_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:track="@drawable/switch_track_bg"
+            app:thumbTint="@color/appColor"
             android:layout_marginEnd="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
