@@ -14,4 +14,13 @@
 
     <string name="add_file">添加附件</string>
     <string name="submit_file">提 交</string>
+
+    <string name="advice_title">如何与我们取得联系？</string>
+    <string name="advice_qq_title">1. 我们拥有QQ群聊</string>
+    <string name="advice_qq_content">目前已经拥有 100+ 群友，在这里你可以发表任何关于技术或者使用体验方面的话题。无论您是否懂技术，欢迎随时加入我们！</string>
+    <string name="advice_qq_number">QQ群聊：567290278</string>
+    <string name="advice_github_title">2. Github当然必不可少</string>
+    <string name="advice_github_content">Github作为最出名的开源社区，当然不能少。如果您使用本软件的同时，恰好也喜欢技术，欢迎在fork后进行pr，或者您可以在issue中留下更好的建议！</string>
+    <string name="advice_github_number">Github地址：https://github.com/CofbroTeam/Doraemon</string>
+    <string name="advice_tip">点击蓝色字体可复制至剪切板</string>
 </resources>
