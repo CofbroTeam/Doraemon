@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Vibrator
@@ -157,7 +156,7 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
                 if (call != null) {
                     val sandboxPath =
                         SandboxTransformUtils.copyPathToSandbox(context, srcPath, mineType)
-                    call.onCallback(srcPath, sandboxPath);
+                    call.onCallback(srcPath, sandboxPath)
                 }
             }
             .setImageEngine(GlideEngine.createGlideEngine())
@@ -207,18 +206,5 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
     private fun vibrate() {
         val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
         vibrator.vibrate(200)
-    }
-
-    private fun createBitmap(photoPath: String): Bitmap {
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(photoPath, options)
-        val imageWidth = options.outWidth
-        val imageHeight = options.outHeight
-        var sampleSize = 1
-        sampleSize = imageWidth.coerceAtMost(imageHeight)
-        options.inSampleSize = sampleSize
-        options.inJustDecodeBounds = false
-        return BitmapFactory.decodeFile(photoPath, options)
     }
 }
