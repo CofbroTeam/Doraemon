@@ -4,7 +4,6 @@ import com.cofbro.hymvvmutils.base.BaseResponse
 import com.cofbro.hymvvmutils.base.DataState
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.Cookie
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -14,13 +13,15 @@ import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
-import java.util.UUID
 
 
 object NetworkUtils {
     private val client = OkHttpClient()
 
-    fun buildClientRequest(url: String, cookies: String = CacheUtils.cache["cookies"] ?: ""): Request {
+    fun buildClientRequest(
+        url: String,
+        cookies: String = CacheUtils.cache["cookies"] ?: ""
+    ): Request {
         return Request.Builder().url(url)
             .addHeader("Accept-Language", "zh-Hans-CN;q=1, zh-Hant-CN;q=0.9")
             .addHeader("cookie", cookies)
@@ -133,7 +134,7 @@ object NetworkUtils {
     }
 
     fun post2(url: String, file: File): BaseResponse<Response> {
-        var cookies = CacheUtils.cache["cookies"] ?: ""
+        val cookies = CacheUtils.cache["cookies"] ?: ""
         //val size = text.toByteArray(Charset.defaultCharset()).size.toString()
         val uid = CacheUtils.cache["uid"] ?: ""
         val body = MultipartBody.Builder()
@@ -162,6 +163,20 @@ object NetworkUtils {
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.60"
             )
             .post(body).build()
+        val call = client.newCall(request)
+        val response = BaseResponse<Response>()
+        response.dataState = DataState.STATE_INITIALIZE
+        response.data = call.execute()
+        return response
+    }
+
+    fun postForLogin(bodyString: String, url: String):BaseResponse<Response> {
+        val mediaType = "application/x-www-form-urlencoded; charset=utf-8".toMediaTypeOrNull()
+        val requestBody = RequestBody.create(mediaType, bodyString)
+        val request: Request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
         val call = client.newCall(request)
         val response = BaseResponse<Response>()
         response.dataState = DataState.STATE_INITIALIZE

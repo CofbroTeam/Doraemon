@@ -112,4 +112,5 @@ dependencies {
     implementation 'io.github.lucksiege:camerax:v3.10.9'
     //
     implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
+    implementation "org.apache.directory.studio:org.apache.commons.codec:1.8"
 }
