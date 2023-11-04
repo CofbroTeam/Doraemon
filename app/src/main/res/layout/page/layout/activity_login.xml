@@ -27,7 +27,7 @@
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        app:hint="Your Username *"
+        app:hint="Your Phone Number *"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,12 +119,13 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:id="@+id/tv_phone_login"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/app_light_radius_bg"
         android:gravity="center"
-        android:text="学号登录"
+        android:text="手机号登录"
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/tvLogin"
