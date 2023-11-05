@@ -8,8 +8,6 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -41,7 +39,6 @@ import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
-import com.cofbro.qian.utils.showSignResult
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,26 +57,21 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         getCurrentLocationLatLng()
 
     }
-    /**
-     * 根据LocationManager获取定位信息的提供者
-     * @param locationManager
-     * @return
-     */
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
 
-        get_AvtarImage()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        getAvtarImage()
         initArgs()
         initObserver()
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
-        init_Loaction_Data()
+        initLocationData()
     }
 
     private fun doNetwork() {
         viewModel.preSign(viewModel.preUrl)
     }
-    private fun init_Loaction_Data(){
+    private fun initLocationData(){
         viewModel.default_Sign_Lating =
             CacheUtils.cache["default_Sign_latitude"]?.toDouble()
                 ?.let { CacheUtils.cache["default_Sign_longitude"]?.toDouble()
@@ -138,14 +130,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
     private fun initArgs() {
         viewModel.aid = intent.getStringExtra("aid") ?: ""
-        Log.v("sign:aid:",viewModel.aid)
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
         viewModel.uid = CacheUtils.cache["uid"] ?: ""
-        Log.v("ui:", viewModel.preUrl)
-
-        /**
-         * 传递数据
-         */
     }
 
     override fun onResume() {
@@ -343,7 +329,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             binding?.maps?.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(markerPosition, 17F))
         }
     }
-    private fun get_AvtarImage()  {
+    private fun getAvtarImage()  {
         // 用户头像
         val uid =CacheUtils.cache["uid"]
         uid?.let {
