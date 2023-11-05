@@ -113,8 +113,8 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
 
     private fun toVerifyCodeActivity() {
         val phoneNumber = binding?.ipUsername?.getTextString() ?: ""
-        if (phoneNumber.isEmpty()) {
-            ToastUtils.show("请先输入手机号")
+        if (phoneNumber.length == 11) {
+            ToastUtils.show("请输入正确的手机号")
             return
         }
         val intent = Intent(this, SMSActivity::class.java)
