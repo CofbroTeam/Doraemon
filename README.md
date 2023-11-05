@@ -19,11 +19,11 @@
 ## 🗒️ 各级页面
 | **登录页** | **课程列表页** | **签到列表页** | **定位签到页** |
 |:---:|:---:|:---:|:---:|
-| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/71e699c8-b6a7-4e4e-9d0b-a2caadbfad85"/> </div> |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/e3835137-50d0-47bd-bcc0-2f4b18750218"/> </div> |
 | **作业列表页** | **作业上传页** | **账号绑定页** | **个人页** |
 | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fd5c12de-ebfa-49ea-ad36-acccaf9f07c8"/> </div>| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/81e06049-799c-41b5-841c-f2ed27746643"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/185a9037-2159-46fa-9481-1cba4497397d"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/7367d640-94fb-4ebb-809b-312bc4f28a8e"/> </div>
-| **签到日志页** | **敬请期待** | **敬请期待** | **敬请期待** |
-| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/44685cee-c529-466f-88ce-224f452f02d5"/> </div>|
+| **签到日志页** | **建议页** | **敬请期待** | **敬请期待** |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/44685cee-c529-466f-88ce-224f452f02d5"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60eb6700-be6d-494e-8594-491a62d905c3"/> </div>|
 
 
 
