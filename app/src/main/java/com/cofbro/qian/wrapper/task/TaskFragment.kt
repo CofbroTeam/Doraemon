@@ -31,13 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Response
 
 /**
  * @author cofbro
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var qrCodeId = ""
     private var alreadySign = false
     private var cookies = ""
 
@@ -74,6 +74,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
+            qrCodeId = id ?: ""
             signWithCamera(id)
         }
     }
@@ -179,10 +180,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogetherLiveData.observe(this) { response ->
             val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
-                val body = data.body?.string()
+                val body = data.body?.string() ?: ""
 //                val headers = data.headers
 //                val cookies = headers.values("Set-Cookie").toString()
-                 signRecord(body, cookies)
+                signRecord(body, cookies)
             }
         }
     }
@@ -342,6 +343,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    private suspend fun signTogether(qrCodeId: String, cookies: String) {
+        val uid = findUID(cookies)
+        viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
+    }
+
     private suspend fun signLocation(api: String) {
         activity?.let {
             viewModel.sign(api)
@@ -432,22 +438,29 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private suspend fun signWithAccounts() {
-        val data = AccountManager.loadAllAccountData(requireContext())
-        val users = data.getJSONArray(Constants.Account.USERS)
-        users?.let {
-            it.forEach { item ->
-                val user = item as? JSONObject ?: JSONObject()
-                tryLogin(user)
-                delay(1200)
+        withContext(Dispatchers.IO) {
+            val data = AccountManager.loadAllAccountData(requireContext())
+            val users = data.getJSONArray(Constants.Account.USERS)
+            users?.let {
+                it.forEach { item ->
+                    val user = item as? JSONObject ?: JSONObject()
+                    tryLogin(user)
+                    delay(300)
+//                    val cookies = user.getStringExt(Constants.Account.COOKIE)
+//                    val uid = findUID(cookies)
+//                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+//                    viewModel.preSign(signWithPreSign, cookies)
+//                    delay(3000)
+//                    viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId), cookies)
+                }
             }
         }
-
     }
 
-    private fun signRecord(body: String?, cookies: String = "") {
+    private fun signRecord(body: String, cookies: String = "") {
         if (!alreadySign) return
         val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
-        val status = body?.contains("成功") ?: false
+        val status = body.contains("成功") || body.contains("success")
         record(uid, status)
     }
 
@@ -458,8 +471,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private fun tryLogin(user: JSONObject) {
-        val username = user.getStringExt("username")
-        val password = user.getStringExt("password")
+        val username = user.getStringExt(Constants.Account.USERNAME)
+        val password = user.getStringExt(Constants.Account.PASSWORD)
         if (username.isNotEmpty() && password.isNotEmpty()) {
             viewModel.tryLogin(URL.getLoginPath(username, password))
         }
@@ -468,8 +481,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWith(id: String, code: String = "", cookies: String) {
         val uid = findUID(cookies)
         val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-        viewModel.preSign(signWithPreSign)
-        signTogether(id, code, cookies)
+        viewModel.preSign(signWithPreSign, cookies)
+        if (qrCodeId.isEmpty()) {
+            signTogether(id, code, cookies)
+        } else {
+            signTogether(qrCodeId, cookies)
+        }
     }
 
     private fun findUID(cookies: String): String {

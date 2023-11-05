@@ -393,6 +393,7 @@ object Constants {
     object Account {
         const val UID = "uid"
         const val FID = "fid"
+        const val COOKIE = "cookie"
         const val USERNAME = "username"
         const val PASSWORD = "password"
         const val PIC_URL = "picUrl"
@@ -401,7 +402,18 @@ object Constants {
         const val HISTORY = "history"
     }
 
+    object Recorder {
+        const val FILE_NAME = "sign_record"
+        const val UID = "uid"
+        const val COURSE_NAME = "courseName"
+        const val TIME = "time"
+        const val STATUS = "status"
+        const val SIZE = "size"
+        const val RECORDS = "records"
+    }
+
     object USER {
         const val USERNAME = "username"
+        const val UID = "uid"
     }
 }

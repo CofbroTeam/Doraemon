@@ -11,4 +11,6 @@
     <color name="statusBarColor">#f3f9ff</color>
     <color name="textColor">#171D42</color>
     <color name="red">#FF0000</color>
+    <color name="track_selected_color">#AD3170FF</color>
+    <color name="track_unselected_color">#EDEDED</color>
 </resources>

@@ -24,6 +24,7 @@ import com.cofbro.qian.utils.getStringExt
  *         {
  *             "username": "cofbro",
  *             "password": "123456",
+ *             "cookies": "",
  *             "uid": "000",
  *             "fid": "000",
  *             "picUrl": "xxxxxxxxx"
@@ -31,6 +32,7 @@ import com.cofbro.qian.utils.getStringExt
  *         {
  *             "username": "cofbro",
  *             "password": "123456",
+ *             "cookies": "",
  *             "uid": "000",
  *             "fid": "000",
  *             "picUrl": "xxxxxxxxx"

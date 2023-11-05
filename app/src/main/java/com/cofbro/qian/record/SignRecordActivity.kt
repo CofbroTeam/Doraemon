@@ -6,6 +6,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivitySignRecordBinding
@@ -29,6 +30,10 @@ class SignRecordActivity : BaseActivity<SignRecordViewModel, ActivitySignRecordB
     private fun initEvent() {
         binding?.ivBack?.setOnClickListener {
             finish()
+        }
+
+        binding?.tvRecordTip?.setOnClickListener {
+            binding?.rvRecord?.smoothScrollToPosition(0)
         }
     }
 
@@ -67,6 +72,20 @@ class SignRecordActivity : BaseActivity<SignRecordViewModel, ActivitySignRecordB
                     super.getItemOffsets(outRect, view, parent, state)
                 }
             })
+
+            addOnScrollListener(object :OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    changeRecordTipView(dy)
+                }
+            })
+        }
+    }
+
+    private fun changeRecordTipView(scrollDy: Int) {
+        if (scrollDy > 0) {
+            binding?.tvRecordTip?.visibility = View.VISIBLE
+        } else {
+            binding?.tvRecordTip?.visibility = View.GONE
         }
     }
 

@@ -3,7 +3,6 @@ package com.cofbro.qian.login
 import androidx.lifecycle.viewModelScope
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
-import com.cofbro.qian.utils.DefaultRepository
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +22,6 @@ open class LoginViewModel : BaseViewModel<LoginRepository>() {
                 val request = NetworkUtils.buildServerRequest(url)
                 NetworkUtils.request(request)
             }
-
         }
     }
 }

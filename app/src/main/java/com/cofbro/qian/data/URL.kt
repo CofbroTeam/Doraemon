@@ -49,8 +49,16 @@ object URL {
     fun getWorkEncPath(courseId: String, classId: String, cpi: String): String =
         "https://mooc1-2.chaoxing.com/mooc-ans/visit/stucoursemiddle?courseid=$courseId&clazzid=$classId&vc=1&cpi=$cpi&ismooc2=1&v=2"
 
+    // 作业列表
     fun getHomeworkListPath(courseId: String, classId: String, cpi: String, workEnc: String): String =
         "https://mooc1.chaoxing.com/mooc2/work/list?courseId=$courseId&classId=$classId&cpi=$cpi&ut=s&enc=$workEnc"
 
+    // 用户信息
     fun getUserInfo(): String = "http://i.chaoxing.com/base"
+
+    // 验证码
+    fun getSendCaptchaUrl(): String = "https://passport2-api.chaoxing.com/api/sendcaptcha"
+
+    fun getLoginWithSmsUrl(): String = "https://passport2-api.chaoxing.com/v11/loginregister?cx_xxt_passport=json"
+
 }

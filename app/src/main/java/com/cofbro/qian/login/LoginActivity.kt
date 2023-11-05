@@ -2,13 +2,13 @@ package com.cofbro.qian.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
+import com.cofbro.qian.login.sms.SMSActivity
 import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.safeParseToJson
@@ -90,6 +90,16 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         autoClearFocus()
         // 登录
         login()
+        // 手机号登录
+        phoneLogin()
+    }
+
+    private fun phoneLogin() {
+        binding?.tvPhoneLogin?.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                toVerifyCodeActivity()
+            }
+        }
     }
 
     private fun login() {
@@ -100,6 +110,18 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                 viewModel.login(URL.getLoginPath(mUsername!!, mPassword!!))
             }
         }
+    }
+
+    private fun toVerifyCodeActivity() {
+        val phoneNumber = binding?.ipUsername?.getTextString() ?: ""
+        if (phoneNumber.length != 11) {
+            ToastUtils.show("请输入正确的手机号")
+            return
+        }
+        val intent = Intent(this, SMSActivity::class.java)
+        intent.putExtra("phoneNumber", phoneNumber)
+        CacheUtils.activities["LoginActivity"] = this
+        startActivity(intent)
     }
 
     private fun autoClearFocus() {

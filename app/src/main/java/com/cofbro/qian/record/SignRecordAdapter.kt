@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemRecordSignBinding
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
@@ -43,7 +44,7 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
     }
 
     override fun getItemCount(): Int {
-        return recordData?.getIntExt("size") ?: 0
+        return recordData?.getIntExt(Constants.Recorder.SIZE) ?: 0
     }
 
     override fun onBindViewHolder(holder: SignRecordViewHolder, position: Int) {
@@ -54,17 +55,32 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(position: Int) {
-            val size = recordData?.getIntExt("size") ?: 0
-            val record = recordData?.getJSONArrayExt("records")
+            val size = recordData?.getIntExt(Constants.Recorder.SIZE) ?: 0
+            val record = recordData?.getJSONArrayExt(Constants.Recorder.RECORDS)
                 ?.getOrNull(size - position - 1) as? JSONObject
                 ?: JSONObject()
 
             // uid
-            binding.tvRecordUsername.text = "uid: ${record.getStringExt("uid")}"
+            binding.tvRecordUsername.text = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
 
             // 签到状态
-            val status = record.getStringExt("status")
+            val status = record.getStringExt(Constants.Recorder.STATUS)
             binding.tvRecordStatus.text = status
+            bindTextColor(status)
+
+            // 课程名称
+            binding.tvRecordCourseName.text = record.getStringExt(Constants.Recorder.COURSE_NAME)
+
+            // 绑定时间
+            val dateStr = record.getStringExt(Constants.Recorder.TIME)
+            binding.tvRecordTime.text = dateStr
+            val dateArray = splitDateStr(dateStr)
+            binding.tvBookReocrdYear.text = dateArray[0]
+            binding.tvBookReocrdMonth.text = dateArray[1]
+            binding.tvBookReocrdDay.text = dateArray[2]
+        }
+
+        private fun bindTextColor(status: String) {
             if (status == "失败") {
                 binding.tvRecordStatus.setTextColor(
                     ContextCompat.getColor(
@@ -72,18 +88,14 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
                         R.color.red
                     )
                 )
+            } else {
+                binding.tvRecordStatus.setTextColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.white
+                    )
+                )
             }
-
-            // 课程名称
-            binding.tvRecordCourseName.text = record.getStringExt("courseName")
-
-            // 绑定时间
-            val dateStr = record.getStringExt("time")
-            binding.tvRecordTime.text = dateStr
-            val dateArray = splitDateStr(dateStr)
-            binding.tvBookReocrdYear.text = dateArray[0]
-            binding.tvBookReocrdMonth.text = dateArray[1]
-            binding.tvBookReocrdDay.text = dateArray[2]
         }
     }
 
