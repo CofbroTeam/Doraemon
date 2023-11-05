@@ -21,7 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/mapback"
+            android:background="@drawable/map_back"
             android:scaleType="center"
              />
 
