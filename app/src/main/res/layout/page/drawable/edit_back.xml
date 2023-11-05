@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 设置透明背景色 -->
-    <solid android:color="#aeb1dc" />
+    <solid android:color="#F9FCDF" />
 
     <!-- 设置一个黑色边框 -->
     <stroke

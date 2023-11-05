@@ -4,29 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:orientation="vertical"
-    android:padding="5dp"
+    android:padding="8dp"
     tools:context=".mapsetting.InputTipsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/white"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_height="60dp"
+        android:background="@drawable/app_white_small_radius_bg"
         android:orientation="horizontal"
         android:layout_marginTop="40dp">
 
         <ImageButton
             android:id="@+id/back"
-            android:layout_width="56dp"
-            android:layout_height="match_parent"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="2dp"
             android:background="@drawable/back"
-            android:scaleType="center"
-             />
+            android:scaleType="center"/>
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/keyWord"
@@ -45,9 +42,6 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/inputtip_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-    >
-
-    </androidx.recyclerview.widget.RecyclerView>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

@@ -29,6 +29,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     }
 
     private fun tryLogin() {
+
         val username = getBySp("username")
         val password = getBySp("password")
         if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
