@@ -22,7 +22,7 @@
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/map_dialog_bg"
+            android:background="@drawable/bottom_dialog_bg"
             app:behavior_hideable="false"
             app:behavior_peekHeight="200dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -30,7 +30,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/sign_bottom_content"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="500dp">
 
                 <LinearLayout
                     android:id="@+id/linearLayoutmap"
@@ -63,7 +63,7 @@
                         android:layout_height="50dp"
                         android:background="@drawable/map_dialog_bg"
                         android:completionThreshold="1"
-                        android:drawableLeft="@drawable/search_24"
+                        android:drawableLeft="@drawable/ic_search"
                         android:dropDownVerticalOffset="1.0dip"
                         android:gravity="center_vertical"
                         android:hint="查找地点"
@@ -178,12 +178,11 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
                             android:background="@drawable/ic_bind_two"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="@+id/textView2">
-
-                        </ImageView>
+                            app:layout_constraintEnd_toEndOf="@+id/textView2" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -216,6 +215,8 @@
                             android:id="@+id/imageView6"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
                             android:background="@drawable/ic_bind_three"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent" />
