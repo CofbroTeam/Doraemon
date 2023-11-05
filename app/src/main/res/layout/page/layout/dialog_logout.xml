@@ -18,7 +18,7 @@
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/dialog_logout"
+        android:src="@drawable/duolaa"
         android:scaleType="centerCrop"
         android:layout_gravity="center"
         android:padding="8dp" />

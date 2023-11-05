@@ -465,7 +465,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
-
                 withContext(Dispatchers.Main) {
                     /**
                      * 回到TaskActivity
