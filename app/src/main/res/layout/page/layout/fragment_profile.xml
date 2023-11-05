@@ -188,7 +188,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout22"
+        android:id="@+id/advice"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
@@ -231,7 +231,7 @@
         android:background="@drawable/app_white_radius_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout22">
+        app:layout_constraintTop_toBottomOf="@+id/advice">
 
         <ImageView
             android:id="@+id/imageView21"

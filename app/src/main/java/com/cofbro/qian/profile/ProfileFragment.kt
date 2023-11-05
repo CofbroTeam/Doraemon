@@ -18,16 +18,15 @@ import com.cofbro.qian.account.manager.AccountManagerActivity
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentProfileBinding
 import com.cofbro.qian.login.LoginActivity
+import com.cofbro.qian.profile.advice.AdviceFragment
 import com.cofbro.qian.record.SignRecordActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
-import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>() {
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
@@ -110,6 +109,11 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         binding?.signRecords?.setOnClickListener {
             val intent = Intent(requireActivity(), SignRecordActivity::class.java)
             startActivity(intent)
+        }
+
+        binding?.advice?.setOnClickListener {
+            val fragment = AdviceFragment()
+            fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
         }
     }
     private fun clearUserInfo(context: Context){
