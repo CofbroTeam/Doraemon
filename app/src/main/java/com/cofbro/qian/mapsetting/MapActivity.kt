@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.alibaba.fastjson.JSONObject
 import com.amap.api.location.AMapLocationClient
@@ -46,6 +47,7 @@ import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,6 +67,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         getAvtarImage()
         initArgs()
         initObserver()
+
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
@@ -72,7 +75,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun doNetwork() {
-        viewModel.preSign(viewModel.preUrl)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.preSign(viewModel.preUrl,"")
+        }
     }
 
     private fun initLocationData() {
@@ -492,11 +497,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             signRecord(data)
                             startActivity(intent)
+                            startSignTogether(data)
                         } else {
                             ToastUtil.show(applicationContext, "签到已成功")
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             signRecord(data)
                             startActivity(intent)
+                            startSignTogether(data)
                         }
 
                         /**
@@ -584,7 +591,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private suspend fun startSignTogether(data: String) {
         // 开始代签
         val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
-        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
+        if (signWith && data != "不在可签到范围内") {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             signWithAccounts()
         }
@@ -599,12 +606,18 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     val user = item as? JSONObject ?: JSONObject()
                     tryLogin(user)
                     delay(300)
-//                    val cookies = user.getStringExt(Constants.Account.COOKIE)
-//                    val uid = findUID(cookies)
-//                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-//                    viewModel.preSign(signWithPreSign, cookies)
-//                    delay(3000)
-//                    viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId), cookies)
+                    val cookies = user.getStringExt(com.cofbro.qian.utils.Constants.Account.COOKIE)
+                    val uid = findUID(cookies)
+                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+                    viewModel.preSign(signWithPreSign, cookies)
+                    delay(3000)
+                    viewModel.signTogether(URL.getLocationSignPath(
+                        address = viewModel.default_Sign_Location,
+                        aid = viewModel.aid,
+                        uid = viewModel.uid,
+                        lat = viewModel.default_Sign_Lating?.latitude.toString(),
+                        long = viewModel.default_Sign_Lating?.longitude.toString()
+                    ), cookies)
                 }
             }
         }

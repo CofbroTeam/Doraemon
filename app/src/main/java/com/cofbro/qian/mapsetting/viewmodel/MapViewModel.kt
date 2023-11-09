@@ -53,12 +53,12 @@ class MapViewModel : BaseViewModel<MapRepository>() {
         }
     }
 
-    fun preSign(url: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.request(preSignLiveData, false) {
-                val request = NetworkUtils.buildClientRequest(url)
-                NetworkUtils.request(request)
-            }
+    suspend fun preSign(url: String, cookies: String = "") {
+        repository.request(preSignLiveData, false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
         }
     }
     suspend fun signTogether(url: String, cookies: String) {

@@ -351,9 +351,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
     }
 
-    private suspend fun signLocation(api: String) {
+    private suspend fun signTogether(   address: String?,
+                                        aid: String,
+                                        uid: String,
+                                        lat: String?,
+                                        long: String?,) {
         activity?.let {
-            viewModel.sign(api)
+            viewModel.signTogether(URL.getLocationSignPath(address,aid,uid,lat,long),cookies)
         }
     }
 
