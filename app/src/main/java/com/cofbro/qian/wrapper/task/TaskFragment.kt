@@ -58,6 +58,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var activity: WrapperActivity? = null
     private var taskAdapter: TaskAdapter? = null
     private var loadingDialog: Dialog? = null
+
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -307,9 +308,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         /*
         跳转保存数据
          */
+        intent.putExtra("courseName",activity?.courseName)
         intent.putExtra("courseId", activity?.courseId)
         intent.putExtra("classId", activity?.classId)
         intent.putExtra("cpi", activity?.cpi)
+
         startActivity(intent)
     }
 

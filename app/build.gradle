@@ -113,4 +113,5 @@ dependencies {
     //
     implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
     implementation "org.apache.directory.studio:org.apache.commons.codec:1.8"
+    implementation 'com.github.Dimezis:BlurView:version-2.0.3'
 }
