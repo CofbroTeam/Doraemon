@@ -66,7 +66,7 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
 
     suspend fun getSignCode(url: String) {
         repository.request(signCodeLiveData, false) {
-            val request = NetworkUtils.buildServerRequest(url)
+            val request = NetworkUtils.buildClientRequest(url)
             NetworkUtils.request(request)
         }
     }
