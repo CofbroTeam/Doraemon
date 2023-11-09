@@ -3,16 +3,22 @@ name: android master CI
 on:
   push:
     branches: [ main ]
+    tags:
+      - '*'
   pull_request:
     branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
+
+      - name: Setup version code
+        run: |
+          sed -i 's/\(versionCode\s*\)[0-9]\+/\1${{ github.run_number }}/' app/build.gradle
+          sed -i 's/\(versionName\s*"\)[^"]*"/\1${{ github.ref_name }}"/' app/build.gradle
+
       - name: set up JDK 17
         uses: actions/setup-java@v2
         with:
@@ -21,10 +27,32 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
+
+      - name: Build debug binary with Gradle
+        if: startsWith(github.ref, 'refs/heads/main')
         run: ./gradlew assembleDebug
 
+      - name: Build release binary with Gradle
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./gradlew assembleRelease
+
       - uses: actions/upload-artifact@v2
+        if: startsWith(github.ref, 'refs/heads/main')
         with:
-          name: upload-apk
+          name: debug
           path: ${{github.workspace}}/app/build/outputs/apk/debug/*.apk
+
+      - uses: actions/upload-artifact@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: release
+          path: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Doraemon
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          files: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
