@@ -64,6 +64,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var cookies = ""
     private var preSignUrl = ""
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        getCurrentLocationLatLng()
         getAvtarImage()
         initArgs()
         initObserver()
@@ -117,6 +118,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
                     viewModel.default_My_Lating =
                         LatLng(amapLocation.latitude, amapLocation.longitude)
+                    viewModel.default_My_Location =  amapLocation.country +amapLocation.province +amapLocation.city
                     addLatingDefaultMarker(viewModel.default_My_Lating)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
@@ -552,7 +554,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
-                        if (lat.isNotEmpty() && long.isNotEmpty()) {
+                        if (lat.toInt()!=-1 && long.toInt()!=-1) {
                             viewModel.currentTipPoint = LatLng(lat.toDouble(), lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(), long.toDouble()), default = true)
                             viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
@@ -560,6 +562,24 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             viewModel.statuscontent = statusContent
                             CacheUtils.cache["default_Sign_latitude"] = lat
                             CacheUtils.cache["default_Sign_longitude"] = long
+                        }else{
+                            val default_My_Lating = viewModel.default_My_Lating
+                            val default_My_Location = viewModel.default_My_Location
+                            if(default_My_Location?.isNotEmpty() == true){
+                            val lats = default_My_Lating!!.latitude
+                            val longs = default_My_Lating.longitude
+                            viewModel.currentTipPoint = LatLng(lats, longs)
+                            addLatLngMarker(LatLng(lats, longs), default = true)
+                            viewModel.default_Sign_Lating = LatLng(lats, longs)
+                            viewModel.default_Sign_Location = default_My_Location
+                            viewModel.statuscontent = statusContent
+                            CacheUtils.cache["default_Sign_latitude"] = lats.toString()
+                            CacheUtils.cache["default_Sign_longitude"] = longs.toString()
+                            }else{
+                                ToastUtil.show(applicationContext,"请自行搜索定位")
+                            }
+
+
                         }
                     }
 
@@ -674,7 +694,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
-        getCurrentLocationLatLng()
+
     }
 
     private fun urlEncodeChinese(urlString: String): String {
