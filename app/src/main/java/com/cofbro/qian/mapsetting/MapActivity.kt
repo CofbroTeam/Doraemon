@@ -45,6 +45,7 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
+import com.cofbro.qian.utils.urlEncodeChinese
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -696,20 +697,4 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         }
 
     }
-
-    private fun urlEncodeChinese(urlString: String): String {
-        var url = urlString
-        try {
-            val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
-            var tmp = ""
-            while (matcher.find()) {
-                tmp = matcher.group()
-                url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
-            }
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
-        }
-        return url.replace(" ", "%20")
-    }
-
 }
