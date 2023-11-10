@@ -35,7 +35,7 @@ jobs:
       - name: Clean up
         run: |
           rm signingkey.jks
-          rm ${{github.workspace}}/app/build/outputs/apk/release/*unsigned.apk
+          rm -f ${{github.workspace}}/app/build/outputs/apk/release/app-release-unsigned.apk
 
       - name: Upload release binary to artifacts
         uses: actions/upload-artifact@v3
