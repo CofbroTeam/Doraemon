@@ -2,9 +2,8 @@ name: android master CI
 
 on:
   push:
-    branches: [ main ]
-    tags:
-      - '*'
+    branches: '*'
+    tags: '*'
   pull_request:
     branches: [ main ]
 
@@ -19,38 +18,57 @@ jobs:
           sed -i 's/\(versionCode\s*\)[0-9]\+/\1${{ github.run_number }}/' app/build.gradle
           sed -i 's/\(versionName\s*"\)[^"]*"/\1${{ github.ref_name }}"/' app/build.gradle
 
+      - name: Prepare signing key
+        run: |
+          echo '${{ secrets.SIGNING_KEY }}' | base64 -d > signingkey.jks
+
       - name: set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build debug binary with Gradle
-        if: startsWith(github.ref, 'refs/heads/main')
-        run: ./gradlew assembleDebug
-
+        uses: gradle/gradle-command-action@v2
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') && ! startsWith(github.head_ref, 'main/') }}
+        with:
+          arguments: :assembleDebug
+  
       - name: Build release binary with Gradle
-        if: startsWith(github.ref, 'refs/tags/')
-        run: ./gradlew assembleRelease
+        uses: gradle/gradle-command-action@v2
+        if: startsWith(github.ref, 'refs/tags/') && startsWith(github.head_ref, 'main/')
+        env:
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        with:
+          arguments: :assembleRelease
+
+      - name: Clean up CI files
+        run: rm signingkey.jks
 
       - name: Upload debug binary to artifacts
         uses: actions/upload-artifact@v2
-        if: startsWith(github.ref, 'refs/heads/main')
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') && ! startsWith(github.head_ref, 'main/') }}
         with:
           name: app-debug
           path: ${{github.workspace}}/app/build/outputs/apk/debug/*.apk
 
       - name: Upload release binary to artifacts
         uses: actions/upload-artifact@v2
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && startsWith(github.head_ref, 'main/')
         with:
           name: app-release
           path: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
 
-      - name: Release
+      - name: Setup release info
+        if: startsWith(github.ref, 'refs/tags/') && startsWith(github.head_ref, 'main/')
+        run: |
+          cd ${{github.workspace}}/app/build/outputs/apk/release
+          echo "OPT_APK_SHA=$(sha256sum *.apk | awk '{ print $1 }')" >> $GITHUB_ENV
+          echo "OPT_APK_NAME=$(ls *.apk)" >> $GITHUB_ENV
+
+      - name: Create & upload new release draft
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
@@ -58,3 +76,8 @@ jobs:
           tag_name: ${{ github.ref_name }}
           draft: true
           files: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
+          body: |            
+            ### 文件校验
+            | 文件 | SHA-256 |
+            | --- | --- |
+            | ${{ env.OPT_APK_NAME }} | ${{ env.OPT_APK_SHA }} |
