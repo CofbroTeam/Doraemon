@@ -9,14 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Prepare signing key
-        run: |
-          echo '${{ secrets.SIGNING_KEY }}' | base64 -d > signingkey.jks
+        run: echo '${{ secrets.SIGNING_KEY }}' | base64 -d > signingkey.jks
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -33,11 +32,13 @@ jobs:
         with:
           arguments: assembleRelease
 
-      - name: Clean up signing key
-        run: rm signingkey.jks
+      - name: Clean up
+        run: |
+          rm signingkey.jks
+          rm ${{github.workspace}}/app/build/outputs/apk/release/*-unsigned.apk
 
       - name: Upload release binary to artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: app-release
           path: ${{github.workspace}}/app/build/outputs/apk/release/*.apk
