@@ -9,24 +9,36 @@ import com.cofbro.qian.databinding.ItemMessageListBinding
 import com.cofbro.qian.friend.viewholder.MessageListContentViewHolder
 
 class MessageListAdapter : RecyclerView.Adapter<MessageListContentViewHolder<JSONObject>>() {
-    private var conversations: List<JSONObject>? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageListContentViewHolder<JSONObject> {
+    private var conversations = mutableListOf<JSONObject>()
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): MessageListContentViewHolder<JSONObject> {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMessageListBinding.inflate(inflater, parent, false)
         return MessageListContentViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
-        return conversations?.size ?: 0
+        return conversations.size
     }
 
     override fun onBindViewHolder(holder: MessageListContentViewHolder<JSONObject>, position: Int) {
-        holder.bind(position, conversations?.getOrNull(position))
+        holder.bind(position, conversations.getOrNull(position))
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setData(conv: List<JSONObject>) {
-        conversations = conv
+        conversations = ArrayList(conv)
         notifyDataSetChanged()
+    }
+
+    fun insertData(conv: JSONObject, position: Int) {
+        conversations.add(position, conv)
+        notifyItemInserted(0)
+    }
+
+    fun insertBeforeFirst(conv: JSONObject) {
+        insertData(conv, 0)
     }
 }

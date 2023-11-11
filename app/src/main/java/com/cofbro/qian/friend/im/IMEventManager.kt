@@ -7,6 +7,7 @@ import cn.leancloud.im.v2.LCIMMessage
 import cn.leancloud.im.v2.LCIMMessageHandler
 import cn.leancloud.im.v2.LCIMMessageManager
 import cn.leancloud.im.v2.messages.LCIMTextMessage
+import cn.leancloud.json.JSONObject
 
 
 object IMEventManager {
@@ -63,5 +64,13 @@ object IMEventManager {
             eventCallback.onInvite(client, conversation, operator)
         }
 
+        override fun onInfoChanged(
+            client: LCIMClient?,
+            conversation: LCIMConversation?,
+            attr: JSONObject?,
+            operator: String?
+        ) {
+            eventCallback.onInfoChanged(client, conversation, attr, operator)
+        }
     }
 }

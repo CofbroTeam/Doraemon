@@ -20,9 +20,12 @@
 
     <TextView
         android:id="@+id/tv_username"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/textColor"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -31,10 +34,15 @@
 
     <TextView
         android:id="@+id/tv_last_message"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="80dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="#6c7e9b"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tv_username"
         app:layout_constraintTop_toBottomOf="@+id/tv_username" />
 
@@ -49,13 +57,14 @@
         app:layout_constraintTop_toTopOf="@+id/tv_username" />
 
     <TextView
+        android:id="@+id/tv_unread_msg_count"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:text="5"
-        android:gravity="center"
-        android:textSize="12sp"
         android:background="@drawable/text_blue_circle_bg"
+        android:gravity="center"
         android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tv_last_message"
         app:layout_constraintEnd_toEndOf="@+id/tv_time"
         app:layout_constraintTop_toBottomOf="@+id/tv_username" />

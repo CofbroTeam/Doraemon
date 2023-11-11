@@ -1,5 +1,6 @@
 package com.cofbro.qian.friend.viewholder
 
+import android.view.View
 import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -7,6 +8,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.databinding.ItemMessageListBinding
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getLongExt
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
@@ -19,6 +21,19 @@ class MessageListContentViewHolder<T : JSONObject>(private val binding: ItemMess
         binding.tvLastMessage.text =
             t?.getStringExt("content")?.safeParseToJson()?.getStringExt("_lctext")
         binding.tvTime.text = formatTimestamp(t?.getLongExt("time") ?: 0L)
+
+        val unReadCount = t?.getIntExt("unReadCount") ?: 0
+        bindUnReadMsgCount(unReadCount)
+
+    }
+
+    private fun bindUnReadMsgCount(unReadCount: Int) {
+        if (unReadCount > 0) {
+            binding.tvUnreadMsgCount.text = unReadCount.toString()
+            binding.tvUnreadMsgCount.visibility = View.VISIBLE
+        } else {
+            binding.tvUnreadMsgCount.visibility = View.GONE
+        }
     }
 
     private fun loadImage(url: String) {

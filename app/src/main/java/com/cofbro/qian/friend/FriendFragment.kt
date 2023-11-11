@@ -2,11 +2,13 @@ package com.cofbro.qian.friend
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import cn.leancloud.LCObject
+import cn.leancloud.LCUser
 import cn.leancloud.im.v2.LCIMClient
 import cn.leancloud.im.v2.LCIMConversation
 import cn.leancloud.im.v2.LCIMMessage
@@ -22,28 +24,42 @@ import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getStatusBarHeight
+import com.cofbro.qian.utils.getStringExt
 import com.hjq.toast.ToastUtils
+import java.util.ArrayList
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
     private var userListAdapter: UserListAdapter? = null
     private var messageListAdapter: MessageListAdapter? = null
+    private var friendRequestConv = arrayListOf<LCIMConversation>()
+    private var messageConv = arrayListOf<JSONObject>()
+    private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initEventManager()
         initView()
         initObserver()
         doNetwork()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding?.ivMore?.setOnClickListener {
+            responseFriendRequest(friendRequestConv[0], true)
+        }
     }
 
     private fun initObserver() {
         // 登录即时通讯服务
         viewModel.loginIMLiveData.observe(this) {
+            // 查询所有会话
             queryConversation(
                 onSuccess = {
-                    traversToAdapterData(it)
+                    sortConvData(it)
                 },
                 onError = {
-
+                    ToastUtils.show(it)
                 }
             )
         }
@@ -53,34 +69,54 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
          * 1 -> conv
          * 2 -> user
          */
-        viewModel.traversAdapterLiveData.observe(this) {
+        viewModel.realConversationLiveData.observe(this) {
             messageListAdapter?.setData(it)
+        }
+
+        viewModel.friendRequestLiveData.observe(this) {
+            if (it.isNotEmpty()) {
+                binding?.tvMock?.visibility = View.VISIBLE
+            } else {
+                binding?.tvMock?.visibility = View.GONE
+            }
         }
     }
 
-    private fun traversToAdapterData(conv: List<LCIMConversation>) {
-        val list = arrayListOf<String>()
+    /**
+     * 将和自己有关的所有会话数据分成两种数据
+     * 1 -> 未响应的好友请求
+     * 2 -> 真实的会话
+     */
+    private fun sortConvData(conv: List<LCIMConversation>?) {
+        if (conv == null) return
+        val convList = ArrayList(conv)
+        val queryUserInfoUid = arrayListOf<String>()
         conv.forEach {
-            var uid = ""
-            it.members.forEach { id ->
-                if (id != IMClientUtils.getCntUser()?.objectId) {
-                    uid = id
-                }
+            val status = it["agree"] ?: ""
+            if (status == IMClientUtils.IMConstants.NOT_RESPONSE) {
+                // 移除掉未响应的好友请求
+                convList.remove(it)
+                friendRequestConv.add(it)
+            } else {
+                val uid = getTargetUid(it)
+                queryUserInfoUid.add(uid)
             }
-            list.add(uid)
         }
+        // 将渲染好友请求的逻辑分离出去
+        viewModel.friendRequestLiveData.postValue(friendRequestConv)
         // 根据uid查询当前聊天user
-        queryContainsUserInfo(list, onSuccess = {
-            val packedData = arrayListOf<JSONObject>()
+        queryContainsUserInfo(queryUserInfoUid, onSuccess = {
             it.forEachIndexed { index, user ->
                 val data = JSONObject()
                 data["username"] = user["username"]
                 data["avatar"] = user["avatar"]
-                data["content"] = conv.getOrNull(index)?.lastMessage?.content
-                data["time"] = conv.getOrNull(index)?.lastMessageAt?.time.toString()
-                packedData.add(data)
+                data["content"] = convList.getOrNull(index)?.lastMessage?.content ?: ""
+                data["time"] = convList.getOrNull(index)?.lastMessageAt?.time.toString()
+                data["unReadCount"] = convList.getOrNull(index)?.unreadMessagesCount.toString()
+                data["conv"] = convList.getOrNull(index)
+                messageConv.add(data)
             }
-            viewModel.traversAdapterLiveData.postValue(packedData)
+            viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
     }
 
@@ -93,6 +129,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     private fun initView() {
+        initToolbar()
         userListAdapter = UserListAdapter()
         binding?.rvUserList?.apply {
             adapter = userListAdapter
@@ -122,6 +159,18 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
+    private fun initToolbar() {
+        // height of toolbar
+        binding?.toolBar?.apply {
+            val toolbarHeight = getStatusBarHeight(requireContext()) + dp2px(
+                requireContext(),
+                66
+            )
+            val csLayout = layoutParams
+            csLayout.height = toolbarHeight
+        }
+    }
+
     override fun showLoading(msg: String?) {
         if (!msg.isNullOrEmpty()) {
             ToastUtils.show(msg)
@@ -133,18 +182,43 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         conversation: LCIMConversation?,
         client: LCIMClient?
     ) {
-        ToastUtils.show("收到消息")
+        Log.d(TAG, "onMessage: 收到消息")
+        insertMessageAccordingToConv(conversation)
+    }
+
+    private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {
+        messageConv.forEachIndexed { index, convItem ->
+            val conv = convItem.getObject("conv", LCIMConversation::class.java)
+            if (conversation?.conversationId == conv.conversationId) {
+                convItem["conv"] = conversation
+                convItem["content"] = conversation?.lastMessage?.content.toString()
+                convItem["time"] = conversation?.lastMessageAt?.time.toString()
+                convItem["unReadCount"] = conversation?.unreadMessagesCount.toString()
+                messageListAdapter?.notifyItemChanged(index)
+                return
+            }
+        }
+        // 如果找不到一样的，说明列表中没有改对话，应该将其插入
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {
-        ToastUtils.show("收到邀请")
+        Log.d(TAG, "onInvite: ${operator} 请求添加好友")
+    }
+
+    override fun onInfoChanged(
+        client: LCIMClient?,
+        conversation: LCIMConversation?,
+        attr: cn.leancloud.json.JSONObject?,
+        operator: String?
+    ) {
+        ToastUtils.show("属性改变")
     }
 
     private fun loginIM() {
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("test123", "123456",
+            IMClientUtils.loginIM("13752899701", "200369chy",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 }, onError = {
@@ -155,16 +229,94 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     private fun queryConversation(
-        onSuccess: (List<LCIMConversation>) -> Unit,
+        onSuccess: (List<LCIMConversation>?) -> Unit,
         onError: (String) -> Unit
     ) {
         IMClientUtils.queryConversation(onSuccess, onError)
     }
 
     private fun queryContainsUserInfo(
-        array: List<String>, onSuccess: (List<LCObject>) -> Unit,
+        array: List<String>,
+        onSuccess: (List<LCObject>) -> Unit,
         onError: (String) -> Unit
     ) {
-        IMClientUtils.queryContainsUsers(array, onSuccess, onError)
+        IMClientUtils.queryContainsUsersForConversation(array, onSuccess, onError)
+    }
+
+    /**
+     * 处理好友请求
+     * @param conversation 此处好友请求的会话
+     * @param accept 是否同意添加好友
+     */
+    private fun responseFriendRequest(conversation: LCIMConversation, accept: Boolean) {
+        // 1. 将对话的状态改为已响应
+        IMClientUtils.updateConversationInfo(conversation, accept, onSuccess = {}, onError = {})
+        if (accept) {
+            // 2.1 如果同意好友后，向对方发送一条消息，表示已成为好友
+            IMClientUtils.sendMsg(conversation, "我们已经成为好友啦~",
+                onSuccess = {
+                    Log.d(TAG, "responseFriendRequest: 问候语发送成功")
+                    // 2.2 将好友请求会话remove
+                    friendRequestConv.remove(conversation)
+                    // 2.3 将此次的conversation渲染到列表中
+                    insertConv(conversation) {
+                        // 2.4 补全Relation表中的关系
+                        saveFriendRelation(it)
+                    }
+
+                },
+                onError = {
+                    Log.d(TAG, "responseFriendRequest: 问候语发送失败")
+                }
+            )
+        }
+    }
+
+    /**
+     * 将conversation插入到聊天列表中
+     */
+    private fun insertConv(conversation: LCIMConversation, onSuccess: (LCObject) -> Unit) {
+        val uid = getTargetUid(conversation)
+        IMClientUtils.queryContainUserForConversation(
+            uid,
+            onSuccess = {
+                val user = it.getOrNull(0) ?: LCUser()
+                val data = JSONObject()
+                data["username"] = user.username
+                data["avatar"] = user["avatar"]
+                data["conv"] = conversation
+                data["content"] = conversation.lastMessage?.content ?: ""
+                data["time"] = conversation.lastMessageAt?.time.toString()
+                messageListAdapter?.insertBeforeFirst(data)
+                onSuccess(user)
+            }, onError = {
+                Log.d(TAG, "insertConv: 查询单个用户失败")
+            }
+        )
+    }
+
+    /**
+     * 更新云端的Relation表，将好友关系添加进去
+     */
+    private fun saveFriendRelation(target: LCObject) {
+        val map = hashMapOf<String, String>()
+        map["targetAvatar"] = target["avatar"]?.toString() ?: ""
+        map["targetId"] = target["objectId"]?.toString() ?: ""
+        map["targetName"] = target["username"]?.toString() ?: ""
+        map["owner"] = IMClientUtils.getCntUser()?.username ?: ""
+        map["ownerId"] = IMClientUtils.getCntUser()?.objectId ?: ""
+        viewModel.saveFriendRelation(map) {
+            Log.d(TAG, "saveFriendRelation: Relation更新成功！")
+        }
+    }
+
+    private fun getTargetUid(conv: LCIMConversation): String {
+        var uid = ""
+        conv.members.forEach { id ->
+            if (id != IMClientUtils.getCntUser()?.objectId) {
+                uid = id
+            }
+        }
+        return uid
     }
 }

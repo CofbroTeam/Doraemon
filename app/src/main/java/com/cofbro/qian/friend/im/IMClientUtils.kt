@@ -15,10 +15,15 @@ import cn.leancloud.im.v2.callback.LCIMMessagesQueryCallback
 import cn.leancloud.im.v2.messages.LCIMTextMessage
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import java.util.Arrays
 
 
 object IMClientUtils {
+    object IMConstants {
+        const val NOT_RESPONSE = "notResponse"
+        const val AGREED = "agreed"
+        const val REFUSED = "refused"
+    }
+
     private var client: LCIMClient? = null
     private var user: LCUser? = null
 
@@ -67,7 +72,7 @@ object IMClientUtils {
         onError: (String) -> Unit = {}
     ) {
         getIMClient()?.createConversation(
-            mutableListOf(uid), "${getCntUser()?.username ?: ""} & $uid", null, false, true,
+            mutableListOf(uid), "${getCntUser()?.objectId ?: ""} & $uid", null, false, true,
             object : LCIMConversationCreatedCallback() {
                 override fun done(conversation: LCIMConversation, e: LCIMException?) {
                     if (e == null) {
@@ -110,11 +115,12 @@ object IMClientUtils {
      * @param onSuccess success callback
      * @param onError error callback
      */
-    fun queryConversation(onSuccess: (List<LCIMConversation>) -> Unit, onError: (String) -> Unit) {
+    fun queryConversation(onSuccess: (List<LCIMConversation>?) -> Unit, onError: (String) -> Unit) {
         val query = getIMClient()?.conversationsQuery
+        query?.setQueryPolicy(LCQuery.CachePolicy.NETWORK_ELSE_CACHE);
         query?.whereContainedIn("m", mutableListOf(getCntUser()?.objectId ?: ""))
         query?.findInBackground(object : LCIMConversationQueryCallback() {
-            override fun done(convs: List<LCIMConversation>, e: LCIMException?) {
+            override fun done(convs: List<LCIMConversation>?, e: LCIMException?) {
                 if (e == null) {
                     onSuccess(convs)
                 } else {
@@ -149,16 +155,17 @@ object IMClientUtils {
     }
 
     /**
-     * 组合查询，查询所有满足条件的item
+     * 查询所有参与过的对话
      * @param array the condition of query array
      * @param onSuccess success callback
      * @param onError error callback
      */
-    fun queryContainsUsers(
+    fun queryContainsUsersForConversation(
         array: List<String>,
         onSuccess: (List<LCObject>) -> Unit,
         onError: (String) -> Unit
     ) {
+        if (array.isEmpty()) return
         val queryList = arrayListOf<LCQuery<LCObject>>()
         array.forEach {
             val query = LCQuery<LCObject>("_User")
@@ -166,7 +173,63 @@ object IMClientUtils {
             queryList.add(query)
         }
         val queryPacket = LCQuery.or(queryList)
-        queryPacket.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
+        queryPacket.findInBackground()
+            .subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
+    }
+
+    /**
+     * 查询所有参与过的对话
+     * @param uid the unique identification of a user
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun queryContainUserForConversation(
+        uid: String,
+        onSuccess: (List<LCUser>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val query = LCQuery<LCUser>("_User")
+        query.whereEqualTo("objectId", uid)
+        query.findInBackground().subscribe(DefaultObserver<List<LCUser>>(onSuccess, onError))
+    }
+
+    /**
+     * 搜索好友
+     * @param username the unique identification of a user
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun querySingleUserByUsernameFuzzy(
+        username: String,
+        onSuccess: (List<LCObject>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val query = LCQuery<LCObject>("_User")
+        query.whereContains("username", username)
+        query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
+    }
+
+    fun queryToFindFriend() {
+        val query = LCQuery<LCObject>("Relation")
+    }
+
+    fun updateConversationInfo(
+        conversation: LCIMConversation,
+        accept: Boolean,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val value = if (accept) IMConstants.AGREED else IMConstants.REFUSED
+        conversation.set("agree", value)
+        conversation.updateInfoInBackground(object : LCIMConversationCallback() {
+            override fun done(e: LCIMException?) {
+                if (e == null) {
+                    onSuccess()
+                } else {
+                    onError(e.message.toString())
+                }
+            }
+        })
     }
 
     class DefaultObserver<T : Any>(
