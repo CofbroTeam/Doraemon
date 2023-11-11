@@ -117,7 +117,7 @@ object IMClientUtils {
      */
     fun queryConversation(onSuccess: (List<LCIMConversation>?) -> Unit, onError: (String) -> Unit) {
         val query = getIMClient()?.conversationsQuery
-        query?.setQueryPolicy(LCQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        query?.setQueryPolicy(LCQuery.CachePolicy.NETWORK_ELSE_CACHE)
         query?.whereContainedIn("m", mutableListOf(getCntUser()?.objectId ?: ""))
         query?.findInBackground(object : LCIMConversationQueryCallback() {
             override fun done(convs: List<LCIMConversation>?, e: LCIMException?) {

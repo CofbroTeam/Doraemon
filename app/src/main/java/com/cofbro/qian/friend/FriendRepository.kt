@@ -16,4 +16,12 @@ class FriendRepository : BaseRepository() {
     ) {
         leanCloudUtils.saveInLC(className, equalMap, null, onSuccess)
     }
+
+    fun searchInLC(
+        className: String,
+        equalMap: HashMap<String, String>,
+        onSuccess: (List<LCObject>) -> Unit = {}
+    ) {
+        leanCloudUtils.searchInLC(className, equalMap, null, onSuccess)
+    }
 }

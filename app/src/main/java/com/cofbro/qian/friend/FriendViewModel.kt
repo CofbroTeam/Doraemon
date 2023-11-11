@@ -28,4 +28,11 @@ class FriendViewModel : BaseViewModel<FriendRepository>() {
     ) {
         repository.saveInLC("Relation", equalMap, onSuccess)
     }
+
+    fun findFriend(
+        equalMap: HashMap<String, String>,
+        onSuccess: (List<LCObject>) -> Unit = {}
+    ) {
+        repository.searchInLC("Relation", equalMap, onSuccess)
+    }
 }

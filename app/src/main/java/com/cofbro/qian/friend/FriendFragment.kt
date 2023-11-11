@@ -53,6 +53,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun initObserver() {
         // 登录即时通讯服务
         viewModel.loginIMLiveData.observe(this) {
+            // 查询好友
+            loadUserList()
             // 查询所有会话
             queryConversation(
                 onSuccess = {
@@ -128,12 +130,44 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         loginIM()
     }
 
+    private fun loadUserList() {
+        val map = hashMapOf<String, String>()
+        map["ownerId"] = IMClientUtils.getCntUser()?.objectId ?: ""
+        viewModel.findFriend(map) {
+            userListAdapter?.setData(it)
+        }
+    }
+
     private fun initView() {
         initToolbar()
         userListAdapter = UserListAdapter()
         binding?.rvUserList?.apply {
             adapter = userListAdapter
             layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
+
+            addItemDecoration(object : ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    if (parent.layoutManager?.getPosition(view) == 0) {
+                        return outRect.set(
+                            dp2px(requireContext(), 16),
+                            0,
+                            dp2px(requireContext(), 20),
+                            0
+                        )
+                    }
+                    return outRect.set(
+                        0,
+                        0,
+                        dp2px(requireContext(), 20),
+                        0
+                    )
+                }
+            })
         }
 
         messageListAdapter = MessageListAdapter()
@@ -198,7 +232,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 return
             }
         }
-        // 如果找不到一样的，说明列表中没有改对话，应该将其插入
+        // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
+        val data = JSONObject()
+        data["conv"] = conversation
+        data["content"] = conversation?.lastMessage?.content.toString()
+        data["time"] = conversation?.lastMessageAt?.time.toString()
+        data["unReadCount"] = conversation?.unreadMessagesCount.toString()
+        messageListAdapter?.insertBeforeFirst(data)
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {
