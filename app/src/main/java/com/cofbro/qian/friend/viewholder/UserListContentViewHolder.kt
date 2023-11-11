@@ -8,8 +8,8 @@ import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemFriendListBinding
 import com.cofbro.qian.utils.dp2px
 
-class UserListContentViewHolder(private val binding: ItemFriendListBinding) : DefaultViewHolder(binding) {
-    override fun bind(position: Int) {
+class UserListContentViewHolder<T: Any>(private val binding: ItemFriendListBinding) : DefaultViewHolder<T>(binding) {
+    override fun bind(position: Int, t: T?) {
         val options = RequestOptions().transform(
             CenterCrop(),
             RoundedCorners(dp2px(binding.root.context, 25))
