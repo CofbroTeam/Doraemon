@@ -1,9 +1,11 @@
 package com.cofbro.qian.friend.im
 
+import android.util.Log
 import cn.leancloud.LCObject
 import cn.leancloud.LCQuery
 import cn.leancloud.LCUser
 import cn.leancloud.im.v2.LCIMClient
+import cn.leancloud.im.v2.LCIMClientEventHandler
 import cn.leancloud.im.v2.LCIMConversation
 import cn.leancloud.im.v2.LCIMException
 import cn.leancloud.im.v2.LCIMMessage
@@ -15,13 +17,13 @@ import cn.leancloud.im.v2.callback.LCIMMessagesQueryCallback
 import cn.leancloud.im.v2.messages.LCIMTextMessage
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import java.util.Arrays
 
 
 
 
 
 object IMClientUtils {
+    private val TAG = "IMClientUtils"
     object IMConstants {
         const val NOT_RESPONSE = "notResponse"
         const val AGREED = "agreed"
@@ -30,6 +32,23 @@ object IMClientUtils {
 
     private var client: LCIMClient? = null
     private var user: LCUser? = null
+
+    fun init() {
+        LCIMClient.setClientEventHandler(object : LCIMClientEventHandler() {
+            override fun onConnectionPaused(client: LCIMClient?) {
+                Log.d(TAG, "onConnectionPaused: ")
+            }
+
+            override fun onConnectionResume(client: LCIMClient?) {
+                Log.d(TAG, "onConnectionResume: ")
+            }
+
+            override fun onClientOffline(client: LCIMClient?, code: Int) {
+                Log.d(TAG, "onClientOffline: ")
+            }
+
+        })
+    }
 
     fun getIMClient(): LCIMClient? {
         return client
@@ -77,6 +96,30 @@ object IMClientUtils {
     ) {
         getIMClient()?.createConversation(
             mutableListOf(uid), "${getCntUser()?.objectId ?: ""} & $uid", null, false, true,
+            object : LCIMConversationCreatedCallback() {
+                override fun done(conversation: LCIMConversation, e: LCIMException?) {
+                    if (e == null) {
+                        onSuccess(conversation)
+                    } else {
+                        onError(e.message.toString())
+                    }
+                }
+            })
+    }
+
+    /**
+     * 创建新的对话
+     * @param uid objectId of target user
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun createNewConversation(
+        uid: String,
+        onSuccess: (LCIMConversation) -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        getIMClient()?.createConversation(
+            mutableListOf(uid), "${getCntUser()?.objectId ?: ""} & $uid", null, false, false,
             object : LCIMConversationCreatedCallback() {
                 override fun done(conversation: LCIMConversation, e: LCIMException?) {
                     if (e == null) {

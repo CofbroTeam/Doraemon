@@ -51,6 +51,15 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             showFriendRequestFragment(friendRequestConv)
             //responseFriendRequest(friendRequestConv[0], true)
         }
+
+        binding?.tvTitle?.setOnClickListener {
+            IMClientUtils.createNewConversation(
+                "654e22d46e07082ba15e4752",
+                onSuccess = {
+                    ToastUtils.show("好友申请发送成功")
+                },
+                onError = {})
+        }
     }
 
     private fun initObserver() {
@@ -126,6 +135,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     private fun initEventManager() {
+        IMClientUtils.init()
         IMEventManager.init(this)
     }
 
@@ -264,7 +274,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("13752899701", "200369chy",
+            IMClientUtils.loginIM("", "",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
@@ -335,6 +345,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 data["content"] = conversation.lastMessage?.content ?: ""
                 data["time"] = conversation.lastMessageAt?.time.toString()
                 data["unReadCount"] = conversation.unreadMessagesCount.toString()
+                // 更新数据源
+                messageConv.add(data)
                 messageListAdapter?.insertBeforeFirst(data)
                 onSuccess(user)
             }, onError = {
@@ -354,7 +366,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         map["targetName"] = target["username"]?.toString() ?: ""
         map["owner"] = IMClientUtils.getCntUser()?.username ?: ""
         map["ownerId"] = IMClientUtils.getCntUser()?.objectId ?: ""
-        map["ownerId"] = URL.getAvtarImgPath(uid)
+        map["ownerAvatar"] = URL.getAvtarImgPath(uid)
         viewModel.saveFriendRelation(map) {
             Log.d(TAG, "saveFriendRelation: Relation更新成功！")
         }
