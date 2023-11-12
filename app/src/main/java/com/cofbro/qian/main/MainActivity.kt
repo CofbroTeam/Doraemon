@@ -10,9 +10,12 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
+import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
+import com.hjq.toast.ToastUtils
 
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
+    private var currentBackPressedTime = 0L
     private var homeFragment: HomeFragment? = null
     private var friendFragment: FriendFragment? = null
     private var profileFragment: ProfileFragment? = null
@@ -26,7 +29,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun initView() {
         contentId = binding?.content?.id ?: -1
 
-        createAllFragment()
+        initFirstFragment()
 
         binding?.navigationBar?.setOnItemSelectedListener { item ->
             if (item.itemId != binding?.navigationBar?.selectedItemId) {
@@ -36,10 +39,23 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     }
 
                     R.id.tab_friend -> {
+                        if (friendFragment == null) {
+                            friendFragment = FriendFragment()
+                            supportFragmentManager.beginTransaction()
+                                .add(contentId, friendFragment!!, "FriendFragment")
+                                .commit()
+                        }
                         showFragment(friendFragment!!)
                     }
 
                     R.id.tab_profile -> {
+                        if (profileFragment == null) {
+                            profileFragment = ProfileFragment()
+                            supportFragmentManager.beginTransaction()
+                                .add(contentId, profileFragment!!, "ProfileFragment")
+                                .commit()
+
+                        }
                         showFragment(profileFragment!!)
                     }
                 }
@@ -49,21 +65,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
     }
 
-    private fun createAllFragment() {
+    private fun initFirstFragment() {
         homeFragment = HomeFragment()
-        friendFragment = FriendFragment()
-        profileFragment = ProfileFragment()
-
         supportFragmentManager.beginTransaction()
+            .show(homeFragment!!)
             .add(contentId, homeFragment!!, "HomeFragment")
-            .add(contentId, friendFragment!!, "FriendFragment")
-            .add(contentId, profileFragment!!, "profileFragment")
-            .hide(friendFragment!!)
-            .hide(profileFragment!!)
             .commit()
-
-
+        lastShowFragment = homeFragment
     }
+
 
     private fun showFragment(fragmentToShow: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -76,13 +86,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     }
 
 
-    private fun selectFragment(fragment: Fragment?) {
-        if (contentId == -1) return
-        fragment?.let {
-            val fragmentManager: FragmentManager = supportFragmentManager
-            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            transaction.replace(contentId, fragment)
-            transaction.commit()
+    override fun onBackPressed() {
+        if (System.currentTimeMillis() - currentBackPressedTime > BACK_PRESSED_INTERVAL) {
+            currentBackPressedTime = System.currentTimeMillis()
+            ToastUtils.show("再按一次退出")
+            return
         }
+        super.onBackPressed()
     }
 }
