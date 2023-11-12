@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.leancloud.LCObject
-import cn.leancloud.LCUser
 import com.cofbro.qian.databinding.ItemFriendListBinding
 import com.cofbro.qian.friend.viewholder.UserListContentViewHolder
 

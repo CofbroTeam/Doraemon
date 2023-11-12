@@ -15,6 +15,10 @@ import cn.leancloud.im.v2.callback.LCIMMessagesQueryCallback
 import cn.leancloud.im.v2.messages.LCIMTextMessage
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
+import java.util.Arrays
+
+
+
 
 
 object IMClientUtils {
@@ -209,8 +213,20 @@ object IMClientUtils {
         query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
     }
 
-    fun queryToFindFriend() {
-        val query = LCQuery<LCObject>("Relation")
+    /**
+     * 加载好友
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun queryToFindExistFriend(onSuccess: (List<LCObject>) -> Unit, onError: (String) -> Unit) {
+        val query1 = LCQuery<LCObject>("Relation")
+        query1.whereEqualTo("ownerId", getCntUser()?.objectId ?: "")
+
+        val query2 = LCQuery<LCObject>("Relation")
+        query2.whereEqualTo("targetId", getCntUser()?.objectId ?: "")
+
+        val query = LCQuery.or(listOf(query1, query2))
+        query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
     }
 
     fun updateConversationInfo(

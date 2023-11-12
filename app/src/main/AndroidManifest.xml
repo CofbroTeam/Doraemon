@@ -53,21 +53,21 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--            </intent-filter>-->
-        </activity>
-
-        <activity android:name=".wrapper.did.DoHomeworkActivity" />
-        <activity android:name=".main.MainActivity"
-            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
 
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".wrapper.did.DoHomeworkActivity" />
+        <activity android:name=".main.MainActivity"
+            android:exported="true">
+<!--            <intent-filter>-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".account.manager.AccountManagerActivity" />

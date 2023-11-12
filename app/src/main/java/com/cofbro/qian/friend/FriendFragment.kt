@@ -17,17 +17,19 @@ import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.SP_PASSWORD
 import com.cofbro.hymvvmutils.base.SP_USER_NAME
 import com.cofbro.hymvvmutils.base.getBySp
+import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentFriendBinding
 import com.cofbro.qian.friend.adapter.MessageListAdapter
 import com.cofbro.qian.friend.adapter.UserListAdapter
+import com.cofbro.qian.friend.friendrequest.FriendRequestFragment
 import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
+import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
-import com.cofbro.qian.utils.getStringExt
 import com.hjq.toast.ToastUtils
-import java.util.ArrayList
+import kotlin.collections.ArrayList
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
@@ -46,7 +48,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun initEvent() {
         binding?.ivMore?.setOnClickListener {
-            responseFriendRequest(friendRequestConv[0], true)
+            showFriendRequestFragment(friendRequestConv)
+            //responseFriendRequest(friendRequestConv[0], true)
         }
     }
 
@@ -131,11 +134,14 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     private fun loadUserList() {
-        val map = hashMapOf<String, String>()
-        map["ownerId"] = IMClientUtils.getCntUser()?.objectId ?: ""
-        viewModel.findFriend(map) {
-            userListAdapter?.setData(it)
-        }
+        IMClientUtils.queryToFindExistFriend(
+            onSuccess = {
+                userListAdapter?.setData(it)
+            },
+            onError = {
+                Log.d(TAG, "loadUserList: 加载好友失败")
+            }
+        )
     }
 
     private fun initView() {
@@ -242,7 +248,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {
-        Log.d(TAG, "onInvite: ${operator} 请求添加好友")
+        Log.d(TAG, "onInvite: $operator 请求添加好友")
     }
 
     override fun onInfoChanged(
@@ -261,7 +267,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             IMClientUtils.loginIM("13752899701", "200369chy",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
-                }, onError = {
+                },
+                onError = {
                     ToastUtils.show(it)
                 }
             )
@@ -288,7 +295,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
      * @param conversation 此处好友请求的会话
      * @param accept 是否同意添加好友
      */
-    private fun responseFriendRequest(conversation: LCIMConversation, accept: Boolean) {
+    fun responseFriendRequest(conversation: LCIMConversation, accept: Boolean) {
         // 1. 将对话的状态改为已响应
         IMClientUtils.updateConversationInfo(conversation, accept, onSuccess = {}, onError = {})
         if (accept) {
@@ -327,6 +334,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 data["conv"] = conversation
                 data["content"] = conversation.lastMessage?.content ?: ""
                 data["time"] = conversation.lastMessageAt?.time.toString()
+                data["unReadCount"] = conversation.unreadMessagesCount.toString()
                 messageListAdapter?.insertBeforeFirst(data)
                 onSuccess(user)
             }, onError = {
@@ -339,12 +347,14 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
      * 更新云端的Relation表，将好友关系添加进去
      */
     private fun saveFriendRelation(target: LCObject) {
+        val uid = CacheUtils.cache["uid"] ?: ""
         val map = hashMapOf<String, String>()
         map["targetAvatar"] = target["avatar"]?.toString() ?: ""
         map["targetId"] = target["objectId"]?.toString() ?: ""
         map["targetName"] = target["username"]?.toString() ?: ""
         map["owner"] = IMClientUtils.getCntUser()?.username ?: ""
         map["ownerId"] = IMClientUtils.getCntUser()?.objectId ?: ""
+        map["ownerId"] = URL.getAvtarImgPath(uid)
         viewModel.saveFriendRelation(map) {
             Log.d(TAG, "saveFriendRelation: Relation更新成功！")
         }
@@ -358,5 +368,10 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             }
         }
         return uid
+    }
+
+    private fun showFriendRequestFragment(conv: List<LCIMConversation>) {
+        val fragment = FriendRequestFragment(conv)
+        fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
     }
 }

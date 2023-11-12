@@ -1,8 +1,6 @@
 package com.cofbro.qian.main
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -12,11 +10,13 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
-import com.google.android.material.navigation.NavigationBarView
 
 
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
-    private var homeFragment: Fragment? = null
+    private var homeFragment: HomeFragment? = null
+    private var friendFragment: FriendFragment? = null
+    private var profileFragment: ProfileFragment? = null
+    private var lastShowFragment: Fragment? = null
     private var contentId = -1
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initView()
@@ -25,28 +25,54 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     private fun initView() {
         contentId = binding?.content?.id ?: -1
-        homeFragment = HomeFragment()
-        selectFragment(homeFragment)
+
+        createAllFragment()
 
         binding?.navigationBar?.setOnItemSelectedListener { item ->
             if (item.itemId != binding?.navigationBar?.selectedItemId) {
                 when (item.itemId) {
                     R.id.tab_home -> {
-                        selectFragment(HomeFragment())
+                        showFragment(homeFragment!!)
                     }
 
                     R.id.tab_friend -> {
-                        selectFragment(FriendFragment())
+                        showFragment(friendFragment!!)
                     }
 
                     R.id.tab_profile -> {
-                        selectFragment(ProfileFragment())
+                        showFragment(profileFragment!!)
                     }
                 }
                 return@setOnItemSelectedListener true
             }
             false
         }
+    }
+
+    private fun createAllFragment() {
+        homeFragment = HomeFragment()
+        friendFragment = FriendFragment()
+        profileFragment = ProfileFragment()
+
+        supportFragmentManager.beginTransaction()
+            .add(contentId, homeFragment!!, "HomeFragment")
+            .add(contentId, friendFragment!!, "FriendFragment")
+            .add(contentId, profileFragment!!, "profileFragment")
+            .hide(friendFragment!!)
+            .hide(profileFragment!!)
+            .commit()
+
+
+    }
+
+    private fun showFragment(fragmentToShow: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.show(fragmentToShow)
+        lastShowFragment?.let {
+            transaction.hide(it)
+        }
+        lastShowFragment = fragmentToShow
+        transaction.commit()
     }
 
 
