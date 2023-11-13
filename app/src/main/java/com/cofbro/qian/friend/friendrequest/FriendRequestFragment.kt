@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.leancloud.LCObject
+import cn.leancloud.LCUser
 import cn.leancloud.im.v2.LCIMConversation
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.R
@@ -22,6 +23,7 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
     private val TAG = "FriendRequestFragment"
     private var mAdapter: FriendRequestAdapter? = null
     private var rootView: View? = null
+    private var usersTemp = ArrayList<LCObject>()
     private val data = arrayListOf<JSONObject>()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +59,10 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
             setOnItemClickListener { pos ->
                 findFriendFragment()?.let { friendFragment ->
                     conv.getOrNull(pos)?.let {
+                        // 更新聊天列表
                         friendFragment.responseFriendRequest(it, true)
+                        // 更新用户列表
+                        friendFragment.insertDataIntoUserList(usersTemp)
                     }
                 }
             }
@@ -75,6 +80,7 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
         }
         IMClientUtils.queryContainsUsersForConversation(uidList,
             onSuccess = {
+                // 好友申请列表
                 sortConvData(it)
                 mAdapter?.setData(data)
             },
@@ -86,6 +92,7 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
 
     private fun sortConvData(users: List<LCObject>) {
         users.forEachIndexed { index, lcObject ->
+            // 好友申请列表
             val item = JSONObject()
             val conversation = conv.getOrNull(index)
             item["username"] = lcObject.getString("username")
@@ -95,6 +102,12 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
             item["content"] = "请求添加好友"
             item["status"] = conversation?.get("agree").toString()
             data.add(item)
+
+            // 好友列表
+            val o = LCObject()
+            o.put("owner", lcObject.getString("username"))
+            o.put("ownerAvatar", lcObject.getString("avatar"))
+            usersTemp.add(o)
         }
     }
 

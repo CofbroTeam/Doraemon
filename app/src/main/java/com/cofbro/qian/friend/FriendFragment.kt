@@ -172,7 +172,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                         return outRect.set(
                             dp2px(requireContext(), 16),
                             0,
-                            dp2px(requireContext(), 20),
+                            dp2px(requireContext(), 14),
                             0
                         )
                     }
@@ -258,7 +258,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {
-        Log.d(TAG, "onInvite: $operator 请求添加好友")
+        val status = conversation?.get("agree")
+        if (status == IMClientUtils.IMConstants.NOT_RESPONSE) {
+            friendRequestConv.add(conversation)
+            // 将渲染好友请求的逻辑分离出去
+            viewModel.friendRequestLiveData.postValue(friendRequestConv)
+        }
+
     }
 
     override fun onInfoChanged(
@@ -274,7 +280,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("", "",
+            IMClientUtils.loginIM("13752899701", "200369chy",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
@@ -327,6 +333,10 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 }
             )
         }
+    }
+
+    fun insertDataIntoUserList(data: List<LCObject>) {
+        userListAdapter?.insertItemRange(data)
     }
 
     /**

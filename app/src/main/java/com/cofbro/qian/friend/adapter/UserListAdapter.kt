@@ -8,12 +8,15 @@ import cn.leancloud.LCObject
 import com.cofbro.qian.databinding.ItemFriendListBinding
 import com.cofbro.qian.friend.viewholder.UserListContentViewHolder
 
-class UserListAdapter: RecyclerView.Adapter<UserListContentViewHolder<LCObject>>()  {
-    private var users = mutableListOf<LCObject>()
+class UserListAdapter : RecyclerView.Adapter<UserListContentViewHolder<LCObject>>() {
+    private var users = arrayListOf<LCObject>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserListContentViewHolder<LCObject> {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): UserListContentViewHolder<LCObject> {
         val inflater = LayoutInflater.from(parent.context)
-        val binding =  ItemFriendListBinding.inflate(inflater, parent, false)
+        val binding = ItemFriendListBinding.inflate(inflater, parent, false)
         return UserListContentViewHolder(binding)
     }
 
@@ -25,9 +28,18 @@ class UserListAdapter: RecyclerView.Adapter<UserListContentViewHolder<LCObject>>
         holder.bind(position, users.getOrNull(position))
     }
 
+    fun insertItemRange(data: List<LCObject>) {
+        users.addAll(0, data)
+        notifyItemRangeInserted(0, data.size)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data: List<LCObject>) {
         users = ArrayList(data)
         notifyDataSetChanged()
+    }
+
+    fun getData(): ArrayList<LCObject> {
+        return users
     }
 }
