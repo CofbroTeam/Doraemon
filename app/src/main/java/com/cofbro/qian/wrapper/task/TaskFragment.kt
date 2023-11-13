@@ -14,10 +14,12 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
 import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
+import com.cofbro.qian.profile.advice.AdviceFragment
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
@@ -116,7 +118,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     binding?.rflSignTask?.finishRefresh()
                 }
                 if (it.data == null) {
-                    hideLoadingView()
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                    }
                 }
                 val data = it.data?.body?.string()
                 withContext(Dispatchers.Main) {
@@ -131,7 +135,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTypeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 if (it.data == null) {
-                    hideLoadingView()
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                    }
                 }
                 val data = it.data?.body?.string()
                 signTypeData = data?.safeParseToJson()
@@ -144,7 +150,15 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signCodeLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 if (it.data == null) {
-                    hideLoadingView()
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                    }
+                } else {
+                    val body = it.data?.body?.string() ?: ""
+                    code = HtmlParser.parseToSignCode(body)
+                    viewModel.preSign(preSignUrl)
+                    // 签到
+                    signNormally(id, code)
                 }
             }
         }
@@ -275,19 +289,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signNormally(id)
                 }
             }
-            // 签到码签到
-            Constants.SIGN.SIGN_CODE -> {
-                withContext(Dispatchers.Main) {
-                    hideLoadingView()
-                    showCodeDialog(id)
-                }
-            }
 
-            // 手势签到
-            Constants.SIGN.GESTURE -> {
+            // 签到码签到，手势签到
+            Constants.SIGN.SIGN_CODE, Constants.SIGN.GESTURE -> {
                 withContext(Dispatchers.Main) {
                     hideLoadingView()
-                    showGestureDialog(id)
+                    showChooseSignTypeDialog(id, type)
                 }
             }
 
@@ -361,12 +368,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    /**
-     * 服务端现已不下发签到码，客户端发起请求后由服务端校验，
-     * 因此暂时没有方法能够拿到密码
-     */
-    private suspend fun signWithSignCode(aid: String) {
-        viewModel.getSignCode(URL.getSignCodePath(aid))
+    private suspend fun getSignCode(aid: String, classId: String, courseId: String) {
+        viewModel.getSignCode(URL.getSignCodePath(aid, classId, courseId))
     }
 
 
@@ -390,7 +393,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         loadingDialog = null
     }
 
-    private suspend fun showCodeDialog(id: String) {
+    private fun showCodeDialog(id: String) {
         codeDialog = CodingDialog(requireContext()).apply {
             setCancelable(false)
             setPositiveClickListener {
@@ -424,7 +427,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun showGestureDialog(id: String) {
+    private fun showGestureDialog(id: String) {
         gestureInputDialog = GestureInputDialog(requireContext()).apply {
             show()
             setInputEndListener { inputPwd ->
@@ -499,5 +502,28 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private fun findUID(cookies: String): String {
         val uid = cookies.substringAfter("UID=")
         return uid.substringBefore(";")
+    }
+
+    private suspend fun showChooseSignTypeDialog(aid: String, type: String) {
+        val courseId = activity?.courseId ?: ""
+        val classId = activity?.classId ?: ""
+        val fragment = SignTypeFragment().apply {
+            setOnClickSignDirectlyListener {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    getSignCode(aid, classId, courseId)
+                }
+                dismiss()
+            }
+
+            setOnClickSignWithCodeListener {
+                if (type == Constants.SIGN.GESTURE) {
+                    showGestureDialog(aid)
+                } else {
+                    showCodeDialog(aid)
+                }
+                dismiss()
+            }
+        }
+        fragment.show(requireActivity().supportFragmentManager, "SignTypeFragment")
     }
 }

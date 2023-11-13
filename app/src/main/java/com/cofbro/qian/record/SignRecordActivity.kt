@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivitySignRecordBinding
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getStatusBarHeight
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ class SignRecordActivity : BaseActivity<SignRecordViewModel, ActivitySignRecordB
 
     private fun initObserver() {
         viewModel.loadLiveData.observe(this) {
+            responseLottieView()
             mAdapter?.setData(records)
         }
     }
@@ -105,6 +108,19 @@ class SignRecordActivity : BaseActivity<SignRecordViewModel, ActivitySignRecordB
         lifecycleScope.launch(Dispatchers.IO) {
             records = SignRecorder.readRecords(this@SignRecordActivity)
             viewModel.notifyData()
+        }
+    }
+
+    private fun responseLottieView() {
+        if (records == null) {
+            binding?.lottieView?.visibility = View.VISIBLE
+            return
+        }
+        val size = records?.getIntExt(Constants.Recorder.SIZE)?.takeIf { it != -1 } ?: 0
+        if (size == 0) {
+            binding?.lottieView?.visibility = View.VISIBLE
+        } else {
+            binding?.lottieView?.visibility = View.GONE
         }
     }
 }
