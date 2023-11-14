@@ -78,7 +78,6 @@
         <activity android:name=".photo.PhotoSignActivity" />
         <activity android:name=".record.SignRecordActivity" />
         <activity android:name=".login.sms.SMSActivity"/>
-
         <service android:name="com.amap.api.location.APSService" />
     </application>
 

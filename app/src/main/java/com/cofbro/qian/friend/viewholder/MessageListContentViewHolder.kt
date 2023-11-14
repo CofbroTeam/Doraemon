@@ -1,5 +1,6 @@
 package com.cofbro.qian.friend.viewholder
 
+import android.content.Intent
 import android.view.View
 import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide
@@ -25,6 +26,9 @@ class MessageListContentViewHolder<T : JSONObject>(private val binding: ItemMess
         val unReadCount = t?.getIntExt("unReadCount") ?: 0
         bindUnReadMsgCount(unReadCount)
 
+        itemView.setOnClickListener {
+            binding.root.context.startActivity(Intent(binding.root.context, TestActivity::class.java))
+        }
     }
 
     private fun bindUnReadMsgCount(unReadCount: Int) {
