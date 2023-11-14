@@ -8,6 +8,7 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
+import com.cofbro.qian.friend.im.chatActivity.ChatTestFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
 import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
@@ -17,7 +18,7 @@ import com.hjq.toast.ToastUtils
 class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var currentBackPressedTime = 0L
     private var homeFragment: HomeFragment? = null
-    private var friendFragment: FriendFragment? = null
+    private var friendFragment: ChatTestFragment? = null
     private var profileFragment: ProfileFragment? = null
     private var lastShowFragment: Fragment? = null
     private var contentId = -1
@@ -40,7 +41,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
                     R.id.tab_friend -> {
                         if (friendFragment == null) {
-                            friendFragment = FriendFragment()
+                            friendFragment = ChatTestFragment()
                             supportFragmentManager.beginTransaction()
                                 .add(contentId, friendFragment!!, "FriendFragment")
                                 .commit()
