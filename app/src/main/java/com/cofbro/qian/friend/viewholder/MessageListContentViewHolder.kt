@@ -8,6 +8,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.qian.databinding.ItemMessageListBinding
+import com.cofbro.qian.friend.chatActivity.ChatActivity
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getLongExt
@@ -27,7 +28,7 @@ class MessageListContentViewHolder<T : JSONObject>(private val binding: ItemMess
         bindUnReadMsgCount(unReadCount)
 
         itemView.setOnClickListener {
-            binding.root.context.startActivity(Intent(binding.root.context, TestActivity::class.java))
+            binding.root.context.startActivity(Intent(binding.root.context, ChatActivity::class.java))
         }
     }
 

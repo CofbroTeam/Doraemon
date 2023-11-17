@@ -40,12 +40,13 @@
             android:name="com.amap.api.v2.apikey"
             android:value="787057d8a10578894fc4719a3bd274dc" />
 
-        <service android:name="cn.leancloud.push.PushService"/>
-        <receiver android:name="cn.leancloud.push.LCBroadcastReceiver"
+        <service android:name="cn.leancloud.push.PushService" />
+        <receiver
+            android:name="cn.leancloud.push.LCBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
@@ -61,13 +62,14 @@
         </activity>
 
         <activity android:name=".wrapper.did.DoHomeworkActivity" />
-        <activity android:name=".main.MainActivity"
+        <activity
+            android:name=".main.MainActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            <intent-filter>-->
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
 
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--            </intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+            <!--            </intent-filter>-->
         </activity>
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".account.manager.AccountManagerActivity" />
@@ -77,7 +79,9 @@
         <activity android:name=".mapsetting.MapActivity" />
         <activity android:name=".photo.PhotoSignActivity" />
         <activity android:name=".record.SignRecordActivity" />
-        <activity android:name=".login.sms.SMSActivity"/>
+        <activity android:name=".login.sms.SMSActivity" />
+        <activity android:name=".friend.chatActivity.ChatActivity" />
+
         <service android:name="com.amap.api.location.APSService" />
     </application>
 

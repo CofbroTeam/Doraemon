@@ -21,16 +21,16 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentFriendBinding
 import com.cofbro.qian.friend.adapter.MessageListAdapter
 import com.cofbro.qian.friend.adapter.UserListAdapter
+import com.cofbro.qian.friend.chatActivity.observer.ConversationObservable
 import com.cofbro.qian.friend.friendrequest.FriendRequestFragment
-import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
+import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
-import kotlin.collections.ArrayList
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
@@ -236,6 +236,9 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         Log.d(TAG, "onMessage: 收到消息")
         insertMessageAccordingToConv(conversation)
         MessageSubscriber.dispatch(conversation)
+        if (conversation != null) {
+            ConversationObservable.getInstance().notifyConversationObserver(conversation)
+        }
     }
 
     private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {
@@ -282,7 +285,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("", "",
+            IMClientUtils.loginIM("test123", "123456",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
