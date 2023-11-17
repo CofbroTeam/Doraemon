@@ -1,5 +1,6 @@
 package com.cofbro.qian.friend
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,10 @@ import cn.leancloud.im.v2.LCIMClient
 import cn.leancloud.im.v2.LCIMConversation
 import cn.leancloud.im.v2.LCIMMessage
 import com.alibaba.fastjson.JSONObject
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.SP_PASSWORD
 import com.cofbro.hymvvmutils.base.SP_USER_NAME
@@ -27,6 +32,7 @@ import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
@@ -38,6 +44,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var messageListAdapter: MessageListAdapter? = null
     private var friendRequestConv = arrayListOf<LCIMConversation>()
     private var messageConv = arrayListOf<JSONObject>()
+    private var distanceForHandleScroll = 0f
+    private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initEventManager()
@@ -50,7 +58,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun initEvent() {
         binding?.ivMore?.setOnClickListener {
             showFriendRequestFragment(friendRequestConv)
-            //responseFriendRequest(friendRequestConv[0], true)
         }
 
         binding?.tvTitle?.setOnClickListener {
@@ -66,6 +73,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun initObserver() {
         // 登录即时通讯服务
         viewModel.loginIMLiveData.observe(this) {
+            // 更新昵称
+            updateUsername(IMClientUtils.getCntUser()?.username.toString())
             // 查询好友
             loadUserList()
             // 查询所有会话
@@ -130,6 +139,21 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 data["unReadCount"] = convList.getOrNull(index)?.unreadMessagesCount.toString()
                 data["conv"] = convList.getOrNull(index)
                 messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
             }
             viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
@@ -157,6 +181,49 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun initView() {
         initToolbar()
+        initTopAppbar()
+        initHandleScrollView()
+        initUserRecyclerView()
+        initMessageRecyclerView()
+    }
+
+    private fun initMessageRecyclerView() {
+        messageListAdapter = MessageListAdapter()
+        binding?.rvMessageList?.apply {
+            adapter = messageListAdapter
+            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+
+            addItemDecoration(object : ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val defaultPadding = dp2px(requireContext(), 16)
+                    if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(
+                            1
+                        )
+                    ) {
+                        return outRect.set(
+                            defaultPadding,
+                            0,
+                            defaultPadding,
+                            dp2px(requireContext(), 80)
+                        )
+                    }
+                    return outRect.set(
+                        defaultPadding,
+                        0,
+                        defaultPadding,
+                        dp2px(requireContext(), 13)
+                    )
+                }
+            })
+        }
+    }
+
+    private fun initUserRecyclerView() {
         userListAdapter = UserListAdapter()
         binding?.rvUserList?.apply {
             adapter = userListAdapter
@@ -186,34 +253,52 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 }
             })
         }
+    }
 
-        messageListAdapter = MessageListAdapter()
-        binding?.rvMessageList?.apply {
-            adapter = messageListAdapter
-            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+    private fun updateUsername(username: String) {
+        binding?.tvSelfUsername?.text = username
+    }
 
-            addItemDecoration(object : ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    return outRect.set(
-                        dp2px(requireContext(), 16),
-                        0,
-                        dp2px(requireContext(), 16),
-                        dp2px(requireContext(), 20)
-                    )
-                }
-            })
+    private fun initTopAppbar() {
+        binding?.topAppBar?.apply {
+            val layout = layoutParams
+            layout?.height = toolbarHeight - 20
+            layoutParams = layout
         }
+        // 账号
+        updateUsername(IMClientUtils.getCntUser()?.username.toString())
+        val uid = CacheUtils.cache[Constants.USER.UID] ?: ""
+        // 头像
+        val options = RequestOptions().transform(
+            CenterCrop(),
+            RoundedCorners(dp2px(requireContext(), 25))
+        )
+        Glide.with(this)
+            .load(URL.getAvtarImgPath(uid))
+            .apply(options)
+            .into(binding!!.ivSelfAvatar)
+    }
+
+    private fun initHandleScrollView() {
+        binding?.handledScrollView?.apply {
+            distanceForHandleScroll = (dp2px(requireContext(), 132) + toolbarHeight).toFloat()
+            handleScrollDy = distanceForHandleScroll
+            setScrollTopListener {
+                if (it) {
+                    binding?.topAppBar?.visibility = View.GONE
+                } else {
+                    binding?.topAppBar?.visibility = View.VISIBLE
+                    binding?.topAppBar?.setBackgroundColor(Color.parseColor("#03A9F4"))
+                }
+            }
+        }
+
     }
 
     private fun initToolbar() {
         // height of toolbar
         binding?.toolBar?.apply {
-            val toolbarHeight = getStatusBarHeight(requireContext()) + dp2px(
+            toolbarHeight = getStatusBarHeight(requireContext()) + dp2px(
                 requireContext(),
                 66
             )
@@ -282,7 +367,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("", "",
+            IMClientUtils.loginIM("13752899701", "200369chy",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
