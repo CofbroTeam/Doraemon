@@ -26,8 +26,13 @@ object URL {
         "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
 
     // 普通签到
-    fun getNormalSignPath(courseId: String, classId: String, aid: String, signCode: String = ""): String =
-        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid&signCode=$signCode"
+    fun getNormalSignPath(
+        courseId: String,
+        classId: String,
+        aid: String,
+        signCode: String = ""
+    ): String =
+        "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/signIn?courseId=$courseId&classId=$classId&activeId=$aid&signCode=$signCode&validate="
 
     fun getLocationSignPath(
         address: String?,
@@ -50,7 +55,12 @@ object URL {
         "https://mooc1-2.chaoxing.com/mooc-ans/visit/stucoursemiddle?courseid=$courseId&clazzid=$classId&vc=1&cpi=$cpi&ismooc2=1&v=2"
 
     // 作业列表
-    fun getHomeworkListPath(courseId: String, classId: String, cpi: String, workEnc: String): String =
+    fun getHomeworkListPath(
+        courseId: String,
+        classId: String,
+        cpi: String,
+        workEnc: String
+    ): String =
         "https://mooc1.chaoxing.com/mooc2/work/list?courseId=$courseId&classId=$classId&cpi=$cpi&ut=s&enc=$workEnc"
 
     // 用户信息
@@ -59,6 +69,14 @@ object URL {
     // 验证码
     fun getSendCaptchaUrl(): String = "https://passport2-api.chaoxing.com/api/sendcaptcha"
 
-    fun getLoginWithSmsUrl(): String = "https://passport2-api.chaoxing.com/v11/loginregister?cx_xxt_passport=json"
+    fun getLoginWithSmsUrl(): String =
+        "https://passport2-api.chaoxing.com/v11/loginregister?cx_xxt_passport=json"
+
+    fun getAnalysisPath(aid: String): String =
+        "https://mobilelearn.chaoxing.com/pptSign/analysis?DB_STRATEGY=RANDOM&aid=$aid&vs=1"
+
+    fun getAnalysis2Path(analysis2Code: String): String = "https://mobilelearn.chaoxing.com/pptSign/analysis2?DB_STRATEGY=RANDOM&code=$analysis2Code"
+
+    fun checkSignCodePath(aid: String, signCode: String): String = "https://mobilelearn.chaoxing.com/widget/sign/pcStuSignController/checkSignCode?activeId=$aid&signCode=$signCode"
 
 }

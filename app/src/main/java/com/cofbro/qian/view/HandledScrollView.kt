@@ -28,7 +28,7 @@ class HandledScrollView : NestedScrollView {
         } else {
             scrollTopListener?.invoke(true)
         }
-        if (dy > 0 && sc rollY < handleScrollDy) {
+        if (dy > 0 && scrollY < handleScrollDy) {
             scrollBy(0, dy)
             consumed[1] = dy
         }
