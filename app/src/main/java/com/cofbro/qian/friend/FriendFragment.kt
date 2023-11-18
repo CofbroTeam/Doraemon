@@ -21,7 +21,6 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentFriendBinding
 import com.cofbro.qian.friend.adapter.MessageListAdapter
 import com.cofbro.qian.friend.adapter.UserListAdapter
-import com.cofbro.qian.friend.chatActivity.observer.ConversationObservable
 import com.cofbro.qian.friend.friendrequest.FriendRequestFragment
 import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
@@ -236,9 +235,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         Log.d(TAG, "onMessage: 收到消息")
         insertMessageAccordingToConv(conversation)
         MessageSubscriber.dispatch(conversation)
-        if (conversation != null) {
-            ConversationObservable.getInstance().notifyConversationObserver(conversation)
-        }
     }
 
     private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {

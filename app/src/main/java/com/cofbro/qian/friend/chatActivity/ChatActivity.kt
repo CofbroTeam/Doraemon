@@ -2,17 +2,17 @@ package com.cofbro.qian.friend.chatActivity
 
 import android.os.Bundle
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import cn.leancloud.im.v2.LCIMMessage
+import cn.leancloud.im.v2.LCIMConversation
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivityChatBinding
-import com.cofbro.qian.friend.chatActivity.observer.ConversationObservable
-import com.cofbro.qian.friend.chatActivity.observer.IConversationObserver
 import com.cofbro.qian.friend.chatActivity.rv_chat.ChatAdapter
 import com.cofbro.qian.friend.chatActivity.rv_chat.ChatContent
 import com.cofbro.qian.friend.im.IMClientUtils
+import com.cofbro.qian.friend.im.IMessageDispatchEvent
+import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.mapsetting.util.ToastUtil
 
-class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IConversationObserver {
+class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessageDispatchEvent {
     private val list = mutableListOf(
         ChatContent(ChatContent.TYPE_NORMAL_MYSELF, "胡绍鹰", "21:20"),
         ChatContent(ChatContent.TYPE_NORMAL_FRIEND, "陈浩钖", "21:20"),
@@ -24,7 +24,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IConver
     )
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        ConversationObservable.getInstance().addConversationObserver(this) // 订阅
+        MessageSubscriber.subscribe(this) // 订阅
         setBackClick()
         setRecyclerView()
         setRVList(list)
@@ -42,7 +42,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IConver
 
     override fun onDestroy() {
         super.onDestroy()
-        ConversationObservable.getInstance().removeConversationObserver()
+        MessageSubscriber.unSubscribe(this)
     }
 
     private fun setBackClick() {
@@ -88,20 +88,20 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IConver
         }
     }
 
-    override fun getConversationId(): String {
-        return viewModel.mConversation.conversationId
-    }
-
-    override fun onMessage(message: LCIMMessage) {
+    override fun onMessage(conv: LCIMConversation) {
         // todo --- onMessage...
         list.add(
             ChatContent(
                 ChatContent.TYPE_NORMAL_FRIEND,
-                message.content,
-                message.timestamp.toString()
+                conv.lastMessage.content,
+                conv.lastMessage.timestamp.toString()
             )
         )
         setRVList(list)
         binding?.rvChat?.adapter?.notifyItemInserted(list.size - 1)
+    }
+
+    override fun getConversationId(): String {
+        return viewModel.mConversation.conversationId
     }
 }

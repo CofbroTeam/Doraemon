@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import cn.leancloud.LCObject
 import com.cofbro.qian.databinding.ItemChatNormalFriendBinding
 import com.cofbro.qian.databinding.ItemChatNormalMyselfBinding
 import com.cofbro.qian.databinding.ItemChatRequestHomeworkFriendBinding
 import com.cofbro.qian.databinding.ItemChatRequestHomeworkMyselfBinding
+import com.cofbro.qian.friend.viewholder.DefaultViewHolder
 
 class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var mItemList = emptyList<ChatContent>()
@@ -59,7 +61,9 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
 
             else -> {
-                throw IllegalStateException("ChatAdapter中，type类型不存在")
+                // 以上类型都不是，返回
+                binding = ItemChatNormalMyselfBinding.inflate(layoutInflater, parent, false)
+                return NormalMyselfViewHolder(binding)
             }
         }
     }
@@ -69,37 +73,52 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ViewHolderBind)
-            holder.bind(position)
+        when (mItemList[position].type) {
+            ChatContent.TYPE_NORMAL_MYSELF -> {
+                (holder as NormalMyselfViewHolder).bind(position, null)
+            }
+
+            ChatContent.TYPE_NORMAL_FRIEND -> {
+                (holder as NormalFriendViewHolder).bind(position, null)
+            }
+
+            ChatContent.TYPE_REQUEST_HOMEWORK_MYSELF -> {
+                (holder as RequestHomeWorkMyselfViewHolder).bind(position, null)
+            }
+
+            ChatContent.TYPE_REQUEST_HOMEWORK_FRIEND -> {
+                (holder as RequestHomeWorkFriendViewHolder).bind(position, null)
+            }
+        }
     }
 
     inner class NormalMyselfViewHolder(private val binding: ItemChatNormalMyselfBinding) :
-        RecyclerView.ViewHolder(binding.root), ViewHolderBind {
-        override fun bind(position: Int) {
+        DefaultViewHolder<LCObject>(binding) {
+        override fun bind(position: Int, t: LCObject?) {
             binding.tvMessage.text = mItemList[position].message
             binding.tvTime.text = mItemList[position].time
         }
     }
 
     inner class NormalFriendViewHolder(private val binding: ItemChatNormalFriendBinding) :
-        RecyclerView.ViewHolder(binding.root), ViewHolderBind {
-        override fun bind(position: Int) {
+        DefaultViewHolder<LCObject>(binding) {
+        override fun bind(position: Int, t: LCObject?) {
             binding.tvMessage.text = mItemList[position].message
             binding.tvTime.text = mItemList[position].time
         }
     }
 
     inner class RequestHomeWorkMyselfViewHolder(private val binding: ItemChatRequestHomeworkMyselfBinding) :
-        RecyclerView.ViewHolder(binding.root), ViewHolderBind {
-        override fun bind(position: Int) {
+        DefaultViewHolder<LCObject>(binding) {
+        override fun bind(position: Int, t: LCObject?) {
             binding.tvMessage.text = mItemList[position].message
             binding.tvTime.text = mItemList[position].time
         }
     }
 
     inner class RequestHomeWorkFriendViewHolder(private val binding: ItemChatRequestHomeworkFriendBinding) :
-        RecyclerView.ViewHolder(binding.root), ViewHolderBind {
-        override fun bind(position: Int) {
+        DefaultViewHolder<LCObject>(binding) {
+        override fun bind(position: Int, t: LCObject?) {
             binding.apply {
                 btnReject.setOnClickListener {
                     onRejectClickListener?.invoke(it)
