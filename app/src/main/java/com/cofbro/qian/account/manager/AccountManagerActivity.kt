@@ -18,6 +18,7 @@ import com.cofbro.qian.databinding.ActivityAccountmanagerBinding
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
@@ -64,6 +65,7 @@ class AccountManagerActivity :
 
             setDataChangedListener {
                 updateAccountData(it)
+                responseLottieView(it)
             }
         }
         notifyAdapterDataChanged(data)
@@ -134,7 +136,7 @@ class AccountManagerActivity :
             csLayout.height = toolbarHeight
         }
         // topMargin of recyclerView
-        binding?.recyclerView?.apply {
+        binding?.content?.apply {
             val rvLayout = layoutParams as? MarginLayoutParams
             rvLayout?.let {
                 it.topMargin = toolbarHeight
@@ -290,6 +292,19 @@ class AccountManagerActivity :
         val newData = data?.toJSONString() ?: ""
         lifecycleScope.launch(Dispatchers.IO) {
             AccountManager.updateAccountData(this@AccountManagerActivity, newData)
+        }
+    }
+
+    private fun responseLottieView(data: JSONObject?) {
+        if (data == null) {
+            binding?.lottieView?.visibility = View.VISIBLE
+            return
+        }
+        val size = data.getIntExt(Constants.Account.SIZE).takeIf { it != -1 } ?: 0
+        if (size == 0) {
+            binding?.lottieView?.visibility = View.VISIBLE
+        } else {
+            binding?.lottieView?.visibility = View.GONE
         }
     }
 

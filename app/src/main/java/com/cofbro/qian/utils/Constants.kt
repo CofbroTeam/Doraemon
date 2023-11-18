@@ -1,6 +1,7 @@
 package com.cofbro.qian.utils
 
 object Constants {
+    const val BACK_PRESSED_INTERVAL = 2000
     /**
      * 签到类型
      *

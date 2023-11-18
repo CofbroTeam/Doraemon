@@ -19,7 +19,8 @@ import okhttp3.Response
 class MapViewModel : BaseViewModel<MapRepository>() {
     val preSignLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
-
+    val signTogetherLiveData = ResponseMutableLiveData<Response>()
+    val loginLiveData = ResponseMutableLiveData<Response>()
     var progressDialog: Dialog? = null // 搜索时进度条
     var poiResult: PoiResultV2? = null // poi返回的结果
     var currentPage = 1
@@ -33,10 +34,12 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var Tip_address: String? = null
     var Tip_name: String? = null
     var Tip_City: String? = null
+    var courseName: String? = null
     // 声明AMapLocationClient类对象
     var  mLocationClient: AMapLocationClient? = null;
     var mLocationOption: AMapLocationClientOption? = null
     var default_My_Lating:LatLng? = null
+    var default_My_Location:String? = null
     var preUrl= ""
     var signUrl= ""
     var uid = ""
@@ -51,10 +54,24 @@ class MapViewModel : BaseViewModel<MapRepository>() {
         }
     }
 
-    fun preSign(url: String) {
+    suspend fun preSign(url: String, cookies: String = "") {
+        repository.request(preSignLiveData, false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
+    suspend fun signTogether(url: String, cookies: String) {
+        repository.request(signTogetherLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
+    fun tryLogin(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.request(preSignLiveData, false) {
-                val request = NetworkUtils.buildClientRequest(url)
+            repository.request(loginLiveData, false) {
+                val request = NetworkUtils.buildServerRequest(url)
                 NetworkUtils.request(request)
             }
         }
