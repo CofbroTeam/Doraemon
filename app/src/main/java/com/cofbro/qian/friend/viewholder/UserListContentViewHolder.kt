@@ -15,27 +15,15 @@ class UserListContentViewHolder<T : LCObject>(private val binding: ItemFriendLis
         innerBind(t)
     }
 
-    private fun bindAvatar(url: String?) {
-        if (url.isNullOrEmpty()) return
-        val options = RequestOptions().transform(
-            CenterCrop(),
-            RoundedCorners(dp2px(binding.root.context, 25))
-        )
-        Glide.with(binding.root)
-            .load(url)
-            .apply(options)
-            .into(binding.ivAvatar)
-    }
-
     private fun innerBind(t: T?) {
         if (t?.getString("ownerId") == IMClientUtils.getCntUser()?.objectId.toString()) {
             binding.tvUsername.text = t.getString("targetName") ?: ""
             val url = t.getString("targetAvatar") ?: ""
-            bindAvatar(url)
+            setImage(binding.ivAvatar, url)
         } else {
             binding.tvUsername.text = t?.getString("owner") ?: ""
             val url = t?.getString("ownerAvatar") ?: ""
-            bindAvatar(url)
+            setImage(binding.ivAvatar, url)
         }
     }
 }

@@ -27,16 +27,15 @@ import com.cofbro.qian.databinding.FragmentFriendBinding
 import com.cofbro.qian.friend.adapter.MessageListAdapter
 import com.cofbro.qian.friend.adapter.UserListAdapter
 import com.cofbro.qian.friend.friendrequest.FriendRequestFragment
-import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
+import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
-import kotlin.collections.ArrayList
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
@@ -58,6 +57,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun initEvent() {
         binding?.ivMore?.setOnClickListener {
             showFriendRequestFragment(friendRequestConv)
+            //responseFriendRequest(friendRequestConv[0], true)
         }
 
         binding?.tvTitle?.setOnClickListener {
@@ -70,10 +70,137 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
+    private fun initView() {
+        initToolbar()
+        initTopAppbar()
+        initHandleScrollView()
+        initMessageRecyclerView()
+        initUserRecyclerView()
+    }
+
+    private fun initMessageRecyclerView() {
+        messageListAdapter = MessageListAdapter()
+        binding?.rvMessageList?.apply {
+            adapter = messageListAdapter
+            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
+
+            addItemDecoration(object : ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    val defaultPadding = dp2px(requireContext(), 16)
+                    if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(
+                            1
+                        )
+                    ) {
+                        return outRect.set(
+                            defaultPadding,
+                            0,
+                            defaultPadding,
+                            dp2px(requireContext(), 80)
+                        )
+                    }
+                    return outRect.set(
+                        defaultPadding,
+                        0,
+                        defaultPadding,
+                        dp2px(requireContext(), 13)
+                    )
+                }
+            })
+        }
+    }
+
+    private fun initUserRecyclerView() {
+        userListAdapter = UserListAdapter()
+        binding?.rvUserList?.apply {
+            adapter = userListAdapter
+            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
+
+            addItemDecoration(object : ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    if (parent.layoutManager?.getPosition(view) == 0) {
+                        return outRect.set(
+                            dp2px(requireContext(), 16),
+                            0,
+                            dp2px(requireContext(), 14),
+                            0
+                        )
+                    }
+                    return outRect.set(
+                        0,
+                        0,
+                        dp2px(requireContext(), 14),
+                        0
+                    )
+                }
+            })
+        }
+    }
+
+    private fun updateUsername(username: String) {
+        binding?.tvSelfUsername?.text = username
+    }
+
+    private fun initTopAppbar() {
+        binding?.topAppBar?.apply {
+            val layout = layoutParams
+            layout?.height = toolbarHeight - 25
+            layoutParams = layout
+        }
+        // 账号
+        updateUsername(IMClientUtils.getCntUser()?.username.toString())
+        val uid = CacheUtils.cache[Constants.USER.UID] ?: ""
+        // 头像
+        val options = RequestOptions().transform(
+            CenterCrop(),
+            RoundedCorners(dp2px(requireContext(), 25))
+        )
+        Glide.with(this)
+            .load(URL.getAvtarImgPath(uid))
+            .apply(options)
+            .into(binding!!.ivSelfAvatar)
+    }
+
+    private fun initHandleScrollView() {
+        binding?.handledScrollView?.apply {
+            distanceForHandleScroll = (dp2px(requireContext(), 132) + toolbarHeight).toFloat()
+            handleScrollDy = distanceForHandleScroll
+            setScrollTopListener {
+                if (it) {
+                    binding?.topAppBar?.visibility = View.GONE
+                } else {
+                    binding?.topAppBar?.visibility = View.VISIBLE
+                    binding?.topAppBar?.setBackgroundColor(Color.parseColor("#03A9F4"))
+                }
+            }
+        }
+    }
+
+    private fun initToolbar() {
+        // height of toolbar
+        binding?.toolBar?.apply {
+            toolbarHeight = getStatusBarHeight(requireContext()) + dp2px(
+                requireContext(),
+                66
+            )
+            val csLayout = layoutParams
+            csLayout.height = toolbarHeight
+        }
+    }
+
     private fun initObserver() {
         // 登录即时通讯服务
         viewModel.loginIMLiveData.observe(this) {
-            // 更新昵称
+            // 更新名字
             updateUsername(IMClientUtils.getCntUser()?.username.toString())
             // 查询好友
             loadUserList()
@@ -154,6 +281,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 messageConv.add(data)
                 messageConv.add(data)
                 messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+                messageConv.add(data)
+
             }
             viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
@@ -179,133 +311,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         )
     }
 
-    private fun initView() {
-        initToolbar()
-        initTopAppbar()
-        initHandleScrollView()
-        initUserRecyclerView()
-        initMessageRecyclerView()
-    }
-
-    private fun initMessageRecyclerView() {
-        messageListAdapter = MessageListAdapter()
-        binding?.rvMessageList?.apply {
-            adapter = messageListAdapter
-            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false)
-
-            addItemDecoration(object : ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    val defaultPadding = dp2px(requireContext(), 16)
-                    if (parent.layoutManager?.getPosition(view) == adapter?.itemCount?.minus(
-                            1
-                        )
-                    ) {
-                        return outRect.set(
-                            defaultPadding,
-                            0,
-                            defaultPadding,
-                            dp2px(requireContext(), 80)
-                        )
-                    }
-                    return outRect.set(
-                        defaultPadding,
-                        0,
-                        defaultPadding,
-                        dp2px(requireContext(), 13)
-                    )
-                }
-            })
-        }
-    }
-
-    private fun initUserRecyclerView() {
-        userListAdapter = UserListAdapter()
-        binding?.rvUserList?.apply {
-            adapter = userListAdapter
-            layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
-
-            addItemDecoration(object : ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    if (parent.layoutManager?.getPosition(view) == 0) {
-                        return outRect.set(
-                            dp2px(requireContext(), 16),
-                            0,
-                            dp2px(requireContext(), 14),
-                            0
-                        )
-                    }
-                    return outRect.set(
-                        0,
-                        0,
-                        dp2px(requireContext(), 20),
-                        0
-                    )
-                }
-            })
-        }
-    }
-
-    private fun updateUsername(username: String) {
-        binding?.tvSelfUsername?.text = username
-    }
-
-    private fun initTopAppbar() {
-        binding?.topAppBar?.apply {
-            val layout = layoutParams
-            layout?.height = toolbarHeight - 20
-            layoutParams = layout
-        }
-        // 账号
-        updateUsername(IMClientUtils.getCntUser()?.username.toString())
-        val uid = CacheUtils.cache[Constants.USER.UID] ?: ""
-        // 头像
-        val options = RequestOptions().transform(
-            CenterCrop(),
-            RoundedCorners(dp2px(requireContext(), 25))
-        )
-        Glide.with(this)
-            .load(URL.getAvtarImgPath(uid))
-            .apply(options)
-            .into(binding!!.ivSelfAvatar)
-    }
-
-    private fun initHandleScrollView() {
-        binding?.handledScrollView?.apply {
-            distanceForHandleScroll = (dp2px(requireContext(), 132) + toolbarHeight).toFloat()
-            handleScrollDy = distanceForHandleScroll
-            setScrollTopListener {
-                if (it) {
-                    binding?.topAppBar?.visibility = View.GONE
-                } else {
-                    binding?.topAppBar?.visibility = View.VISIBLE
-                    binding?.topAppBar?.setBackgroundColor(Color.parseColor("#03A9F4"))
-                }
-            }
-        }
-
-    }
-
-    private fun initToolbar() {
-        // height of toolbar
-        binding?.toolBar?.apply {
-            toolbarHeight = getStatusBarHeight(requireContext()) + dp2px(
-                requireContext(),
-                66
-            )
-            val csLayout = layoutParams
-            csLayout.height = toolbarHeight
-        }
-    }
 
     override fun showLoading(msg: String?) {
         if (!msg.isNullOrEmpty()) {
@@ -351,7 +356,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             // 将渲染好友请求的逻辑分离出去
             viewModel.friendRequestLiveData.postValue(friendRequestConv)
         }
-
     }
 
     override fun onInfoChanged(
@@ -367,7 +371,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("13752899701", "200369chy",
+            IMClientUtils.loginIM("", "",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },

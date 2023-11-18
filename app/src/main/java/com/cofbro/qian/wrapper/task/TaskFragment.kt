@@ -14,6 +14,7 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
 import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
+import com.cofbro.qian.profile.advice.AdviceFragment
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
@@ -59,6 +60,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var activity: WrapperActivity? = null
     private var taskAdapter: TaskAdapter? = null
     private var loadingDialog: Dialog? = null
+
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -334,9 +336,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         /*
         跳转保存数据
          */
+        intent.putExtra("courseName",activity?.courseName)
         intent.putExtra("courseId", activity?.courseId)
         intent.putExtra("classId", activity?.classId)
         intent.putExtra("cpi", activity?.cpi)
+
         startActivity(intent)
     }
 
@@ -375,9 +379,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
     }
 
-    private suspend fun signLocation(api: String) {
+    private suspend fun signTogether(   address: String?,
+                                        aid: String,
+                                        uid: String,
+                                        lat: String?,
+                                        long: String?,) {
         activity?.let {
-            viewModel.sign(api)
+            viewModel.signTogether(URL.getLocationSignPath(address,aid,uid,lat,long),cookies)
         }
     }
 

@@ -1,6 +1,5 @@
 package com.cofbro.qian.friend.viewholder
 
-import android.content.Intent
 import android.view.View
 import com.alibaba.fastjson.JSONObject
 import com.bumptech.glide.Glide

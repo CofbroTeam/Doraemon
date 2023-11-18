@@ -33,5 +33,4 @@ class HandledScrollView : NestedScrollView {
             consumed[1] = dy
         }
     }
-
 }

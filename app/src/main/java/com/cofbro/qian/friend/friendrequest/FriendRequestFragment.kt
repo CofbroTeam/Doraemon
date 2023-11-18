@@ -12,7 +12,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cn.leancloud.LCObject
-import cn.leancloud.LCUser
 import cn.leancloud.im.v2.LCIMConversation
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.R
