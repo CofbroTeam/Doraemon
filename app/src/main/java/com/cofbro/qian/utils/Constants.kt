@@ -1,6 +1,7 @@
 package com.cofbro.qian.utils
 
 object Constants {
+    const val BACK_PRESSED_INTERVAL = 2000
     /**
      * 签到类型
      *
@@ -415,5 +416,15 @@ object Constants {
     object USER {
         const val USERNAME = "username"
         const val UID = "uid"
+    }
+
+    object Cache {
+        const val TOP_ACTIVITY = "topActivity"
+        const val CONV = "conv"
+    }
+
+    object HolderType {
+        const val NORMAL_USER_SEND = 100
+        const val NORMAL_SELF_SEND = 101
     }
 }

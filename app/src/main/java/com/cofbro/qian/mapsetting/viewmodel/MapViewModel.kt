@@ -39,6 +39,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var  mLocationClient: AMapLocationClient? = null;
     var mLocationOption: AMapLocationClientOption? = null
     var default_My_Lating:LatLng? = null
+    var default_My_Location:String? = null
     var preUrl= ""
     var signUrl= ""
     var uid = ""
@@ -53,12 +54,12 @@ class MapViewModel : BaseViewModel<MapRepository>() {
         }
     }
 
-    fun preSign(url: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.request(preSignLiveData, false) {
-                val request = NetworkUtils.buildClientRequest(url)
-                NetworkUtils.request(request)
-            }
+    suspend fun preSign(url: String, cookies: String = "") {
+        repository.request(preSignLiveData, false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
         }
     }
     suspend fun signTogether(url: String, cookies: String) {

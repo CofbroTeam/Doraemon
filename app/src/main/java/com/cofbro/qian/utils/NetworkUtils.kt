@@ -184,12 +184,11 @@ object NetworkUtils {
         return response
     }
 
-    fun requestAsync(url: String, onSuccess: (Response) -> Unit = {}, onFailure: () -> Unit = {}) {
-        val request = Request.Builder().url(url).build()
-        val call = client.newCall(request)
+    fun requestAsync(clientRequest: Request, onSuccess: (Response) -> Unit = {}, onFailure: (String) -> Unit = {}) {
+        val call = client.newCall(clientRequest)
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                onFailure()
+                onFailure(e.message.toString())
             }
 
             override fun onResponse(call: Call, response: Response) {
