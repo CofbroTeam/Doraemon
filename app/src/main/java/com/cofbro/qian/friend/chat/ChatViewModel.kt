@@ -1,4 +1,4 @@
-package com.cofbro.qian.friend.chatActivity
+package com.cofbro.qian.friend.chat
 
 import cn.leancloud.im.v2.LCIMConversation
 import com.cofbro.hymvvmutils.base.BaseRepository

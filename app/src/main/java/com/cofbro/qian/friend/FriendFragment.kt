@@ -47,11 +47,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-//        initEventManager()
-//        initView()
-//        initObserver()
-//        doNetwork()
-//        initEvent()
+        initEventManager()
+        initView()
+        initObserver()
+        doNetwork()
+        initEvent()
     }
 
     private fun initEvent() {
@@ -325,7 +325,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     ) {
         Log.d(TAG, "onMessage: 收到消息")
         insertMessageAccordingToConv(conversation)
-        MessageSubscriber.dispatch(conversation)
+        MessageSubscriber.dispatch(conversation, message)
     }
 
     private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {
@@ -371,7 +371,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("test123", "123456",
+            IMClientUtils.loginIM("", "",
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
