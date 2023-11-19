@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.widget.NestedScrollView
-import com.cofbro.qian.utils.dp2px
 
 class HandledScrollView : NestedScrollView {
     private var scrollTopListener: ((isTop: Boolean) -> Unit)? = null
+    var handleScrollDy = 0f
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -23,15 +23,14 @@ class HandledScrollView : NestedScrollView {
 
 
     override fun onNestedPreScroll(target: View, dx: Int, dy: Int, consumed: IntArray, type: Int) {
-        if (scrollY > 200f) {
+        if (scrollY > handleScrollDy) {
             scrollTopListener?.invoke(false)
         } else {
             scrollTopListener?.invoke(true)
         }
-        if (dy > 0 && scrollY < dp2px(context, 200)) {
+        if (dy > 0 && scrollY < handleScrollDy) {
             scrollBy(0, dy)
             consumed[1] = dy
         }
     }
-
 }

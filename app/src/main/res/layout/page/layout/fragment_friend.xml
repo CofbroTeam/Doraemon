@@ -20,7 +20,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="wrap_content">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/tool_bar"
@@ -46,7 +46,7 @@
                     <TextView
                         android:id="@+id/tv_title"
                         android:layout_width="wrap_content"
-                        android:layout_height="35dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginBottom="16dp"
                         android:gravity="center"
@@ -70,22 +70,64 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout9"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/app_white_radius_bg"
+                    android:elevation="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tool_bar">
+
+                    <EditText
+                        android:id="@+id/editText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="24dp"
+                        android:background="@null"
+                        android:hint="搜索用户名字"
+                        android:maxLines="1"
+                        android:textColor="@color/black"
+                        android:textColorHint="#6d7f9b"
+                        android:textSize="13sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView9"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/map_search" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_user_list"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="3dp"
+                    android:layout_height="70dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="20dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tool_bar" />
+                    app:layout_constraintTop_toBottomOf="@+id/constraintLayout9" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="800dp"
                 android:background="@drawable/bottom_dialog_bg">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -94,8 +136,39 @@
                     android:layout_height="match_parent" />
             </LinearLayout>
         </LinearLayout>
-
-
     </com.cofbro.qian.view.HandledScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#03A9F4"
+        android:elevation="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_self_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_self_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_self_avatar"
+            app:layout_constraintStart_toEndOf="@+id/iv_self_avatar"
+            app:layout_constraintTop_toTopOf="@+id/iv_self_avatar" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

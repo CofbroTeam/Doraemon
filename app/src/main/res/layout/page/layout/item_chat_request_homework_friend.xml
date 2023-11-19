@@ -16,58 +16,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/avatar_default" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+    <TextView
+        android:id="@+id/tv_message"
         android:layout_width="200dp"
         android:layout_height="100dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:background="@drawable/bg_chat_normal_friend"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="request homework"
+        android:textColor="@color/red"
+        android:textSize="12sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/avatar"
-        app:layout_constraintTop_toTopOf="@+id/avatar">
+        app:layout_constraintTop_toTopOf="@+id/avatar" />
 
-        <TextView
-            android:id="@+id/tv_message"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:padding="10dp"
-            android:text="request homework"
-            android:textColor="@color/red"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/btn_reject"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/btn_reject"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_marginBottom="5dp"
-            android:background="@null"
-            android:text="拒绝"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_accept"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@+id/tv_message" />
-
-        <Button
-            android:id="@+id/btn_accept"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_marginBottom="5dp"
-            android:background="@null"
-            android:text="同意"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/tv_message"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btn_reject" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tv_time"
@@ -75,6 +38,27 @@
         android:layout_height="wrap_content"
         android:text="time"
         android:textSize="8sp"
-        app:layout_constraintStart_toStartOf="@+id/constraintLayout"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintStart_toStartOf="@+id/tv_message"
+        app:layout_constraintTop_toBottomOf="@+id/tv_message" />
+
+    <ImageButton
+        android:id="@+id/btn_reject"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/ic_reject"
+        app:layout_constraintEnd_toStartOf="@+id/btn_accept"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@+id/tv_message"
+        app:layout_constraintTop_toBottomOf="@+id/tv_time" />
+
+    <ImageButton
+        android:id="@+id/btn_accept"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/ic_accept"
+        app:layout_constraintEnd_toEndOf="@+id/tv_message"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_reject"
+        app:layout_constraintTop_toTopOf="@+id/btn_reject" />
 </androidx.constraintlayout.widget.ConstraintLayout>

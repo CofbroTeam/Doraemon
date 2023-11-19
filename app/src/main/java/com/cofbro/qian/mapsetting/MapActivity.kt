@@ -10,7 +10,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import com.alibaba.fastjson.JSONObject
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps2d.AMap
@@ -28,6 +30,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
+import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.R
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityMapBinding
@@ -36,10 +39,17 @@ import com.cofbro.qian.mapsetting.overlay.Poi2DOverlay
 import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
+import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getStringExt
+import com.cofbro.qian.utils.safeParseToJson
+import com.cofbro.qian.utils.urlEncodeChinese
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -51,11 +61,15 @@ import java.util.regex.Pattern
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener {
-
+    private var alreadySign = false
+    private var cookies = ""
+    private var preSignUrl = ""
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        getCurrentLocationLatLng()
         getAvtarImage()
         initArgs()
         initObserver()
+
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
@@ -63,7 +77,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun doNetwork() {
-        viewModel.preSign(viewModel.preUrl)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.preSign(viewModel.preUrl,"")
+        }
     }
 
     private fun initLocationData() {
@@ -103,6 +119,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     amapLocation.gpsAccuracyStatus //获取GPS的当前状态
                     viewModel.default_My_Lating =
                         LatLng(amapLocation.latitude, amapLocation.longitude)
+                    viewModel.default_My_Location =  amapLocation.country +amapLocation.province +amapLocation.city
                     addLatingDefaultMarker(viewModel.default_My_Lating)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
@@ -132,6 +149,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.aid = intent.getStringExtra("aid") ?: ""
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
         viewModel.uid = CacheUtils.cache["uid"] ?: ""
+        viewModel.courseName = intent.getStringExtra("courseName") ?: ""
     }
 
     override fun onResume() {
@@ -360,23 +378,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun initViewClick() {
-//        val translateAnimation: Animation =
-//            AnimationUtils.loadAnimation(mContext, R.anim.translate_animation)
-//        translateAnimation.fillAfter = false
-//
-//        translateAnimation.setAnimationListener(object : Animation.AnimationListener {
-//            override fun onAnimationStart(animation: Animation) {
-//
-//            }
-//            override fun onAnimationEnd(animation: Animation) {
-//
-//            }
-//            override fun onAnimationRepeat(animation: Animation) {}
-//        })
         binding?.selectButton?.setOnClickListener {
+            /**
+             * 绑定签到
+             */
             if (viewModel.statuscontent == "签到成功") {
                 ToastUtil.show(applicationContext, "签到已成功")
                 val intent = Intent(applicationContext, MainActivity::class.java)
+
                 startActivity(intent)
             }
             if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
@@ -395,6 +404,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                 viewModel.currentTipPoint.longitude.toString()
                             )
                         sign(viewModel.signUrl)
+                        /**
+                         * 实现一起签到
+                         */
+
                     } else {
                         ToastUtils.show("请稍后")
                     }
@@ -411,6 +424,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             long = viewModel.default_Sign_Lating?.longitude.toString()
                         )
                         sign(defaultUrl)
+
                     } else {
                         /**
                          * 判断是否签到成功，或者本来就没有签到位置
@@ -454,6 +468,17 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
 
     }
+    private fun signRecord(body: String, cookies: String = "") {
+        if (!alreadySign) return
+        val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+        val status = body.contains("成功") || body.contains("success")
+        record(uid, status)
+    }
+    private fun record(uid: String, status: Boolean) {
+        val courseName = viewModel.courseName
+        val statusName = if (status) "成功" else "失败"
+        SignRecorder.record(applicationContext, uid, courseName!!, statusName)
+    }
 
     private fun initObserver() {
         // 签到
@@ -473,11 +498,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         if (data!!.contains("签到过了")) {
                             ToastUtil.show(applicationContext, "签到已成功")
                             val intent = Intent(applicationContext, MainActivity::class.java)
+                            signRecord(data)
                             startActivity(intent)
+                            startSignTogether(data)
                         } else {
                             ToastUtil.show(applicationContext, "签到已成功")
                             val intent = Intent(applicationContext, MainActivity::class.java)
+                            signRecord(data)
                             startActivity(intent)
+                            startSignTogether(data)
                         }
 
                         /**
@@ -509,6 +538,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             ), default = true
                         )
                         viewModel.default_Sign_Location = locationText
+                        viewModel.default_Sign_Location = locationText
                         viewModel.statuscontent = statusContent
                         viewModel.default_Sign_Lating =
                             LatLng(latitude.toDouble(), longitude.toDouble())
@@ -525,7 +555,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
-                        if (lat.isNotEmpty() && long.isNotEmpty()) {
+                        if (lat.toInt()!=-1 && long.toInt()!=-1) {
                             viewModel.currentTipPoint = LatLng(lat.toDouble(), lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(), long.toDouble()), default = true)
                             viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
@@ -533,6 +563,24 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             viewModel.statuscontent = statusContent
                             CacheUtils.cache["default_Sign_latitude"] = lat
                             CacheUtils.cache["default_Sign_longitude"] = long
+                        }else{
+                            val default_My_Lating = viewModel.default_My_Lating
+                            val default_My_Location = viewModel.default_My_Location
+                            if(default_My_Location?.isNotEmpty() == true){
+                            val lats = default_My_Lating!!.latitude
+                            val longs = default_My_Lating.longitude
+                            viewModel.currentTipPoint = LatLng(lats, longs)
+                            addLatLngMarker(LatLng(lats, longs), default = true)
+                            viewModel.default_Sign_Lating = LatLng(lats, longs)
+                            viewModel.default_Sign_Location = default_My_Location
+                            viewModel.statuscontent = statusContent
+                            CacheUtils.cache["default_Sign_latitude"] = lats.toString()
+                            CacheUtils.cache["default_Sign_longitude"] = longs.toString()
+                            }else{
+                                ToastUtil.show(applicationContext,"请自行搜索定位")
+                            }
+
+
                         }
                     }
 
@@ -540,20 +588,71 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
-
-        // 签到
-        viewModel.signLiveData.observe(this) {
+        // 绑定签到
+        viewModel.signTogetherLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.toString()
-                withContext(Dispatchers.Main) {
-
-                }
+                val body = data.body?.string() ?: ""
+                val headers = data.headers
+                cookies = headers.values("Set-Cookie").toString()
+//                val headers = data.headers
+//                val cookies = headers.values("Set-Cookie").toString()
+                signRecord(body, cookies)
             }
         }
     }
 
     private fun sign(url: String) {
         viewModel.sign(url)
+    }
+    private suspend fun signTogether(url: String, cookies: String) {
+        val uid = findUID(cookies)
+        viewModel.signTogether(viewModel.signUrl,cookies)
+    }
+    private suspend fun startSignTogether(data: String) {
+        // 开始代签
+        val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
+        if (signWith && data != "不在可签到范围内") {
+            // 如果本账号签到成功，则开始自动签到其他绑定账号
+            signWithAccounts()
+        }
+    }
+
+    private suspend fun signWithAccounts() {
+        withContext(Dispatchers.IO) {
+            val data = AccountManager.loadAllAccountData(applicationContext)
+            val users = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
+            users?.let {
+                it.forEach { item ->
+                    val user = item as? JSONObject ?: JSONObject()
+                    tryLogin(user)
+                    delay(300)
+                    val cookies = user.getStringExt(com.cofbro.qian.utils.Constants.Account.COOKIE)
+                    val uid = findUID(cookies)
+                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+                    viewModel.preSign(signWithPreSign, cookies)
+                    delay(3000)
+                    viewModel.signTogether(URL.getLocationSignPath(
+                        address = viewModel.default_Sign_Location,
+                        aid = viewModel.aid,
+                        uid = viewModel.uid,
+                        lat = viewModel.default_Sign_Lating?.latitude.toString(),
+                        long = viewModel.default_Sign_Lating?.longitude.toString()
+                    ), cookies)
+                }
+            }
+        }
+    }
+    private fun tryLogin(user: JSONObject) {
+        val username = user.getStringExt(com.cofbro.qian.utils.Constants.Account.USERNAME)
+        val password = user.getStringExt(com.cofbro.qian.utils.Constants.Account.PASSWORD)
+        if (username.isNotEmpty() && password.isNotEmpty()) {
+            viewModel.tryLogin(URL.getLoginPath(username, password))
+        }
+    }
+    private fun findUID(cookies: String): String {
+        val uid = cookies.substringAfter("UID=")
+        return uid.substringBefore(";")
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
@@ -596,22 +695,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
-        getCurrentLocationLatLng()
-    }
 
-    private fun urlEncodeChinese(urlString: String): String {
-        var url = urlString
-        try {
-            val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
-            var tmp = ""
-            while (matcher.find()) {
-                tmp = matcher.group()
-                url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
-            }
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
-        }
-        return url.replace(" ", "%20")
     }
-
 }

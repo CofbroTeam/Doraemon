@@ -16,7 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters 'armeabi-v7a'
+            abiFilters 'arm64-v8a'
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -89,7 +89,7 @@ dependencies {
     implementation 'com.github.bingoogolapple.BGAQRCode-Android:zxing:1.3.8'
     // OpenCV基础库
     implementation 'com.github.jenly1314.WeChatQRCode:opencv:2.0.1'
-    implementation 'com.github.jenly1314.WeChatQRCode:opencv-armv7a:2.0.1'
+    implementation 'com.github.jenly1314.WeChatQRCode:opencv-armv64:2.0.1'
     // 微信二维码识别功能
     implementation 'com.github.jenly1314.WeChatQRCode:wechat-qrcode:2.0.1'
     // okhttp

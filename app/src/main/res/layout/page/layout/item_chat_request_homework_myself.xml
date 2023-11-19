@@ -20,7 +20,11 @@
         android:id="@+id/tv_message"
         android:layout_width="200dp"
         android:layout_height="100dp"
+<<<<<<< HEAD
         android:layout_marginEnd="5dp"
+=======
+        android:layout_marginEnd="10dp"
+>>>>>>> temp
         android:background="@drawable/bg_chat_normal_myself"
         android:gravity="center"
         android:padding="10dp"

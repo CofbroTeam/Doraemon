@@ -6,7 +6,6 @@ import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
@@ -17,6 +16,7 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
     val signCodeLiveData = ResponseMutableLiveData<Response>()
     val signTogetherLiveData = ResponseMutableLiveData<Response>()
     val loginLiveData = ResponseMutableLiveData<Response>()
+    val analysisLiveData = ResponseMutableLiveData<Response>()
 
 
     fun queryActiveTaskList(url: String) {
@@ -78,5 +78,35 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
                 NetworkUtils.request(request)
             }
         }
+    }
+
+    suspend fun request(url: String, cookies: String = "") {
+        repository.request(ResponseMutableLiveData(), false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun analysis(url: String) {
+        repository.request(analysisLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+
+    suspend fun analysis2(url: String, cookies: String = "") {
+        repository.request(ResponseMutableLiveData(), false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
+
+    fun analysisForSignTogether(url: String, cookies: String, onSuccess: (Response) -> Unit = {}, onFailure: (String) -> Unit = {}) {
+        val request = NetworkUtils.buildClientRequest(url, cookies)
+        NetworkUtils.requestAsync(request, onSuccess, onFailure)
     }
 }

@@ -60,6 +60,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var activity: WrapperActivity? = null
     private var taskAdapter: TaskAdapter? = null
     private var loadingDialog: Dialog? = null
+
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
         initArgs()
         initObserver()
@@ -77,7 +78,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // 这里的id包含url中的所有参数
             val id = result?.substringAfter("id=")
             qrCodeId = id ?: ""
-            signWithCamera(id)
+            lifecycleScope.launch(Dispatchers.IO) {
+                analysisAndStartSign(id?.substringBefore("&") ?: "")
+            }
         }
     }
 
@@ -143,7 +146,23 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 // 签到类型获取后，开始签到
                 realSign(signTypeData)
             }
+        }
 
+        viewModel.analysisLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string()
+                val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                viewModel.analysis2(URL.getAnalysis2Path(analysis2Code))
+                val courseId = activity?.courseId ?: ""
+                val classId = activity?.classId ?: ""
+                if (code.isNotEmpty()) {
+                    signDirectly()
+                } else if (qrCodeId.isNotEmpty()) {
+                    signWithCamera(qrCodeId)
+                } else {
+                    getSignCode(id, classId, courseId)
+                }
+            }
         }
 
         viewModel.signCodeLiveData.observe(this) {
@@ -155,9 +174,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 } else {
                     val body = it.data?.body?.string() ?: ""
                     code = HtmlParser.parseToSignCode(body)
-                    viewModel.preSign(preSignUrl)
-                    // 签到
-                    signNormally(id, code)
+                    signDirectly()
                 }
             }
         }
@@ -195,8 +212,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string() ?: ""
-//                val headers = data.headers
-//                val cookies = headers.values("Set-Cookie").toString()
                 signRecord(body, cookies)
             }
         }
@@ -214,6 +229,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             signWithAccounts()
         }
+    }
+
+    private suspend fun signDirectly() {
+        viewModel.preSign(preSignUrl)
+        viewModel.request(URL.checkSignCodePath(id, code))
+        // 签到
+        signNormally(id, code)
     }
 
     private suspend fun responseUI(data: String) {
@@ -314,9 +336,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         /*
         跳转保存数据
          */
+        intent.putExtra("courseName",activity?.courseName)
         intent.putExtra("courseId", activity?.courseId)
         intent.putExtra("classId", activity?.classId)
         intent.putExtra("cpi", activity?.cpi)
+
         startActivity(intent)
     }
 
@@ -355,10 +379,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
     }
 
-    private suspend fun signLocation(api: String) {
+    private suspend fun signTogether(   address: String?,
+                                        aid: String,
+                                        uid: String,
+                                        lat: String?,
+                                        long: String?,) {
         activity?.let {
-            viewModel.sign(api)
+            viewModel.signTogether(URL.getLocationSignPath(address,aid,uid,lat,long),cookies)
         }
+    }
+
+    /**
+     * 签到流程入口
+     * @param aid activeId
+     */
+    private suspend fun analysisAndStartSign(aid: String) {
+        viewModel.analysis(URL.getAnalysisPath(aid))
     }
 
     private suspend fun getSignCode(aid: String, classId: String, courseId: String) {
@@ -392,9 +428,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             setPositiveClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     code = it
-                    viewModel.preSign(preSignUrl)
-                    // 签到
-                    signNormally(id, code)
+                    analysisAndStartSign(id)
                 }
             }
 
@@ -432,9 +466,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
                     code = inputCode
-                    viewModel.preSign(preSignUrl)
-                    // 签到
-                    signNormally(id, code)
+                    analysisAndStartSign(id)
                 }
             }
         }
@@ -482,14 +514,28 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private suspend fun signWith(id: String, code: String = "", cookies: String) {
-        val uid = findUID(cookies)
-        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-        viewModel.preSign(signWithPreSign, cookies)
-        if (qrCodeId.isEmpty()) {
-            signTogether(id, code, cookies)
-        } else {
-            signTogether(qrCodeId, cookies)
-        }
+        viewModel.analysisForSignTogether(URL.getAnalysisPath(id),
+            cookies,
+            onSuccess = {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val data = it.body?.string()
+                    val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                    viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
+                    val uid = findUID(cookies)
+                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+                    viewModel.preSign(signWithPreSign, cookies)
+                    if (qrCodeId.isEmpty()) {
+                        viewModel.request(URL.checkSignCodePath(id, code), cookies)
+                        signTogether(id, code, cookies)
+                    } else {
+                        signTogether(qrCodeId, cookies)
+                    }
+                }
+            },
+            onFailure = { msg ->
+                ToastUtils.show(msg)
+            }
+        )
     }
 
     private fun findUID(cookies: String): String {
@@ -498,12 +544,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     private suspend fun showChooseSignTypeDialog(aid: String, type: String) {
-        val courseId = activity?.courseId ?: ""
-        val classId = activity?.classId ?: ""
         val fragment = SignTypeFragment().apply {
             setOnClickSignDirectlyListener {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    getSignCode(aid, classId, courseId)
+                    analysisAndStartSign(aid)
                 }
                 dismiss()
             }
