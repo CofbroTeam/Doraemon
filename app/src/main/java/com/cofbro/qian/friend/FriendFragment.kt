@@ -325,7 +325,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     ) {
         Log.d(TAG, "onMessage: 收到消息")
         insertMessageAccordingToConv(conversation)
-        MessageSubscriber.dispatch(conversation)
+        MessageSubscriber.dispatch(conversation, message)
     }
 
     private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {

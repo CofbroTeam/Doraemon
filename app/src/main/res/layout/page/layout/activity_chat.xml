@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_chat_activity">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
@@ -40,58 +42,78 @@
 
         <TextView
             android:id="@+id/topName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="name"
-            app:layout_constraintBottom_toTopOf="@+id/topNickName"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/topAvatar"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/topAvatar"
             app:layout_constraintTop_toTopOf="@+id/topAvatar"
             app:layout_constraintVertical_chainStyle="spread" />
 
-        <TextView
-            android:id="@+id/topNickName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="nickName"
-            app:layout_constraintBottom_toBottomOf="@+id/topAvatar"
-            app:layout_constraintStart_toStartOf="@+id/topName"
-            app:layout_constraintTop_toBottomOf="@+id/topName" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChat"
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/limitInputView"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout10"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBar" />
+        app:layout_constraintTop_toBottomOf="@+id/topBar">
 
-    <com.cofbro.qian.friend.im.chatActivity.LimitInputView
-        android:id="@+id/limitInputView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="100dp"
-        android:layout_marginStart="20dp"
-        android:paddingEnd="50dp"
+        <com.scwang.smart.refresh.header.ClassicsHeader
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srlTextRefreshing="加载中"
+            app:srlTextFinish="加载成功"
+            app:srlTextPulling="下拉加载更多"
+            app:srlTextRelease="释放加载更多"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout10"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/app_white_radius_bg"
+        android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/send"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/send"
-        android:layout_width="40dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/ic_send"
-        app:layout_constraintBottom_toBottomOf="@+id/limitInputView"
-        app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/limitInputView" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <EditText
+            android:id="@+id/et_send_msg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:hint="输入您的消息"
+            android:paddingStart="12dp"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_send"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_send"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_send"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

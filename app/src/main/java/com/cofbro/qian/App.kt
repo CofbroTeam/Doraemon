@@ -24,7 +24,7 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityResumed(activity: Activity) {
-        CacheUtils.activities["topActivity"] = activity
+        CacheUtils.activities[Constants.Cache.TOP_ACTIVITY] = activity
     }
 
     override fun onActivityPaused(activity: Activity) {

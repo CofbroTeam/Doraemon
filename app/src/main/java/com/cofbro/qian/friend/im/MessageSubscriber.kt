@@ -1,6 +1,7 @@
 package com.cofbro.qian.friend.im
 
 import cn.leancloud.im.v2.LCIMConversation
+import cn.leancloud.im.v2.LCIMMessage
 
 object MessageSubscriber {
     private val subscribeObject = arrayListOf<IMessageDispatchEvent>()
@@ -10,15 +11,15 @@ object MessageSubscriber {
     }
 
 
-    fun dispatch(conversation: LCIMConversation?) {
+    fun dispatch(conversation: LCIMConversation?, message: LCIMMessage?,) {
         subscribeObject.forEach {
             if (conversation?.conversationId == it.getConversationId()) {
-                it.onMessage(conversation)
+                it.onMessage(conversation, message)
             }
         }
     }
 
-    fun unSubscribe(subscriber: IMessageDispatchEvent) {
+    fun unsubscribe(subscriber: IMessageDispatchEvent) {
         if (subscribeObject.contains(subscriber)) {
             subscribeObject.remove(subscriber)
         }

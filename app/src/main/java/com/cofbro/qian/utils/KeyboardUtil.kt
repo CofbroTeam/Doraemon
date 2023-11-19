@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.security.AccessController.getContext
 import kotlin.math.abs
@@ -93,12 +94,12 @@ object KeyboardUtil {
 
         //获取到导航栏高度之后再添加布局监听
         mNavHeight = navBarHeight
-//        getNavigationBarHeight(activity, object : NavigationBarCallback() {
-//            fun onHeight(height: Int, hasNav: Boolean) {
-//                mNavHeight = height
-//                contentView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
-//            }
-//        })
+        getNavigationBarHeight(activity, object : NavigationBarCallback {
+            override fun onHeight(height: Int, hasNav: Boolean) {
+                mNavHeight = height
+                contentView.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+            }
+        })
     }
 
     fun unregisterKeyboardHeightListener(activity: Activity) {
@@ -119,43 +120,47 @@ object KeyboardUtil {
             }
         }
 
-//    fun getNavigationBarHeight(activity: Activity, callback: NavigationBarCallback) {
-//        val view = activity.window.decorView
-//        val attachedToWindow = view.isAttachedToWindow
-//        if (attachedToWindow) {
-//            val windowInsets = ViewCompat.getRootWindowInsets(view)!!
-//            val height = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-//            val hasNavigationBar =
-//                windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
-//                        windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0
-//            if (height > 0) {
-//                callback.onHeight(height, hasNavigationBar)
-//            } else {
-//                callback.onHeight(navBarHeight, hasNavigationBar)
-//            }
-//        } else {
-//            view.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
-//                override fun onViewAttachedToWindow(v: View) {
-//                    val windowInsets = ViewCompat.getRootWindowInsets(v)!!
-//                    val height =
-//                        windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-//                    val hasNavigationBar =
-//                        windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
-//                                windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0
-//                    if (height > 0) {
-//                        callback.onHeight(height, hasNavigationBar)
-//                    } else {
-//                        callback.onHeight(navBarHeight, hasNavigationBar)
-//                    }
-//                }
-//
-//                override fun onViewDetachedFromWindow(v: View) {}
-//            })
-//        }
-//    }
+    private fun getNavigationBarHeight(activity: Activity, callback: NavigationBarCallback) {
+        val view = activity.window.decorView
+        val attachedToWindow = view.isAttachedToWindow
+        if (attachedToWindow) {
+            val windowInsets = ViewCompat.getRootWindowInsets(view)!!
+            val height = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val hasNavigationBar =
+                windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
+                        windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0
+            if (height > 0) {
+                callback.onHeight(height, hasNavigationBar)
+            } else {
+                callback.onHeight(navBarHeight, hasNavigationBar)
+            }
+        } else {
+            view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) {
+                    val windowInsets = ViewCompat.getRootWindowInsets(v)!!
+                    val height =
+                        windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                    val hasNavigationBar =
+                        windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
+                                windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0
+                    if (height > 0) {
+                        callback.onHeight(height, hasNavigationBar)
+                    } else {
+                        callback.onHeight(navBarHeight, hasNavigationBar)
+                    }
+                }
+
+                override fun onViewDetachedFromWindow(v: View) {}
+            })
+        }
+    }
 
     interface KeyboardHeightListener {
         fun onKeyboardHeightChanged(height: Int)
+    }
+
+    interface NavigationBarCallback {
+        fun onHeight(height: Int, hasNav: Boolean)
     }
 }
 

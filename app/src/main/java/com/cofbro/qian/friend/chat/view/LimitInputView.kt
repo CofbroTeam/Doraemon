@@ -1,4 +1,4 @@
-package com.cofbro.qian.friend.im.chatActivity
+package com.cofbro.qian.friend.chat.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -32,7 +32,6 @@ class LimitInputView(context: Context, attrs: AttributeSet?) : AppCompatEditText
     }
 
     /** config */
-    private var isSetPadding = false
     private var mLineHeight = 0 // 行高
 
     // 输入字数的提示
@@ -57,13 +56,7 @@ class LimitInputView(context: Context, attrs: AttributeSet?) : AppCompatEditText
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if (!isSetPadding) {
-            // 设置 padding
-            val mPaddingStartAndEnd = width / 20
-            setPadding(mPaddingStartAndEnd, paddingTop, mPaddingStartAndEnd, paddingBottom)
-            isSetPadding = true
-        }
-        drawTip(canvas)
+        //drawTip(canvas)
     }
 
     override fun onTextChanged(

@@ -2,13 +2,10 @@ package com.cofbro.qian.main
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
-import com.cofbro.qian.friend.im.chatActivity.ChatTestFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
 import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
