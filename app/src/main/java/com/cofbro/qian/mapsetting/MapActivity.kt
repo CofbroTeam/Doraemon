@@ -471,29 +471,17 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         val statusName = if (status) "成功" else "失败"
         SignRecorder.record(applicationContext, uid, courseName!!, statusName)
     }
-    private suspend fun signWith(id: String, code: String = "", cookies: String) {
-        val uid = findUID(cookies)
-        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-        viewModel.preSign(signWithPreSign, cookies)
-        if (qrCodeId.isEmpty()) {
-            signTogether(id, code, cookies)
-        } else {
-            signTogether(qrCodeId, cookies)
-        }
-    }
+//    private suspend fun signWith(id: String, code: String = "", cookies: String) {
+//        val uid = findUID(cookies)
+//        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+//        viewModel.preSign(signWithPreSign, cookies)
+//        if (qrCodeId.isEmpty()) {
+//            signTogether(id, code, cookies)
+//        } else {
+//            signTogether(qrCodeId, cookies)
+//        }
+//    }
     private fun initObserver() {
-        // 尝试登录
-        viewModel.loginLiveData.observe(this) { response ->
-            val data = response.data ?: return@observe
-            lifecycleScope.launch(Dispatchers.IO) {
-                val body = data.body?.string()?.safeParseToJson()
-                val headers = data.headers
-                cookies = headers.values("Set-Cookie").toString()
-                if (body?.getBoolean("status") == true) {
-                    signWith(id, code, cookies)
-                }
-            }
-        }
         // 签到
         viewModel.signLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -581,16 +569,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
-
-        // 签到
-        viewModel.signLiveData.observe(this) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.toString()
-                withContext(Dispatchers.Main) {
-
-                }
-            }
-        }
         // 绑定签到
         viewModel.signTogetherLiveData.observe(this) { response ->
             val data = response.data ?: return@observe
@@ -598,8 +576,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 val body = data.body?.string() ?: ""
                 val headers = data.headers
                 cookies = headers.values("Set-Cookie").toString()
-//                val headers = data.headers
-//                val cookies = headers.values("Set-Cookie").toString()
+
                 signRecord(body, cookies)
             }
         }
@@ -617,34 +594,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
-            signWithAccounts()
-        }
-    }
 
-    private suspend fun signWithAccounts() {
-        withContext(Dispatchers.IO) {
-            val data = AccountManager.loadAllAccountData(applicationContext)
-            val users = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
-            users?.let {
-                it.forEach { item ->
-                    val user = item as? JSONObject ?: JSONObject()
-                    tryLogin(user)
-                    delay(300)
-                    signTogether(
-                        URL.getLocationSignPath(
-                            viewModel.default_Sign_Location, aid = ''
-                                , uid = '', lat = viewModel.default_Sign_Lating?.latitude.toString(), long = viewModel.default_Sign_Lating?.longitude.toString()
-                        ),
-                        cookies
-                    )
-//                    val cookies = user.getStringExt(Constants.Account.COOKIE)
-//                    val uid = findUID(cookies)
-//                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-//                    viewModel.preSign(signWithPreSign, cookies)
-//                    delay(3000)
-//                    viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId), cookies)
-                }
-            }
         }
     }
     private fun tryLogin(user: JSONObject) {
