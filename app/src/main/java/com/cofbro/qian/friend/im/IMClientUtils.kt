@@ -187,11 +187,11 @@ object IMClientUtils {
     fun queryHistoryMessage(
         conv: LCIMConversation,
         count: Int = 20,
-        onSuccess: (List<LCIMMessage>) -> Unit,
+        onSuccess: (List<LCIMMessage>?) -> Unit,
         onError: (String) -> Unit
     ) {
         conv.queryMessages(count, object : LCIMMessagesQueryCallback() {
-            override fun done(messages: List<LCIMMessage>, e: LCIMException?) {
+            override fun done(messages: List<LCIMMessage>?, e: LCIMException?) {
                 if (e == null) {
                     onSuccess(messages)
                 } else {

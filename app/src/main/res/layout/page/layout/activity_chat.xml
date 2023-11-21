@@ -3,15 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_chat_activity">
+    android:layout_height="match_parent">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_gradient_chat_activity"
+        android:background="@drawable/app_bar_light_stroke_bg"
+        android:elevation="15dp"
         android:paddingTop="45dp"
         android:paddingBottom="5dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,15 +69,15 @@
         <com.scwang.smart.refresh.header.ClassicsHeader
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srlTextRefreshing="加载中"
             app:srlTextFinish="加载成功"
             app:srlTextPulling="下拉加载更多"
-            app:srlTextRelease="释放加载更多"/>
+            app:srlTextRefreshing="加载中"
+            app:srlTextRelease="释放加载更多" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvChat"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -108,9 +108,10 @@
 
         <ImageView
             android:id="@+id/iv_send"
-            android:layout_width="35dp"
+            android:layout_width="40dp"
             android:layout_height="35dp"
             android:layout_marginEnd="8dp"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_send"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

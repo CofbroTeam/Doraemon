@@ -2,6 +2,8 @@ package com.cofbro.qian.friend.chat
 
 import android.os.Bundle
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import cn.leancloud.im.v2.LCIMConversation
 import cn.leancloud.im.v2.LCIMMessage
@@ -29,11 +31,15 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private var mAdapter: ChatAdapter? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        MessageSubscriber.subscribe(this)
+        initWork()
         initArgs()
         doNetwork()
         initView()
         initEvent()
+    }
+
+    private fun initWork() {
+        MessageSubscriber.subscribe(this)
         registerKeyboardHeight()
     }
 
@@ -41,9 +47,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         super.onDestroy()
         MessageSubscriber.unsubscribe(this)
         unregisterKeyboardHeight()
+        conv?.read()
     }
 
-    override fun onMessage(conv: LCIMConversation, message: LCIMMessage?,) {
+    override fun onMessage(conv: LCIMConversation, message: LCIMMessage?) {
         insertMsg(message)
     }
 
@@ -55,7 +62,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         avatarUrl = intent.getStringExtra("avatar") ?: ""
         username = intent.getStringExtra("username") ?: ""
         conv = CacheUtils.conv[Constants.Cache.CONV]
-        conv?.read()
     }
 
     private fun doNetwork() {
@@ -83,6 +89,14 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         binding?.rvChat?.apply {
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (dy < 0) {
+                        KeyboardUtil.hideKeyboard(this@ChatActivity, binding!!.root)
+                    }
+                }
+            })
         }
     }
 
@@ -91,7 +105,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         // 头像
         val options = RequestOptions().transform(
             CenterCrop(),
-            RoundedCorners( 25)
+            RoundedCorners(25)
         )
         Glide.with(this)
             .load(avatarUrl)
@@ -137,7 +151,9 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             }
             IMClientUtils.queryHistoryMessage(it, realCount,
                 onSuccess = { msg ->
-                    insertRangedData(msg)
+                    msg?.let {
+                        insertRangedData(msg)
+                    }
                 }, onError = {
                     ToastUtils.show("历史数据拉取失败！")
                 }
@@ -171,7 +187,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private fun scrollToNewestOne() {
         val data = mAdapter?.getAllMsg()
         if (!data.isNullOrEmpty()) {
-            binding?.rvChat?.scrollToPosition(data.size - 1)
+            val layoutManager = binding?.rvChat?.layoutManager as? LinearLayoutManager
+            if (layoutManager?.findLastCompletelyVisibleItemPosition() != data.size - 1) {
+                binding?.rvChat?.scrollToPosition(data.size - 1)
+            }
         }
     }
 

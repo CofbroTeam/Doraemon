@@ -39,6 +39,11 @@ class UserListAdapter : RecyclerView.Adapter<UserListContentViewHolder<LCObject>
         notifyDataSetChanged()
     }
 
+    fun insertData(user: LCObject) {
+        users.add(0, user)
+        notifyItemInserted(0)
+    }
+
     fun getData(): ArrayList<LCObject> {
         return users
     }

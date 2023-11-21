@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -33,12 +34,16 @@ import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.MsgFactory
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
+    private var friendList = arrayListOf<LCObject>()
     private var userListAdapter: UserListAdapter? = null
     private var messageListAdapter: MessageListAdapter? = null
     private var friendRequestConv = arrayListOf<LCIMConversation>()
@@ -47,11 +52,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-//        initEventManager()
-//        initView()
-//        initObserver()
-//        doNetwork()
-//        initEvent()
+        initEventManager()
+        initView()
+        initObserver()
+        doNetwork()
+        initEvent()
     }
 
     private fun initEvent() {
@@ -61,12 +66,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
 
         binding?.tvTitle?.setOnClickListener {
-            IMClientUtils.createNewConversation(
-                "654e22d46e07082ba15e4752",
-                onSuccess = {
-                    ToastUtils.show("好友申请发送成功")
-                },
-                onError = {})
+
+        }
+
+        binding?.ivUserSearch?.setOnClickListener {
+            searchUser()
         }
     }
 
@@ -258,13 +262,9 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         // 根据uid查询当前聊天user
         queryContainsUserInfo(queryUserInfoUid, onSuccess = {
             it.forEachIndexed { index, user ->
-                val data = JSONObject()
-                data["username"] = user["username"]
-                data["avatar"] = user["avatar"]
-                data["content"] = convList.getOrNull(index)?.lastMessage?.content ?: ""
-                data["time"] = convList.getOrNull(index)?.lastMessageAt?.time.toString()
-                data["unReadCount"] = convList.getOrNull(index)?.unreadMessagesCount.toString()
-                data["conv"] = convList.getOrNull(index)
+                val username = user["username"].toString()
+                val url = user["avatar"].toString()
+                val data = MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
                 messageConv.add(data)
                 messageConv.add(data)
                 messageConv.add(data)
@@ -303,6 +303,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun loadUserList() {
         IMClientUtils.queryToFindExistFriend(
             onSuccess = {
+                formatUsersInfo(it)
+                friendList.addAll(it)
                 userListAdapter?.setData(it)
             },
             onError = {
@@ -311,6 +313,59 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         )
     }
 
+    private fun formatUsersInfo(users: List<LCObject>) {
+        users.forEach {
+            var name = ""
+            var url = ""
+            var uid = ""
+            if (it.getString("ownerId") == IMClientUtils.getCntUser()?.objectId.toString()) {
+                url = it.getString("targetAvatar") ?: ""
+                name = it.getString("targetName") ?: ""
+                uid = it.getString("targetId") ?: ""
+            } else {
+                url = it.getString("ownerAvatar") ?: ""
+                name = it.getString("owner") ?: ""
+                uid = it.getString("ownerId") ?: ""
+            }
+            it.put("url", url)
+            it.put("name", name)
+            it.put("uid", uid)
+        }
+    }
+
+    private fun searchUser() {
+        val username = binding?.editText?.text.toString()
+        IMClientUtils.querySingleUserByUsernameFuzzy(
+            username,
+            onSuccess = {
+                it.getOrNull(0)?.apply {
+                    sendFriendRequest(objectId)
+                }
+            }, onError = {
+                ToastUtils.show("好友申请发送失败")
+            }
+        )
+    }
+
+    private fun sendFriendRequest(uid: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            IMClientUtils.createNewConversation(
+                uid,
+                onSuccess = {
+                    clearText()
+                    ToastUtils.show("好友申请发送成功")
+                },
+                onError = {
+                    ToastUtils.show("好友申请发送失败")
+                }
+            )
+        }
+    }
+
+    private fun clearText() {
+        binding?.editText?.hint = "搜索用户名字"
+        binding?.editText?.text?.clear()
+    }
 
     override fun showLoading(msg: String?) {
         if (!msg.isNullOrEmpty()) {
@@ -324,11 +379,39 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         client: LCIMClient?
     ) {
         Log.d(TAG, "onMessage: 收到消息")
-        insertMessageAccordingToConv(conversation)
+        insertUserListIfNewFriend(message) { username, url ->
+            insertMessageAccordingToConv(conversation, username, url)
+        }
         MessageSubscriber.dispatch(conversation, message)
     }
 
-    private fun insertMessageAccordingToConv(conversation: LCIMConversation?) {
+    private fun insertUserListIfNewFriend(message: LCIMMessage?, onSuccess: (String, String) -> Unit) {
+        friendList.forEach {
+            if (message?.from == (it.getString("uid") ?: "")) {
+                // 是好友
+                val name = it.getString("name") ?: ""
+                val avatar = it.getString("url") ?: ""
+                onSuccess(name, avatar)
+                return
+            }
+        }
+        IMClientUtils.queryContainUserForConversation(message?.from ?: "",
+            onSuccess = {
+                it.getOrNull(0)?.apply {
+                    val avatar = getString("avatar")
+                    val name = getString("username")
+                    put("url", avatar)
+                    put("name", name)
+                    put("uid", objectId)
+                    onSuccess(name, avatar)
+                    friendList.add(0, this)
+                    userListAdapter?.insertData(this)
+                }
+            }, onError = {}
+        )
+    }
+
+    private fun insertMessageAccordingToConv(conversation: LCIMConversation?, username: String = "", url: String = "") {
         messageConv.forEachIndexed { index, convItem ->
             val conv = convItem.getObject("conv", LCIMConversation::class.java)
             if (conversation?.conversationId == conv.conversationId) {
@@ -341,11 +424,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             }
         }
         // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
-        val data = JSONObject()
-        data["conv"] = conversation
-        data["content"] = conversation?.lastMessage?.content.toString()
-        data["time"] = conversation?.lastMessageAt?.time.toString()
-        data["unReadCount"] = conversation?.unreadMessagesCount.toString()
+        val data = MsgFactory.createConversationMsg(conversation, url, username)
+        messageConv.add(0, data)
         messageListAdapter?.insertBeforeFirst(data)
     }
 
@@ -371,7 +451,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         val username = mContext?.getBySp(SP_USER_NAME) ?: ""
         val password = mContext?.getBySp(SP_PASSWORD) ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
-            IMClientUtils.loginIM("", "",
+            IMClientUtils.loginIM(username, password,
                 onSuccess = {
                     viewModel.loginIMLiveData.postValue(it)
                 },
@@ -427,6 +507,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     fun insertDataIntoUserList(data: List<LCObject>) {
+        friendList.addAll(0, data)
         userListAdapter?.insertItemRange(data)
     }
 
@@ -439,13 +520,9 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             uid,
             onSuccess = {
                 val user = it.getOrNull(0) ?: LCUser()
-                val data = JSONObject()
-                data["username"] = user.username
-                data["avatar"] = user["avatar"]
-                data["conv"] = conversation
-                data["content"] = conversation.lastMessage?.content ?: ""
-                data["time"] = conversation.lastMessageAt?.time.toString()
-                data["unReadCount"] = conversation.unreadMessagesCount.toString()
+                val username = user.username
+                val url = user["avatar"].toString()
+                val data = MsgFactory.createConversationMsg(conversation, url, username)
                 // 更新数据源
                 messageConv.add(data)
                 messageListAdapter?.insertBeforeFirst(data)

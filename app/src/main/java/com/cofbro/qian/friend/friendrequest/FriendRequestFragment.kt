@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.R
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.friend.im.IMClientUtils
+import com.cofbro.qian.utils.MsgFactory
 
 class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFragment() {
     private val TAG = "FriendRequestFragment"
@@ -103,9 +104,7 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
             data.add(item)
 
             // 好友列表
-            val o = LCObject()
-            o.put("owner", lcObject.getString("username"))
-            o.put("ownerAvatar", lcObject.getString("avatar"))
+            val o = MsgFactory.createUserInfoMsg(lcObject)
             usersTemp.add(o)
         }
     }
