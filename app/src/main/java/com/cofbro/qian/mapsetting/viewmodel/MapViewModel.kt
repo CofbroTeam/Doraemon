@@ -21,6 +21,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     val signLiveData = ResponseMutableLiveData<Response>()
     val signTogetherLiveData = ResponseMutableLiveData<Response>()
     val loginLiveData = ResponseMutableLiveData<Response>()
+    val analysisLiveData = ResponseMutableLiveData<Response>()
     var progressDialog: Dialog? = null // 搜索时进度条
     var poiResult: PoiResultV2? = null // poi返回的结果
     var currentPage = 1
@@ -45,7 +46,21 @@ class MapViewModel : BaseViewModel<MapRepository>() {
     var uid = ""
     var aid = ""
     var statuscontent = ""
-    fun sign(url: String) {
+    suspend fun analysis(url: String) {
+        repository.request(analysisLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+    suspend fun analysis2(url: String, cookies: String = "") {
+        repository.request(ResponseMutableLiveData(), false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
+    suspend  fun sign(url: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.request(signLiveData) {
                 val request = NetworkUtils.buildClientRequest(url)

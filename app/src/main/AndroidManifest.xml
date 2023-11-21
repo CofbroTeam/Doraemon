@@ -36,11 +36,16 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:icon,android:theme,android:roundIcon"
         tools:targetApi="31">
+        <activity
+            android:name=".friend.search.SearchFriendActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="787057d8a10578894fc4719a3bd274dc" />
 
         <service android:name="cn.leancloud.push.PushService" />
+
         <receiver
             android:name="cn.leancloud.push.LCBroadcastReceiver"
             android:exported="true">
@@ -54,22 +59,23 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true">
-            <!--            <intent-filter>-->
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-
-            <!--                <action android:name="android.intent.action.MAIN" />-->
-            <!--            </intent-filter>-->
-        </activity>
-
-        <activity android:name=".wrapper.did.DoHomeworkActivity" />
-        <activity
-            android:name=".main.MainActivity"
-            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
 
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+        </activity>
+        <activity android:name=".wrapper.did.DoHomeworkActivity" />
+        <activity
+            android:name=".main.MainActivity"
+            android:exported="true">
+
+            <!-- <intent-filter> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+
+
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".account.manager.AccountManagerActivity" />
