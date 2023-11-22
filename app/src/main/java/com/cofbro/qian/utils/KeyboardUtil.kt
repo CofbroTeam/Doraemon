@@ -24,7 +24,7 @@ import kotlin.math.abs
 object KeyboardUtil {
     var sDecorViewInvisibleHeightPre = 0
     private var onGlobalLayoutListener: OnGlobalLayoutListener? = null
-    private var mNavHeight = 0
+    var mNavHeight = 0
     private var sDecorViewDelta = 0
     private var keyboardHeight = 0
 
@@ -73,6 +73,7 @@ object KeyboardUtil {
                 val imeHeight = windowInsets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                 val navHeight =
                     windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                mNavHeight = navHeight
                 val hasNavigationBar =
                     windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
                             windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0

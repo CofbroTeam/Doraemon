@@ -11,6 +11,7 @@ import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.login.sms.SMSActivity
 import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.safeParseToJson
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
@@ -120,7 +121,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
         }
         val intent = Intent(this, SMSActivity::class.java)
         intent.putExtra("phoneNumber", phoneNumber)
-        CacheUtils.activities["LoginActivity"] = this
+        CacheUtils.activities[Constants.Cache.LOGIN_ACTIVITY] = this
         startActivity(intent)
     }
 

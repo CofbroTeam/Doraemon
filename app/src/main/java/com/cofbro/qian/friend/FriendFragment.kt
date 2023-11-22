@@ -412,6 +412,14 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     }
 
     private fun insertMessageAccordingToConv(conversation: LCIMConversation?, username: String = "", url: String = "") {
+        notifyConversationMsgChanged(conversation)
+        // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
+        val data = MsgFactory.createConversationMsg(conversation, url, username)
+        messageConv.add(0, data)
+        messageListAdapter?.insertBeforeFirst(data)
+    }
+
+    fun notifyConversationMsgChanged(conversation: LCIMConversation?) {
         messageConv.forEachIndexed { index, convItem ->
             val conv = convItem.getObject("conv", LCIMConversation::class.java)
             if (conversation?.conversationId == conv.conversationId) {
@@ -423,10 +431,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 return
             }
         }
-        // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
-        val data = MsgFactory.createConversationMsg(conversation, url, username)
-        messageConv.add(0, data)
-        messageListAdapter?.insertBeforeFirst(data)
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {

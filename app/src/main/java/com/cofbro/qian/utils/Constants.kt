@@ -420,6 +420,8 @@ object Constants {
 
     object Cache {
         const val TOP_ACTIVITY = "topActivity"
+        const val LOGIN_ACTIVITY = "LoginActivity"
+        const val MAIN_ACTIVITY = "MainActivity"
         const val CONV = "conv"
     }
 

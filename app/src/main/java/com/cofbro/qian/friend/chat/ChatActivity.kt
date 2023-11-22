@@ -2,6 +2,8 @@ package com.cofbro.qian.friend.chat
 
 import android.os.Bundle
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -13,9 +15,11 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivityChatBinding
+import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMessageDispatchEvent
 import com.cofbro.qian.friend.im.MessageSubscriber
+import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.KeyboardUtil
@@ -26,11 +30,13 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private var refreshing = false
     private var avatarUrl = ""
     private var username = ""
+    private var pos = 0
     private var conv: LCIMConversation? = null
     private var msgData = arrayListOf<LCIMMessage>()
     private var mAdapter: ChatAdapter? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        changeNavigationResponsively()
         initWork()
         initArgs()
         doNetwork()
@@ -61,6 +67,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private fun initArgs() {
         avatarUrl = intent.getStringExtra("avatar") ?: ""
         username = intent.getStringExtra("username") ?: ""
+        pos = intent.getIntExtra("pos", 0)
         conv = CacheUtils.conv[Constants.Cache.CONV]
     }
 
@@ -130,7 +137,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             this,
             object : KeyboardUtil.KeyboardHeightListener {
                 override fun onKeyboardHeightChanged(height: Int) {
-                    layout?.bottomMargin = height
+                    layout?.bottomMargin = height + KeyboardUtil.mNavHeight
                     binding?.root?.layoutParams = layout
                     scrollToNewestOne()
                 }
@@ -156,6 +163,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
                     }
                 }, onError = {
                     ToastUtils.show("历史数据拉取失败！")
+                    finishRefresh()
                 }
             )
         }
@@ -174,6 +182,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
                 scrollToNewestOne()
             }
         }
+        finishRefresh()
+    }
+
+    private fun finishRefresh() {
         binding?.refreshLayout?.finishRefresh()
     }
 
@@ -207,5 +219,32 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private fun clear() {
         binding?.etSendMsg?.text?.clear()
         binding?.etSendMsg?.hint = "输入您的消息"
+    }
+
+    override fun onStop() {
+        findFriendFragment()?.notifyConversationMsgChanged(conv)
+        super.onStop()
+    }
+
+    private fun findFriendFragment(): FriendFragment? {
+        return (CacheUtils.activities[Constants.Cache.MAIN_ACTIVITY] as? MainActivity)?.supportFragmentManager?.findFragmentByTag(
+            "FriendFragment"
+        ) as? FriendFragment
+    }
+
+    private fun changeNavigationResponsively() {
+        binding?.root?.post {
+            val windowInsects = ViewCompat.getRootWindowInsets(window.decorView)
+            val height = windowInsects?.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+            updateLayoutParams(height)
+        }
+    }
+
+    private fun updateLayoutParams(height: Int) {
+        if (height > 80) {
+            val layout = binding?.root?.layoutParams as? MarginLayoutParams
+            layout?.bottomMargin = height
+            binding?.root?.layoutParams = layout
+        }
     }
 }

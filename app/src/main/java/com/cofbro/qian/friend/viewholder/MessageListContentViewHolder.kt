@@ -33,7 +33,7 @@ class MessageListContentViewHolder<T : JSONObject>(private val binding: ItemMess
 
         itemView.setOnClickListener {
             refreshReadCount(position, t)
-            toChatActivity(url, username, conv)
+            toChatActivity(url, username, conv, position)
         }
     }
 
@@ -42,10 +42,11 @@ class MessageListContentViewHolder<T : JSONObject>(private val binding: ItemMess
         adapter.notifyItemChanged(position)
     }
 
-    private fun toChatActivity(url: String, username: String, conv: LCIMConversation) {
+    private fun toChatActivity(url: String, username: String, conv: LCIMConversation, pos: Int) {
         val intent = Intent(binding.root.context, ChatActivity::class.java)
         intent.putExtra("avatar", url)
         intent.putExtra("username", username)
+        intent.putExtra("pos", pos)
         CacheUtils.conv[Constants.Cache.CONV] = conv
         binding.root.context.startActivity(intent)
     }
