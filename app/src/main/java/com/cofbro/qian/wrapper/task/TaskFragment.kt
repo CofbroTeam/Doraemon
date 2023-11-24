@@ -4,9 +4,11 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.getBySp
@@ -14,7 +16,6 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentTaskBinding
 import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
-import com.cofbro.qian.profile.advice.AdviceFragment
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.CacheUtils
@@ -39,6 +40,8 @@ import kotlinx.coroutines.withContext
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var alreadySignCount = 0
+    private var otherSignUsers: JSONArray? = null
     private var qrCodeId = ""
     private var alreadySign = false
     private var cookies = ""
@@ -189,6 +192,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signRecord(data)
                     responseUI(data)
                     // 开始代签
+                    showLoadingView()
                     startSignTogether(data)
                 }
             }
@@ -208,11 +212,22 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
 
         // 绑定签到
+        // todo 修改签到逻辑
         viewModel.signTogetherLiveData.observe(this) { response ->
             val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string() ?: ""
                 signRecord(body, cookies)
+                if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
+                    val itemUser =
+                        otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
+                    tryLogin(itemUser)
+                    alreadySignCount++
+                } else {
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                    }
+                }
             }
         }
     }
@@ -336,7 +351,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         /*
         跳转保存数据
          */
-        intent.putExtra("courseName",activity?.courseName)
+        intent.putExtra("courseName", activity?.courseName)
         intent.putExtra("courseId", activity?.courseId)
         intent.putExtra("classId", activity?.classId)
         intent.putExtra("cpi", activity?.cpi)
@@ -379,13 +394,15 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
     }
 
-    private suspend fun signTogether(   address: String?,
-                                        aid: String,
-                                        uid: String,
-                                        lat: String?,
-                                        long: String?,) {
+    private suspend fun signTogether(
+        address: String?,
+        aid: String,
+        uid: String,
+        lat: String?,
+        long: String?,
+    ) {
         activity?.let {
-            viewModel.signTogether(URL.getLocationSignPath(address,aid,uid,lat,long),cookies)
+            viewModel.signTogether(URL.getLocationSignPath(address, aid, uid, lat, long), cookies)
         }
     }
 
@@ -475,19 +492,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWithAccounts() {
         withContext(Dispatchers.IO) {
             val data = AccountManager.loadAllAccountData(requireContext())
-            val users = data.getJSONArray(Constants.Account.USERS)
-            users?.let {
-                it.forEach { item ->
-                    val user = item as? JSONObject ?: JSONObject()
-                    tryLogin(user)
-                    delay(300)
-//                    val cookies = user.getStringExt(Constants.Account.COOKIE)
-//                    val uid = findUID(cookies)
-//                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-//                    viewModel.preSign(signWithPreSign, cookies)
-//                    delay(3000)
-//                    viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId), cookies)
-                }
+            otherSignUsers = data.getJSONArray(Constants.Account.USERS)
+            val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
+            if (firstUser != null) {
+                alreadySignCount++
+                tryLogin(firstUser)
             }
         }
     }
@@ -521,6 +530,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     val data = it.body?.string()
                     val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
                     viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
+                    delay(200)
                     val uid = findUID(cookies)
                     val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
                     viewModel.preSign(signWithPreSign, cookies)
