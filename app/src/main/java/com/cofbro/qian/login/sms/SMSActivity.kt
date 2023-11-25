@@ -11,6 +11,7 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivitySmsBinding
 import com.cofbro.qian.main.MainActivity
 import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.PhoneLoginUtil
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
@@ -106,7 +107,7 @@ class SMSActivity : BaseActivity<SMSViewModel, ActivitySmsBinding>() {
     private fun toMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-        CacheUtils.activities["LoginActivity"]?.finish()
+        CacheUtils.activities[Constants.Cache.LOGIN_ACTIVITY]?.finish()
         finish()
     }
 

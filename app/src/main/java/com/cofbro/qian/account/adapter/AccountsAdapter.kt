@@ -2,6 +2,7 @@ package com.cofbro.qian.account.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.fastjson.JSONObject
@@ -43,7 +44,7 @@ import com.cofbro.qian.utils.getStringExt
 class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
     private var accountData: JSONObject? = null
     private var itemClick: ((JSONObject?) -> Unit)? = null
-    private var itemLongClick: ((JSONObject?, Int) -> Unit)? = null
+    private var itemLongClick: ((View, JSONObject?, Int) -> Unit)? = null
     private var onDataChanged: ((JSONObject?) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountsHolder {
@@ -89,14 +90,14 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
                 }
 
                 itemView.setOnLongClickListener {
-                    itemLongClick?.invoke(itemValue, position)
+                    itemLongClick?.invoke(it, itemValue, position)
                     false
                 }
             }
         }
     }
 
-    fun setItemOnLongClickListener(listener: (JSONObject?, Int) -> Unit) {
+    fun setItemOnLongClickListener(listener: (View, JSONObject?, pos: Int) -> Unit) {
         itemLongClick = listener
     }
 
@@ -152,6 +153,13 @@ class AccountsAdapter : RecyclerView.Adapter<AccountsAdapter.AccountsHolder>() {
         } ?: 0
         if (size > 0) {
             notifyItemInserted(size - 1)
+            onDataChanged?.invoke(accountData)
+        }
+    }
+
+    fun notifyItemAccountChanged(pos: Int) {
+        if (pos < (accountData?.getIntExt(Constants.Account.SIZE) ?: 0) && pos >= 0) {
+            notifyItemChanged(pos)
             onDataChanged?.invoke(accountData)
         }
     }
