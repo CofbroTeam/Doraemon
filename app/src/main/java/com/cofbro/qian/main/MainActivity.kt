@@ -1,6 +1,9 @@
 package com.cofbro.qian.main
 
 import android.os.Bundle
+import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.R
@@ -8,6 +11,8 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
+import com.cofbro.qian.utils.CacheUtils
+import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
 import com.hjq.toast.ToastUtils
 
@@ -20,7 +25,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var lastShowFragment: Fragment? = null
     private var contentId = -1
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        CacheUtils.activities[Constants.Cache.MAIN_ACTIVITY] = this
         initView()
+        changeNavigationResponsively()
     }
 
 
@@ -81,6 +88,22 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         }
         lastShowFragment = fragmentToShow
         transaction.commit()
+    }
+
+    private fun changeNavigationResponsively() {
+        binding?.root?.post {
+            val windowInsects = ViewCompat.getRootWindowInsets(window.decorView)
+            val height = windowInsects?.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+            updateLayoutParams(height)
+        }
+    }
+
+    private fun updateLayoutParams(height: Int) {
+        if (height > 80) {
+            val layout = binding?.root?.layoutParams as? MarginLayoutParams
+            layout?.bottomMargin = height
+            binding?.root?.layoutParams = layout
+        }
     }
 
 

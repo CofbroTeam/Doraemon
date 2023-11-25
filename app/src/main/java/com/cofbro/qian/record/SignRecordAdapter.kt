@@ -1,6 +1,7 @@
 package com.cofbro.qian.record
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -13,6 +14,7 @@ import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.splitDateStr
+import kotlin.random.Random
 
 
 /**
@@ -36,6 +38,7 @@ import com.cofbro.qian.utils.splitDateStr
  */
 class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewHolder>() {
     private var recordData: JSONObject? = null
+    private val colorMap = hashMapOf<String, Int>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SignRecordViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -61,7 +64,8 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
                 ?: JSONObject()
 
             // uid
-            binding.tvRecordUsername.text = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
+            val uid = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
+            binding.tvRecordUsername.text = uid
 
             // 签到状态
             val status = record.getStringExt(Constants.Recorder.STATUS)
@@ -69,7 +73,8 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
             bindTextColor(status)
 
             // 课程名称
-            binding.tvRecordCourseName.text = record.getStringExt(Constants.Recorder.COURSE_NAME)
+            val courseName = record.getStringExt(Constants.Recorder.COURSE_NAME)
+            binding.tvRecordCourseName.text = courseName
 
             // 绑定时间
             val dateStr = record.getStringExt(Constants.Recorder.TIME)
@@ -78,6 +83,11 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
             binding.tvBookReocrdYear.text = dateArray[0]
             binding.tvBookReocrdMonth.text = dateArray[1]
             binding.tvBookReocrdDay.text = dateArray[2]
+
+            // 渲染颜色
+            val color = getRandomColor(courseName)
+            binding.ticketView.setTopicColor(color)
+            binding.tvBookReocrdDay.setTextColor(color)
         }
 
         private fun bindTextColor(status: String) {
@@ -95,6 +105,21 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
                         R.color.white
                     )
                 )
+            }
+        }
+
+        private fun getRandomColor(courseName: String): Int {
+            return if (colorMap.contains(courseName)) {
+                colorMap[courseName] ?: 0
+            } else {
+                val random = Random(System.currentTimeMillis())
+                val color = Color.rgb(
+                    random.nextInt(206) + 50,
+                    random.nextInt(206) + 50,
+                    random.nextInt(206) + 50
+                )
+                colorMap[courseName] = color
+                color
             }
         }
     }

@@ -16,14 +16,9 @@ class UserListContentViewHolder<T : LCObject>(private val binding: ItemFriendLis
     }
 
     private fun innerBind(t: T?) {
-        if (t?.getString("ownerId") == IMClientUtils.getCntUser()?.objectId.toString()) {
-            binding.tvUsername.text = t.getString("targetName") ?: ""
-            val url = t.getString("targetAvatar") ?: ""
-            setImage(binding.ivAvatar, url)
-        } else {
-            binding.tvUsername.text = t?.getString("owner") ?: ""
-            val url = t?.getString("ownerAvatar") ?: ""
-            setImage(binding.ivAvatar, url)
-        }
+        val url = t?.getString("url") ?: ""
+        val name = t?.getString("name") ?: ""
+        setImage(binding.ivAvatar, url)
+        binding.tvUsername.text = name
     }
 }

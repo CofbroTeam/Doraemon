@@ -12,6 +12,9 @@
     <string name="tab_friend">好友</string>
     <string name="tab_profile">我的</string>
 
+    <string name="pop_add_remark">添加备注</string>
+    <string name="pop_delete">删除账号</string>
+
     <string name="add_file">添加附件</string>
     <string name="submit_file">提 交</string>
 
@@ -29,4 +32,8 @@
     <string name="choose_sign_type_subTitle">为了防止签到失败，我们提供了两种签到方式。请您选择一种签到方式，如果签到失败，请您更换签到方式。</string>
     <string name="choose_sign_positive_text">我要直签！</string>
     <string name="choose_sign_negative_text">输入密码!</string>
+
+    <string name="account_add_remark_hint">点击输入备注</string>
+    <string name="account_add_remark_title">添加备注</string>
+    <string name="account_add_remark_content">为该账号添加备注后，可在日志页面快速查看代签账号是否签到成功。</string>
 </resources>

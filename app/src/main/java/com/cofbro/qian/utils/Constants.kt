@@ -391,8 +391,35 @@ object Constants {
         const val OBJECT_ID = "objectid"
     }
 
+    /**
+     * {
+     *     "history": "true",
+     *     "size": "2"
+     *     "users": [
+     *         {
+     *             "remark": "xxx",
+     *             "username": "cofbro",
+     *             "password": "123456",
+     *             "cookies": "",
+     *             "uid": "000",
+     *             "fid": "000",
+     *             "picUrl": "xxxxxxxxx"
+     *         },
+     *         {
+     *             "remark": "xxx",
+     *             "username": "cofbro",
+     *             "password": "123456",
+     *             "cookies": "",
+     *             "uid": "000",
+     *             "fid": "000",
+     *             "picUrl": "xxxxxxxxx"
+     *         }
+     *       ]
+     * }
+     */
     object Account {
         const val UID = "uid"
+        const val REMARK = "remark"
         const val FID = "fid"
         const val COOKIE = "cookie"
         const val USERNAME = "username"
@@ -403,6 +430,27 @@ object Constants {
         const val HISTORY = "history"
     }
 
+    /**
+     * {
+     *     "size": "2"
+     *     "records": [
+     *         {
+     *             "uid": "000",
+     *             "username": "cofbro",
+     *             "courseName": "数学",
+     *             "time": "2023.10.31 11:00:00",
+     *             "status": "success"
+     *         },
+     *         {
+     *             "uid": "000",
+     *             "username": "cofbro",
+     *             "courseName": "语文",
+     *             "time": "2023.10.31 11:00:00",
+     *             "status": "success"
+     *         }
+     *       ]
+     * }
+     */
     object Recorder {
         const val FILE_NAME = "sign_record"
         const val UID = "uid"
@@ -420,6 +468,8 @@ object Constants {
 
     object Cache {
         const val TOP_ACTIVITY = "topActivity"
+        const val LOGIN_ACTIVITY = "LoginActivity"
+        const val MAIN_ACTIVITY = "MainActivity"
         const val CONV = "conv"
     }
 

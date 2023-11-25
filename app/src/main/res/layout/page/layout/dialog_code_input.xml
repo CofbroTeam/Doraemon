@@ -7,7 +7,7 @@
     android:background="@drawable/app_white_small_radius_bg">
 
     <TextView
-        android:id="@+id/tv_title"
+        android:id="@+id/tv_dialog_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/tv_dialog_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -30,18 +30,19 @@
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title" />
 
     <EditText
         android:id="@+id/tv_code_input"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="12dp"
+        android:textSize="14sp"
         android:hint="点击输入签到码"
         android:maxLines="1"
-        app:layout_constraintEnd_toEndOf="@+id/textView5"
-        app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintEnd_toEndOf="@+id/tv_dialog_content"
+        app:layout_constraintStart_toStartOf="@+id/tv_dialog_content"
+        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_content" />
 
     <View
         android:id="@+id/view2"

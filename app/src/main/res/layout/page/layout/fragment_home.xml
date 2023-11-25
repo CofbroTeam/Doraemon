@@ -51,11 +51,11 @@
 
         <ImageView
             android:id="@+id/iv_scan_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            android:src="@drawable/scan_view"
+            android:src="@drawable/ic_scan"
             app:layout_constraintBottom_toBottomOf="@+id/iv_user_avtar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/iv_user_avtar" />

@@ -14,6 +14,11 @@ import com.cofbro.qian.utils.KeyboardUtil
 import com.hjq.toast.ToastUtils
 
 class CodingDialog(context: Context) : AlertDialog(context) {
+    private var title: TextView? = null
+    private var content: TextView? = null
+    private var positiveButton: TextView? = null
+    private var negativeButton: TextView? = null
+    private var input: EditText? = null
     private var positiveClick: ((String) -> Unit)? = null
     private var negativeClick: ((View) -> Unit)? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,11 +29,9 @@ class CodingDialog(context: Context) : AlertDialog(context) {
         layoutParams?.width = context.resources.displayMetrics.widthPixels - 200
         window?.attributes = layoutParams
 
-        val positiveButton = findViewById<TextView>(R.id.tv_positive)
-        val negativeButton = findViewById<TextView>(R.id.tv_negative)
-        val input = findViewById<EditText>(R.id.tv_code_input)
+        initView()
 
-        input.setOnFocusChangeListener { _, focus ->
+        input?.setOnFocusChangeListener { _, focus ->
             if (focus) {
                 window?.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
             }
@@ -36,18 +39,38 @@ class CodingDialog(context: Context) : AlertDialog(context) {
 //            KeyboardUtil.showKeyboard(context, input)
         }
 
-        positiveButton.setOnClickListener {
+        positiveButton?.setOnClickListener {
             val code = input?.text.toString()
             if (code.isNotEmpty()) {
                 positiveClick?.invoke(code)
             } else {
-                ToastUtils.show("请输入密码或手势密码!")
+                ToastUtils.show("输入点什么吧~")
             }
         }
 
-        negativeButton.setOnClickListener {
+        negativeButton?.setOnClickListener {
             negativeClick?.invoke(it)
         }
+    }
+
+    private fun initView() {
+        positiveButton = findViewById(R.id.tv_positive)
+        negativeButton = findViewById(R.id.tv_negative)
+        input = findViewById(R.id.tv_code_input)
+        title = findViewById(R.id.tv_dialog_title)
+        content = findViewById(R.id.tv_dialog_content)
+    }
+
+    fun setHint(text: String) {
+        input?.hint = text
+    }
+
+    fun setTitle(titleText: String) {
+        title?.text = titleText
+    }
+
+    fun setContent(text: String) {
+        content?.text = text
     }
 
     fun setPositiveClickListener(listener: (String) -> Unit) {

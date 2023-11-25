@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Vibrator
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.hymvvmutils.base.BaseActivity
+import com.cofbro.qian.R
 import com.cofbro.qian.account.adapter.AccountsAdapter
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityAccountmanagerBinding
@@ -22,6 +24,7 @@ import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
+import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.TipDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -58,12 +61,12 @@ class AccountManagerActivity :
             layoutParams = layout
         }
         mAdapter = AccountsAdapter().apply {
-            setItemOnLongClickListener { itemData, _ ->
-                vibrate()
-                showTipDialog(itemData)
+            setItemOnLongClickListener { view, itemData, pos ->
+                showPopMenu(view, itemData, pos)
             }
 
             setDataChangedListener {
+                // 全量更新
                 updateAccountData(it)
                 responseLottieView(it)
             }
@@ -312,6 +315,44 @@ class AccountManagerActivity :
         val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
         if (vibrator.hasVibrator()) {
             vibrator.vibrate(100L)
+        }
+    }
+
+    private fun showPopMenu(view: View, itemData: JSONObject?, pos: Int) {
+        val menu = PopupMenu(this, view)
+        menu.menuInflater.inflate(R.menu.pop_menu, menu.menu)
+        menu.setOnMenuItemClickListener {
+            if (it.itemId == R.id.pop_add_remark) {
+                menu.dismiss()
+                showRemarkDialog(itemData, pos)
+                return@setOnMenuItemClickListener true
+            } else if (it.itemId == R.id.pop_delete) {
+                menu.dismiss()
+                showTipDialog(itemData)
+                return@setOnMenuItemClickListener true
+            }
+            false
+        }
+        vibrate()
+        menu.show()
+    }
+
+    private fun showRemarkDialog(itemData: JSONObject?, pos: Int) {
+        CodingDialog(this).apply {
+            show()
+            setCancelable(false)
+            setHint(context.resources.getString(R.string.account_add_remark_hint))
+            setTitle(context.resources.getString(R.string.account_add_remark_title))
+            setContent(context.resources.getString(R.string.account_add_remark_content))
+            setPositiveClickListener {
+                itemData?.set(Constants.Account.REMARK, it)
+                mAdapter?.notifyItemAccountChanged(pos)
+                dismiss()
+            }
+
+            setNegativeClickListener {
+                dismiss()
+            }
         }
     }
 }

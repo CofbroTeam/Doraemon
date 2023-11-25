@@ -84,10 +84,9 @@
 
                     <EditText
                         android:id="@+id/editText"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="16dp"
-                        android:layout_marginEnd="24dp"
                         android:background="@null"
                         android:hint="搜索用户名字"
                         android:maxLines="1"
@@ -95,12 +94,12 @@
                         android:textColorHint="#6d7f9b"
                         android:textSize="13sp"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_user_search"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
-                        android:id="@+id/imageView9"
+                        android:id="@+id/iv_user_search"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="8dp"
@@ -116,7 +115,7 @@
                     android:layout_width="0dp"
                     android:layout_height="70dp"
                     android:layout_marginTop="12dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="12dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

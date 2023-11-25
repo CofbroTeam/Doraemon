@@ -24,13 +24,23 @@ import kotlin.math.abs
 object KeyboardUtil {
     var sDecorViewInvisibleHeightPre = 0
     private var onGlobalLayoutListener: OnGlobalLayoutListener? = null
-    private var mNavHeight = 0
+    var mNavHeight = 0
     private var sDecorViewDelta = 0
+    private var keyboardHeight = 0
 
     fun showKeyboard(context: Context, editText: EditText) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
     }
+
+    fun hideKeyboard(context: Context, view: View) {
+        if (keyboardHeight != 0) {
+            val imm: InputMethodManager =
+                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
+
     private fun getDecorViewInvisibleHeight(activity: Activity): Int {
         val decorView = activity.window.decorView
             ?: return sDecorViewInvisibleHeightPre
@@ -63,15 +73,16 @@ object KeyboardUtil {
                 val imeHeight = windowInsets.getInsets(WindowInsetsCompat.Type.ime()).bottom
                 val navHeight =
                     windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                mNavHeight = navHeight
                 val hasNavigationBar =
                     windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars()) &&
                             windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom > 0
-                listener.onKeyboardHeightChanged(
-                    if (hasNavigationBar) Math.max(
-                        imeHeight - navHeight,
-                        0
-                    ) else imeHeight
-                )
+                val height = if (hasNavigationBar) Math.max(
+                    imeHeight - navHeight,
+                    0
+                ) else imeHeight
+                listener.onKeyboardHeightChanged(height)
+                keyboardHeight = height
                 return windowInsets
             }
         })
@@ -88,6 +99,7 @@ object KeyboardUtil {
             val height = getDecorViewInvisibleHeight(activity)
             if (sDecorViewInvisibleHeightPre != height) {
                 listener.onKeyboardHeightChanged(height)
+                keyboardHeight = height
                 sDecorViewInvisibleHeightPre = height
             }
         }

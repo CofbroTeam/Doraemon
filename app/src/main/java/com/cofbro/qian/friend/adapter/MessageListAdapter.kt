@@ -16,7 +16,7 @@ class MessageListAdapter : RecyclerView.Adapter<MessageListContentViewHolder<JSO
     ): MessageListContentViewHolder<JSONObject> {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemMessageListBinding.inflate(inflater, parent, false)
-        return MessageListContentViewHolder(binding)
+        return MessageListContentViewHolder(binding, this)
     }
 
     override fun getItemCount(): Int {

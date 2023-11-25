@@ -15,6 +15,6 @@ class NormalSelfSendViewHolder(private val binding: ItemChatNormalMyselfBinding)
         // 时间
         binding.tvTime.text = formatTimestamp(t?.timestamp ?: 0L)
         // 头像
-        setImage(binding.avatar, URL.getAnalysisPath(CacheUtils.cache["uid"] ?: ""))
+        setImage(binding.avatar, URL.getAvtarImgPath(CacheUtils.cache["uid"] ?: ""))
     }
 }

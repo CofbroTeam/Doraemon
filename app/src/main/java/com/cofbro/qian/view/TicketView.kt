@@ -14,8 +14,10 @@ import com.cofbro.qian.R
 class TicketView : View {
     // 整个ticket的圆角大小
     private var ticketRadius = 80f
+
     // ticket中间虚线处的圆角大小
     private var crannyRadius = 50f
+
     // 左边部分的背景
     private val leftPaint = Paint().apply {
         style = Paint.Style.FILL
@@ -24,6 +26,7 @@ class TicketView : View {
         isAntiAlias = true
         isDither = true
     }
+
     // 右边部分的背景
     private val rightPaint = Paint().apply {
         style = Paint.Style.FILL
@@ -32,6 +35,7 @@ class TicketView : View {
         isAntiAlias = true
         isDither = true
     }
+
     // 虚线的画笔
     private val dashPaint = Paint().apply {
         style = Paint.Style.STROKE
@@ -47,19 +51,28 @@ class TicketView : View {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         init(attrs)
     }
+
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
         defStyleAttr
     )
 
+    fun setTopicColor(color: Int) {
+        leftPaint.color = color
+        dashPaint.color = leftPaint.color
+        invalidate()
+    }
+
     private fun init(attrs: AttributeSet?) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.TicketView)
         ticketRadius = typedArray.getDimension(R.styleable.TicketView_ticketRadius, 80f)
         crannyRadius = typedArray.getDimension(R.styleable.TicketView_crannyRadius, 70f)
-        leftPaint.color = typedArray.getColor(R.styleable.TicketView_leftBackground, Color.parseColor("#3170ff"))
+        leftPaint.color =
+            typedArray.getColor(R.styleable.TicketView_leftBackground, Color.parseColor("#3170ff"))
         dashPaint.color = leftPaint.color
-        rightPaint.color = typedArray.getColor(R.styleable.TicketView_rightBackground, Color.parseColor("#ffffff"))
+        rightPaint.color =
+            typedArray.getColor(R.styleable.TicketView_rightBackground, Color.parseColor("#ffffff"))
         typedArray.recycle()
     }
 
@@ -96,7 +109,15 @@ class TicketView : View {
 
     private fun clipRoundedRect(canvas: Canvas) {
         val path = Path()
-        path.addRoundRect(0f, 0f, width.toFloat(), height.toFloat(), ticketRadius, ticketRadius, Path.Direction.CCW)
+        path.addRoundRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            ticketRadius,
+            ticketRadius,
+            Path.Direction.CCW
+        )
         canvas.clipPath(path)
     }
 
