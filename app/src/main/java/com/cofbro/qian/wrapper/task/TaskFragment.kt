@@ -40,6 +40,7 @@ import kotlinx.coroutines.withContext
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var remark = ""
     private var alreadySignCount = 0
     private var otherSignUsers: JSONArray? = null
     private var qrCodeId = ""
@@ -221,6 +222,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
                     val itemUser =
                         otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
+                    remark = itemUser.getStringExt(Constants.Account.REMARK)
                     tryLogin(itemUser)
                     alreadySignCount++
                 } else {
@@ -496,6 +498,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
             if (firstUser != null) {
                 alreadySignCount++
+                remark = firstUser.getStringExt(Constants.Account.REMARK)
                 tryLogin(firstUser)
             }
         }
@@ -511,7 +514,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private fun record(uid: String, status: Boolean) {
         val courseName = activity?.courseName ?: ""
         val statusName = if (status) "成功" else "失败"
-        SignRecorder.record(requireContext(), uid, courseName, statusName)
+        val username = if (remark.isNotEmpty()) "$uid - ($remark)" else uid
+        SignRecorder.record(requireContext(), username, courseName, statusName)
     }
 
     private fun tryLogin(user: JSONObject) {
