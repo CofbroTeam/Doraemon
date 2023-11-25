@@ -68,13 +68,25 @@ class MapViewModel : BaseViewModel<MapRepository>() {
             }
         }
     }
+    fun analysisForSignTogether(url: String, cookies: String, onSuccess: (Response) -> Unit = {}, onFailure: (String) -> Unit = {}) {
+        val request = NetworkUtils.buildClientRequest(url, cookies)
+        NetworkUtils.requestAsync(request, onSuccess, onFailure)
+    }
+    suspend fun request(url: String, cookies: String = "") {
+        repository.request(ResponseMutableLiveData(), false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
 
-     fun preSign(url: String, cookies: String = "") {
-         viewModelScope.launch(Dispatchers.IO) {
-             repository.request(preSignLiveData) {
-                 val request = NetworkUtils.buildClientRequest(url)
-                 NetworkUtils.request(request)
-             }
+    suspend fun preSign(url: String, cookies: String = "") {
+         repository.request(preSignLiveData, false) {
+             val request = if (cookies.isEmpty()) {
+                 NetworkUtils.buildClientRequest(url)
+             } else NetworkUtils.buildClientRequest(url, cookies)
+             NetworkUtils.request(request)
          }
     }
     suspend fun signTogether(url: String, cookies: String) {

@@ -62,6 +62,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var cookies = ""
     private var preSignUrl = ""
     private var m_status = true
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         getAvtarImage()
         initArgs()
@@ -73,7 +74,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun doNetwork() {
-        viewModel.preSign(viewModel.preUrl)
+        lifecycleScope.launch(Dispatchers.IO){
+            analysisAndStartSign(viewModel.aid)
+            viewModel.preSign(viewModel.preUrl)
+        }
     }
 
     private fun initLocationData() {
@@ -379,11 +383,11 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             if (viewModel.statuscontent == "签到成功") {
                 ToastUtil.show(applicationContext, "您已经签到过了")
                 val intent = Intent(applicationContext, MainActivity::class.java)
-                startActivity(intent)
+//                startActivity(intent)
             }
             if (viewModel.statuscontent != "签到成功"&&viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
-                Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "修改位置成功", Toast.LENGTH_SHORT).show()
                 if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
@@ -505,7 +509,12 @@ private suspend fun analysisAndStartSign(aid: String) {
                             ToastUtil.show(applicationContext, "签到已成功")
                             val intent = Intent(applicationContext, MainActivity::class.java)
                             signRecord(data)
+                            /**
+                             * 开始代签
+                             */
+                            startSignTogether(data)
                             startActivity(intent)
+
                         } else {
                             m_status  = false
                             ToastUtil.show(applicationContext, "签到失败")
@@ -527,16 +536,15 @@ private suspend fun analysisAndStartSign(aid: String) {
                 val data = it.data?.body?.string()
                 val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
                 viewModel.analysis2(URL.getAnalysis2Path(analysis2Code))
-                lifecycleScope.launch(Dispatchers.IO) {
-                    viewModel.sign(viewModel.signUrl)
-                }
+//                lifecycleScope.launch(Dispatchers.IO) {
+//                    viewModel.sign(viewModel.signUrl)
+//                }
             }
 
         }
         viewModel.preSignLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
-                val data = it.data?.body?.string()
-                data?.let {
+                it.data?.body?.string()?.let {
                     val html = Jsoup.parse(it)
                     val locationText = html.getElementById("locationText")?.`val`()
                     val latitude = html.getElementById("locationLatitude")?.`val`()
@@ -564,7 +572,7 @@ private suspend fun analysisAndStartSign(aid: String) {
                             ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
                             viewModel.default_Sign_Lating = viewModel.default_My_Lating
 
-                        }else if(statusContent == "签到成功"){
+                        } else if (statusContent == "签到成功") {
                             alreadySign = true
                         }
 
@@ -586,6 +594,19 @@ private suspend fun analysisAndStartSign(aid: String) {
 
                 }
 
+
+            }
+        }
+        // 尝试登录
+        viewModel.loginLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
+            lifecycleScope.launch(Dispatchers.IO) {
+                val body = data.body?.string()?.safeParseToJson()
+                val headers = data.headers
+                cookies = headers.values("Set-Cookie").toString()
+                if (body?.getBoolean("status") == true) {
+                      signWith(viewModel.aid,cookies)
+                }
             }
         }
         // 绑定签到
@@ -595,31 +616,71 @@ private suspend fun analysisAndStartSign(aid: String) {
                 val body = data.body?.string() ?: ""
                 val headers = data.headers
                 cookies = headers.values("Set-Cookie").toString()
-
-//                signRecord(body, cookies)
+               signRecord(body, cookies)
             }
         }
+    }
+    private suspend fun signWith(id: String, cookies: String) {
+        viewModel.analysisForSignTogether(URL.getAnalysisPath(id),
+            cookies,
+            onSuccess = {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val data = it.body?.string()
+                    val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                    viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
+                    val uid = findUID(cookies)
+                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+                    val tempSignpre = preSignUrl.replace(viewModel.uid,uid)
+                    viewModel.preSign(tempSignpre, cookies)
+                    /*
+                    拼接URL
+                     */
+                    signTogether(cookies)
+                }
+            },
+            onFailure = { msg ->
+                ToastUtils.show(msg)
+            }
+        )
     }
 
     private fun sign(url: String) {
         lifecycleScope.launch (Dispatchers.IO){
-            analysisAndStartSign(viewModel.aid)
-//            viewModel.sign(url)
+            /**
+             * 绑定签到  判断
+             */
+//            analysisAndStartSign(viewModel.aid)
+            viewModel.sign(url)
         }
 
     }
-    private suspend fun signTogether(url: String, cookies: String) {
+    private suspend fun signTogether(cookies: String) {
         val uid = findUID(cookies)
-        viewModel.signTogether(viewModel.signUrl,cookies)
+        val tempUrl = viewModel.signUrl.replace(viewModel.uid,uid)
+        viewModel.signTogether(tempUrl,cookies)
     }
     private suspend fun startSignTogether(data: String) {
         // 开始代签
         val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
-
+            signWithAccounts()
         }
     }
+    private suspend fun signWithAccounts() {
+        withContext(Dispatchers.IO) {
+            val data = AccountManager.loadAllAccountData(applicationContext)
+            val users = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
+            users?.let {
+                it.forEach { item ->
+                    val user = item as? JSONObject ?: JSONObject()
+                    tryLogin(user)
+                    delay(300)
+                }
+            }
+        }
+    }
+
     private fun tryLogin(user: JSONObject) {
         val username = user.getStringExt(com.cofbro.qian.utils.Constants.Account.USERNAME)
         val password = user.getStringExt(com.cofbro.qian.utils.Constants.Account.PASSWORD)
@@ -633,46 +694,48 @@ private suspend fun analysisAndStartSign(aid: String) {
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
-        binding?.maps!!.onCreate(savedInstanceState)
-        if (binding?.maps?.map == null) {
-            setUpMap()
-        }
-        binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
-            binding?.maps?.map?.clear()
-            addLatLngMarker(latLng, default = true)
-            viewModel.currentTipPoint = latLng
-            addLatingDefaultMarker(viewModel.default_Sign_Lating)
-        }
-        if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
-            val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
-            if (tip != null) {
-                /**
-                获取完整Tip
-                 */
-                binding?.maps?.map?.clear()
-                viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
-                if (tip[2] == null || tip[2] == "") {
-                    doSearchQuery(tip[0])
-                } else {
-                    addTipMarker(tip)
-                }
-                if (tip[0].isNotEmpty()) {
-                    binding?.selectButton?.visibility = View.VISIBLE
-                    binding?.etLocationName?.visibility = View.VISIBLE
-                    binding?.mainKeywords?.text = tip[0]
-                }
-
-                if (tip[0] != "") {
-                    //binding?.cleanKeywords?.visibility = View.VISIBLE
-                }
-                // 获取完整的name和address
-                viewModel.Tip_name = tip[0]
-                viewModel.Tip_address = tip[1]
-                viewModel.Tip_City = tip[5]
-
+            binding?.maps!!.onCreate(savedInstanceState)
+            if (binding?.maps?.map == null) {
+                setUpMap()
             }
-        }
-        getCurrentLocationLatLng()
+            binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
+                binding?.maps?.map?.clear()
+                addLatLngMarker(latLng, default = true)
+                viewModel.currentTipPoint = latLng
+                addLatingDefaultMarker(viewModel.default_Sign_Lating)
+            }
+            if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+                val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
+                if (tip != null) {
+                    /**
+                    获取完整Tip
+                     */
+                    binding?.maps?.map?.clear()
+                    viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
+                    if (tip[2] == null || tip[2] == "") {
+                        doSearchQuery(tip[0])
+                    } else {
+                        addTipMarker(tip)
+                    }
+                    if (tip[0].isNotEmpty()) {
+                        binding?.selectButton?.visibility = View.VISIBLE
+                        binding?.etLocationName?.visibility = View.VISIBLE
+                        binding?.mainKeywords?.text = tip[0]
+                    }
+
+                    if (tip[0] != "") {
+                        //binding?.cleanKeywords?.visibility = View.VISIBLE
+                    }
+                    // 获取完整的name和address
+                    viewModel.Tip_name = tip[0]
+                    viewModel.Tip_address = tip[1]
+                    viewModel.Tip_City = tip[5]
+
+                }
+            }
+            getCurrentLocationLatLng()
+
+
     }
 
     private fun urlEncodeChinese(urlString: String): String {
