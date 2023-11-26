@@ -586,7 +586,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                 } else if (preWeb.statusContent == "签到成功") {
                                     alreadySign = true
                                 }
-
                                 CacheUtils.cache["default_Sign_latitude"] = preWeb.latitude
                                 CacheUtils.cache["default_Sign_longitude"] = preWeb.longitude
                             } else {
@@ -598,6 +597,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                     viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
                                     viewModel.default_Sign_Location = preWeb.locationText
                                     viewModel.statuscontent = preWeb.statusContent
+                                    if (preWeb.locationText?.isEmpty() == true && preWeb.statusContent != "签到成功") {
+                                        ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
+                                        viewModel.default_Sign_Lating = viewModel.default_My_Lating
+                                    } else if (preWeb.statusContent == "签到成功") {
+                                        alreadySign = true
+                                    }
                                     CacheUtils.cache["default_Sign_latitude"] = lat
                                     CacheUtils.cache["default_Sign_longitude"] = long
                                 }

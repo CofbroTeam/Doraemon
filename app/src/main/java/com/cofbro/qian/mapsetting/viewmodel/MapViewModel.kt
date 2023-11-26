@@ -11,6 +11,8 @@ import com.amap.api.services.poisearch.PoiSearchV2
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.mapsetting.repository.MapRepository
+import com.cofbro.qian.mapsetting.util.PreWeb
+import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,20 +108,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
         }
     }
     fun preSignWebGet(it:String,onSuccess: (PreWeb) -> Unit = {}){
-        val html = Jsoup.parse(it)
-        val locationText = html.getElementById("locationText")?.`val`()
-        val latitude = html.getElementById("locationLatitude")?.`val`()
-        val longitude = html.getElementById("locationLongitude")?.`val`()
-        val statusContent =
-            html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
-
-        onSuccess(PreWeb(html,locationText,latitude,longitude,statusContent))
-
+        onSuccess(HtmlParser.parsepreSignWebGet(it))
     }
-    class PreWeb(
-        val html: Document,
-        val locationText:String?,
-        val latitude:String?,
-        val longitude:String?,
-        val statusContent:String)
+
 }
