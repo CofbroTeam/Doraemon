@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -44,6 +45,7 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
+import com.cofbro.qian.view.FullScreenDialog
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -60,10 +62,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener {
     private var alreadySign = false
     private var cookies = ""
+    private var remark = ""
     private var preSignUrl = ""
-    private var m_status = true
-
+    private var mStatus = true
+    private var otherSignUsers: JSONArray? = null
+    private var alreadySignCount = 0
+    private var loadingDialog: Dialog? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
         getAvtarImage()
         initArgs()
         initObserver()
@@ -74,7 +80,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     }
 
     private fun doNetwork() {
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             analysisAndStartSign(viewModel.aid)
             viewModel.preSign(viewModel.preUrl)
         }
@@ -118,7 +124,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     viewModel.default_My_Lating =
                         LatLng(amapLocation.latitude, amapLocation.longitude)
                     addLatingDefaultMarker(viewModel.default_My_Lating)
-                    Log.v("sss",amapLocation.address )
+                    Log.v("sss", amapLocation.address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -383,9 +389,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             if (viewModel.statuscontent == "签到成功") {
                 ToastUtil.show(applicationContext, "您已经签到过了")
                 val intent = Intent(applicationContext, MainActivity::class.java)
-//                startActivity(intent)
+                startActivity(intent)
             }
-            if (viewModel.statuscontent != "签到成功"&&viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
+            if (viewModel.statuscontent != "签到成功" && viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
                 Toast.makeText(this, "修改位置成功", Toast.LENGTH_SHORT).show()
                 if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
@@ -466,17 +472,29 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
 
     }
-    private fun signRecord(body: String, cookies: String = "") {
-        if(alreadySign) return
-        val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
-        record(uid, status = m_status)
+
+    private fun signRecord(body: String = "", cookies: String = "") {
+
+        if (alreadySign) return
+        if(body.isNotEmpty()){
+            val status = body.contains("成功") || body.contains("success")
+            val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+            record(uid, status = status)
+        }else{
+            val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+            record(uid, status = mStatus)
+        }
+
     }
+
     private fun record(uid: String, status: Boolean) {
         val courseName = viewModel.courseName
         val statusName = if (status) "成功" else "失败"
-        SignRecorder.record(applicationContext, uid, courseName!!, statusName)
+        val username = if (remark.isNotEmpty()) "$uid - ($remark)" else uid
+        SignRecorder.record(applicationContext, username, courseName!!, statusName)
     }
-//    private suspend fun signWith(id: String, code: String = "", cookies: String) {
+
+    //    private suspend fun signWith(id: String, code: String = "", cookies: String) {
 //        val uid = findUID(cookies)
 //        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
 //        viewModel.preSign(signWithPreSign, cookies)
@@ -486,9 +504,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 //            signTogether(qrCodeId, cookies)
 //        }
 //    }
-private suspend fun analysisAndStartSign(aid: String) {
-    viewModel.analysis(URL.getAnalysisPath(aid))
-}
+    private suspend fun analysisAndStartSign(aid: String) {
+        viewModel.analysis(URL.getAnalysisPath(aid))
+    }
+
     private fun initObserver() {
         // 签到
         viewModel.signLiveData.observe(this) {
@@ -505,18 +524,20 @@ private suspend fun analysisAndStartSign(aid: String) {
                          * 回到TaskFragment
                          */
                         if (data!!.contains("success")) {
-                            m_status  = true
+                            mStatus = true
                             ToastUtil.show(applicationContext, "签到已成功")
-                            val intent = Intent(applicationContext, MainActivity::class.java)
+
                             signRecord(data)
                             /**
                              * 开始代签
                              */
+                            // 开始代签
+                            showLoadingView()
                             startSignTogether(data)
-                            startActivity(intent)
+//                            startActivity(intent)
 
                         } else {
-                            m_status  = false
+                            mStatus = false
                             ToastUtil.show(applicationContext, "签到失败")
 //                            val intent = Intent(applicationContext, MainActivity::class.java)
                             signRecord(data)
@@ -547,10 +568,19 @@ private suspend fun analysisAndStartSign(aid: String) {
                 it.data?.body?.string()?.let {
                     val html = Jsoup.parse(it)
                     val locationText = html.getElementById("locationText")?.`val`()
+
                     val latitude = html.getElementById("locationLatitude")?.`val`()
                     val longitude = html.getElementById("locationLongitude")?.`val`()
                     val statusContent =
                         html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
+                    binding?.mainKeywords?.apply {
+                        hint = if (locationText?.isNotEmpty() == true) {
+                            locationText
+                        } else {
+                            "老师未设置位置,请点击搜索"
+                        }
+                    }
+
                     if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
                         viewModel.currentTipPoint =
                             LatLng(latitude.toDouble(), longitude.toDouble())
@@ -605,7 +635,7 @@ private suspend fun analysisAndStartSign(aid: String) {
                 val headers = data.headers
                 cookies = headers.values("Set-Cookie").toString()
                 if (body?.getBoolean("status") == true) {
-                      signWith(viewModel.aid,cookies)
+                    signWith(viewModel.aid, cookies)
                 }
             }
         }
@@ -614,12 +644,38 @@ private suspend fun analysisAndStartSign(aid: String) {
             val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string() ?: ""
-                val headers = data.headers
-                cookies = headers.values("Set-Cookie").toString()
-               signRecord(body, cookies)
+                signRecord(body, cookies)
+                if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
+                    val itemUser =
+                        otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
+                    remark = itemUser.getStringExt(com.cofbro.qian.utils.Constants.Account.REMARK)
+                    tryLogin(itemUser)
+                    alreadySignCount++
+                } else {
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+
             }
         }
     }
+
+    private fun showLoadingView() {
+        if (loadingDialog == null) {
+            loadingDialog = FullScreenDialog(this)
+        }
+        loadingDialog?.setCancelable(false)
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingView() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
+
     private suspend fun signWith(id: String, cookies: String) {
         viewModel.analysisForSignTogether(URL.getAnalysisPath(id),
             cookies,
@@ -628,9 +684,9 @@ private suspend fun analysisAndStartSign(aid: String) {
                     val data = it.body?.string()
                     val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
                     viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
+                    delay(200)
                     val uid = findUID(cookies)
-                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-                    val tempSignpre = preSignUrl.replace(viewModel.uid,uid)
+                    val tempSignpre =viewModel.preUrl.replace(viewModel.uid, uid)
                     viewModel.preSign(tempSignpre, cookies)
                     /*
                     拼接URL
@@ -645,7 +701,7 @@ private suspend fun analysisAndStartSign(aid: String) {
     }
 
     private fun sign(url: String) {
-        lifecycleScope.launch (Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             /**
              * 绑定签到  判断
              */
@@ -654,29 +710,34 @@ private suspend fun analysisAndStartSign(aid: String) {
         }
 
     }
+
     private suspend fun signTogether(cookies: String) {
         val uid = findUID(cookies)
-        val tempUrl = viewModel.signUrl.replace(viewModel.uid,uid)
-        viewModel.signTogether(tempUrl,cookies)
+        val tempUrl = viewModel.signUrl.replace(viewModel.uid, uid)
+        viewModel.signTogether(tempUrl, cookies)
     }
+
     private suspend fun startSignTogether(data: String) {
         // 开始代签
         val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             signWithAccounts()
+        }else{
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            startActivity(intent)
         }
     }
+
     private suspend fun signWithAccounts() {
         withContext(Dispatchers.IO) {
             val data = AccountManager.loadAllAccountData(applicationContext)
-            val users = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
-            users?.let {
-                it.forEach { item ->
-                    val user = item as? JSONObject ?: JSONObject()
-                    tryLogin(user)
-                    delay(300)
-                }
+            otherSignUsers = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
+            val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
+            if (firstUser != null) {
+                alreadySignCount++
+                remark = firstUser.getStringExt(com.cofbro.qian.utils.Constants.Account.REMARK)
+                tryLogin(firstUser)
             }
         }
     }
@@ -688,52 +749,53 @@ private suspend fun analysisAndStartSign(aid: String) {
             viewModel.tryLogin(URL.getLoginPath(username, password))
         }
     }
+
     private fun findUID(cookies: String): String {
         val uid = cookies.substringAfter("UID=")
         return uid.substringBefore(";")
     }
 
     private fun initMap(savedInstanceState: Bundle?) {
-            binding?.maps!!.onCreate(savedInstanceState)
-            if (binding?.maps?.map == null) {
-                setUpMap()
-            }
-            binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
+        binding?.maps!!.onCreate(savedInstanceState)
+        if (binding?.maps?.map == null) {
+            setUpMap()
+        }
+        binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
+            binding?.maps?.map?.clear()
+            addLatLngMarker(latLng, default = true)
+            viewModel.currentTipPoint = latLng
+            addLatingDefaultMarker(viewModel.default_Sign_Lating)
+        }
+        if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+            val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
+            if (tip != null) {
+                /**
+                获取完整Tip
+                 */
                 binding?.maps?.map?.clear()
-                addLatLngMarker(latLng, default = true)
-                viewModel.currentTipPoint = latLng
-                addLatingDefaultMarker(viewModel.default_Sign_Lating)
-            }
-            if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
-                val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
-                if (tip != null) {
-                    /**
-                    获取完整Tip
-                     */
-                    binding?.maps?.map?.clear()
-                    viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
-                    if (tip[2] == null || tip[2] == "") {
-                        doSearchQuery(tip[0])
-                    } else {
-                        addTipMarker(tip)
-                    }
-                    if (tip[0].isNotEmpty()) {
-                        binding?.selectButton?.visibility = View.VISIBLE
-                        binding?.etLocationName?.visibility = View.VISIBLE
-                        binding?.mainKeywords?.text = tip[0]
-                    }
-
-                    if (tip[0] != "") {
-                        //binding?.cleanKeywords?.visibility = View.VISIBLE
-                    }
-                    // 获取完整的name和address
-                    viewModel.Tip_name = tip[0]
-                    viewModel.Tip_address = tip[1]
-                    viewModel.Tip_City = tip[5]
-
+                viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
+                if (tip[2] == null || tip[2] == "") {
+                    doSearchQuery(tip[0])
+                } else {
+                    addTipMarker(tip)
                 }
+                if (tip[0].isNotEmpty()) {
+                    binding?.selectButton?.visibility = View.VISIBLE
+                    binding?.etLocationName?.visibility = View.VISIBLE
+                    binding?.mainKeywords?.text = tip[0]
+                }
+
+                if (tip[0] != "") {
+                    //binding?.cleanKeywords?.visibility = View.VISIBLE
+                }
+                // 获取完整的name和address
+                viewModel.Tip_name = tip[0]
+                viewModel.Tip_address = tip[1]
+                viewModel.Tip_City = tip[5]
+
             }
-            getCurrentLocationLatLng()
+        }
+        getCurrentLocationLatLng()
 
 
     }
