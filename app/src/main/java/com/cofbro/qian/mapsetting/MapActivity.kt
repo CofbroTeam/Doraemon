@@ -10,8 +10,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -45,10 +45,9 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
-import com.cofbro.qian.utils.urlEncodeChinese
+import com.cofbro.qian.view.FullScreenDialog
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,13 +62,17 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener {
     private var alreadySign = false
     private var cookies = ""
+    private var remark = ""
     private var preSignUrl = ""
+    private var mStatus = true
+    private var otherSignUsers: JSONArray? = null
+    private var alreadySignCount = 0
+    private var loadingDialog: Dialog? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        getCurrentLocationLatLng()
+
         getAvtarImage()
         initArgs()
         initObserver()
-
         doNetwork()
         initViewClick()
         initMap(savedInstanceState)
@@ -78,7 +81,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
     private fun doNetwork() {
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.preSign(viewModel.preUrl,"")
+            analysisAndStartSign(viewModel.aid)
+            viewModel.preSign(viewModel.preUrl)
         }
     }
 
@@ -100,27 +104,27 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.mLocationClient?.setLocationListener { amapLocation ->
             if (amapLocation != null) {
                 if (amapLocation.errorCode == 0) {
-                    amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
-                    amapLocation.latitude //获取纬度
-                    amapLocation.longitude //获取经度
-                    amapLocation.accuracy //获取精度信息
-                    amapLocation.address //地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
-                    amapLocation.country //国家信息
-                    amapLocation.province //省信息
-                    amapLocation.city //城市信息
-                    amapLocation.district //城区信息
-                    amapLocation.street //街道信息
-                    amapLocation.streetNum //街道门牌号信息
-                    amapLocation.cityCode //城市编码
-                    amapLocation.adCode //地区编码
-                    amapLocation.aoiName //获取当前定位点的AOI信息
-                    amapLocation.buildingId //获取当前室内定位的建筑物Id
-                    amapLocation.floor //获取当前室内定位的楼层
-                    amapLocation.gpsAccuracyStatus //获取GPS的当前状态
+//                    amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
+//                    amapLocation.latitude //获取纬度
+//                    amapLocation.longitude //获取经度
+//                    amapLocation.accuracy //获取精度信息
+//                    amapLocation.address //地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
+//                    amapLocation.country //国家信息
+//                    amapLocation.province //省信息
+//                    amapLocation.city //城市信息
+//                    amapLocation.district //城区信息
+//                    amapLocation.street //街道信息
+//                    amapLocation.streetNum //街道门牌号信息
+//                    amapLocation.cityCode //城市编码
+//                    amapLocation.adCode //地区编码
+//                    amapLocation.aoiName //获取当前定位点的AOI信息
+//                    amapLocation.buildingId //获取当前室内定位的建筑物Id
+//                    amapLocation.floor //获取当前室内定位的楼层
+//                    amapLocation.gpsAccuracyStatus //获取GPS的当前状态
                     viewModel.default_My_Lating =
                         LatLng(amapLocation.latitude, amapLocation.longitude)
-                    viewModel.default_My_Location =  amapLocation.country +amapLocation.province +amapLocation.city
                     addLatingDefaultMarker(viewModel.default_My_Lating)
+                    Log.v("sss", amapLocation.address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     Log.e(
@@ -383,14 +387,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
              * 绑定签到
              */
             if (viewModel.statuscontent == "签到成功") {
-                ToastUtil.show(applicationContext, "签到已成功")
+                ToastUtil.show(applicationContext, "您已经签到过了")
                 val intent = Intent(applicationContext, MainActivity::class.java)
-
                 startActivity(intent)
             }
-            if (viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
+            if (viewModel.statuscontent != "签到成功" && viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
-                Toast.makeText(this, "定位成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "修改位置成功", Toast.LENGTH_SHORT).show()
                 if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
@@ -423,6 +426,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             lat = viewModel.default_Sign_Lating?.latitude.toString(),
                             long = viewModel.default_Sign_Lating?.longitude.toString()
                         )
+                        viewModel.signUrl = defaultUrl
                         sign(defaultUrl)
 
                     } else {
@@ -468,16 +472,40 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
 
     }
-    private fun signRecord(body: String, cookies: String = "") {
-        if (!alreadySign) return
-        val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
-        val status = body.contains("成功") || body.contains("success")
-        record(uid, status)
+
+    private fun signRecord(body: String = "", cookies: String = "") {
+
+        if (alreadySign) return
+        if(body.isNotEmpty()){
+            val status = body.contains("成功") || body.contains("success")
+            val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+            record(uid, status = status)
+        }else{
+            val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
+            record(uid, status = mStatus)
+        }
+
     }
+
     private fun record(uid: String, status: Boolean) {
         val courseName = viewModel.courseName
         val statusName = if (status) "成功" else "失败"
-        SignRecorder.record(applicationContext, uid, courseName!!, statusName)
+        val username = if (remark.isNotEmpty()) "$uid - ($remark)" else uid
+        SignRecorder.record(applicationContext, username, courseName!!, statusName)
+    }
+
+    //    private suspend fun signWith(id: String, code: String = "", cookies: String) {
+//        val uid = findUID(cookies)
+//        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
+//        viewModel.preSign(signWithPreSign, cookies)
+//        if (qrCodeId.isEmpty()) {
+//            signTogether(id, code, cookies)
+//        } else {
+//            signTogether(qrCodeId, cookies)
+//        }
+//    }
+    private suspend fun analysisAndStartSign(aid: String) {
+        viewModel.analysis(URL.getAnalysisPath(aid))
     }
 
     private fun initObserver() {
@@ -495,18 +523,25 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                         /**
                          * 回到TaskFragment
                          */
-                        if (data!!.contains("签到过了")) {
+                        if (data!!.contains("success")) {
+                            mStatus = true
                             ToastUtil.show(applicationContext, "签到已成功")
-                            val intent = Intent(applicationContext, MainActivity::class.java)
+
                             signRecord(data)
-                            startActivity(intent)
+                            /**
+                             * 开始代签
+                             */
+                            // 开始代签
+                            showLoadingView()
                             startSignTogether(data)
+//                            startActivity(intent)
+
                         } else {
-                            ToastUtil.show(applicationContext, "签到已成功")
-                            val intent = Intent(applicationContext, MainActivity::class.java)
+                            mStatus = false
+                            ToastUtil.show(applicationContext, "签到失败")
+//                            val intent = Intent(applicationContext, MainActivity::class.java)
                             signRecord(data)
-                            startActivity(intent)
-                            startSignTogether(data)
+//                            startActivity(intent)
                         }
 
                         /**
@@ -517,17 +552,35 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 }
             }
         }
-
-        viewModel.preSignLiveData.observe(this) {
+        viewModel.analysisLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val data = it.data?.body?.string()
-                data?.let {
+                val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                viewModel.analysis2(URL.getAnalysis2Path(analysis2Code))
+//                lifecycleScope.launch(Dispatchers.IO) {
+//                    viewModel.sign(viewModel.signUrl)
+//                }
+            }
+
+        }
+        viewModel.preSignLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                it.data?.body?.string()?.let {
                     val html = Jsoup.parse(it)
                     val locationText = html.getElementById("locationText")?.`val`()
+
                     val latitude = html.getElementById("locationLatitude")?.`val`()
                     val longitude = html.getElementById("locationLongitude")?.`val`()
                     val statusContent =
                         html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
+                    binding?.mainKeywords?.apply {
+                        hint = if (locationText?.isNotEmpty() == true) {
+                            locationText
+                        } else {
+                            "老师未设置位置,请点击搜索"
+                        }
+                    }
+
                     if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
                         viewModel.currentTipPoint =
                             LatLng(latitude.toDouble(), longitude.toDouble())
@@ -549,13 +602,16 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
                             viewModel.default_Sign_Lating = viewModel.default_My_Lating
 
+                        } else if (statusContent == "签到成功") {
+                            alreadySign = true
                         }
+
                         CacheUtils.cache["default_Sign_latitude"] = latitude
                         CacheUtils.cache["default_Sign_longitude"] = longitude
                     } else {
                         val lat = html.getElementById("latitude")?.`val`() ?: ""
                         val long = html.getElementById("longitude")?.`val`() ?: ""
-                        if (lat.toInt()!=-1 && long.toInt()!=-1) {
+                        if (lat.isNotEmpty() && long.isNotEmpty()) {
                             viewModel.currentTipPoint = LatLng(lat.toDouble(), lat.toDouble())
                             addLatLngMarker(LatLng(lat.toDouble(), long.toDouble()), default = true)
                             viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
@@ -563,29 +619,24 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             viewModel.statuscontent = statusContent
                             CacheUtils.cache["default_Sign_latitude"] = lat
                             CacheUtils.cache["default_Sign_longitude"] = long
-                        }else{
-                            val default_My_Lating = viewModel.default_My_Lating
-                            val default_My_Location = viewModel.default_My_Location
-                            if(default_My_Location?.isNotEmpty() == true){
-                            val lats = default_My_Lating!!.latitude
-                            val longs = default_My_Lating.longitude
-                            viewModel.currentTipPoint = LatLng(lats, longs)
-                            addLatLngMarker(LatLng(lats, longs), default = true)
-                            viewModel.default_Sign_Lating = LatLng(lats, longs)
-                            viewModel.default_Sign_Location = default_My_Location
-                            viewModel.statuscontent = statusContent
-                            CacheUtils.cache["default_Sign_latitude"] = lats.toString()
-                            CacheUtils.cache["default_Sign_longitude"] = longs.toString()
-                            }else{
-                                ToastUtil.show(applicationContext,"请自行搜索定位")
-                            }
-
-
                         }
                     }
 
                 }
 
+
+            }
+        }
+        // 尝试登录
+        viewModel.loginLiveData.observe(this) { response ->
+            val data = response.data ?: return@observe
+            lifecycleScope.launch(Dispatchers.IO) {
+                val body = data.body?.string()?.safeParseToJson()
+                val headers = data.headers
+                cookies = headers.values("Set-Cookie").toString()
+                if (body?.getBoolean("status") == true) {
+                    signWith(viewModel.aid, cookies)
+                }
             }
         }
         // 绑定签到
@@ -593,56 +644,104 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             val data = response.data ?: return@observe
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string() ?: ""
-                val headers = data.headers
-                cookies = headers.values("Set-Cookie").toString()
-//                val headers = data.headers
-//                val cookies = headers.values("Set-Cookie").toString()
                 signRecord(body, cookies)
+                if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
+                    val itemUser =
+                        otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
+                    remark = itemUser.getStringExt(com.cofbro.qian.utils.Constants.Account.REMARK)
+                    tryLogin(itemUser)
+                    alreadySignCount++
+                } else {
+                    withContext(Dispatchers.Main) {
+                        hideLoadingView()
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        startActivity(intent)
+                    }
+                }
+
             }
         }
     }
 
+    private fun showLoadingView() {
+        if (loadingDialog == null) {
+            loadingDialog = FullScreenDialog(this)
+        }
+        loadingDialog?.setCancelable(false)
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingView() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
+
+    private suspend fun signWith(id: String, cookies: String) {
+        viewModel.analysisForSignTogether(URL.getAnalysisPath(id),
+            cookies,
+            onSuccess = {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val data = it.body?.string()
+                    val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                    viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
+                    delay(200)
+                    val uid = findUID(cookies)
+                    val tempSignpre =viewModel.preUrl.replace(viewModel.uid, uid)
+                    viewModel.preSign(tempSignpre, cookies)
+                    /*
+                    拼接URL
+                     */
+                    signTogether(cookies)
+                }
+            },
+            onFailure = { msg ->
+                ToastUtils.show(msg)
+            }
+        )
+    }
+
     private fun sign(url: String) {
-        viewModel.sign(url)
+        lifecycleScope.launch(Dispatchers.IO) {
+            /**
+             * 绑定签到  判断
+             */
+//            analysisAndStartSign(viewModel.aid)
+            viewModel.sign(url)
+        }
+
     }
-    private suspend fun signTogether(url: String, cookies: String) {
+
+    private suspend fun signTogether(cookies: String) {
         val uid = findUID(cookies)
-        viewModel.signTogether(viewModel.signUrl,cookies)
+        val tempUrl = viewModel.signUrl.replace(viewModel.uid, uid)
+        viewModel.signTogether(tempUrl, cookies)
     }
+
     private suspend fun startSignTogether(data: String) {
         // 开始代签
         val signWith = applicationContext.getBySp("signWith")?.toBoolean() ?: false
-        if (signWith && data != "不在可签到范围内") {
+        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             signWithAccounts()
+        }else{
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            startActivity(intent)
         }
     }
 
     private suspend fun signWithAccounts() {
         withContext(Dispatchers.IO) {
             val data = AccountManager.loadAllAccountData(applicationContext)
-            val users = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
-            users?.let {
-                it.forEach { item ->
-                    val user = item as? JSONObject ?: JSONObject()
-                    tryLogin(user)
-                    delay(300)
-                    val cookies = user.getStringExt(com.cofbro.qian.utils.Constants.Account.COOKIE)
-                    val uid = findUID(cookies)
-                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-                    viewModel.preSign(signWithPreSign, cookies)
-                    delay(3000)
-                    viewModel.signTogether(URL.getLocationSignPath(
-                        address = viewModel.default_Sign_Location,
-                        aid = viewModel.aid,
-                        uid = viewModel.uid,
-                        lat = viewModel.default_Sign_Lating?.latitude.toString(),
-                        long = viewModel.default_Sign_Lating?.longitude.toString()
-                    ), cookies)
-                }
+            otherSignUsers = data.getJSONArray(com.cofbro.qian.utils.Constants.Account.USERS)
+            val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
+            if (firstUser != null) {
+                alreadySignCount++
+                remark = firstUser.getStringExt(com.cofbro.qian.utils.Constants.Account.REMARK)
+                tryLogin(firstUser)
             }
         }
     }
+
     private fun tryLogin(user: JSONObject) {
         val username = user.getStringExt(com.cofbro.qian.utils.Constants.Account.USERNAME)
         val password = user.getStringExt(com.cofbro.qian.utils.Constants.Account.PASSWORD)
@@ -650,6 +749,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             viewModel.tryLogin(URL.getLoginPath(username, password))
         }
     }
+
     private fun findUID(cookies: String): String {
         val uid = cookies.substringAfter("UID=")
         return uid.substringBefore(";")
@@ -695,6 +795,29 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
+        getCurrentLocationLatLng()
+
 
     }
+
+    private fun urlEncodeChinese(urlString: String): String {
+        var url = urlString
+        try {
+            val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
+            var tmp = ""
+            while (matcher.find()) {
+                tmp = matcher.group()
+                url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
+            }
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+        return url.replace(" ", "%20")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        SignRecorder.writeJson(applicationContext)
+    }
+
 }
