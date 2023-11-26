@@ -2,6 +2,7 @@ package com.cofbro.qian.utils
 
 import com.cofbro.hymvvmutils.base.BaseResponse
 import com.cofbro.hymvvmutils.base.DataState
+import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -196,5 +197,6 @@ object NetworkUtils {
             }
         })
     }
+
 
 }

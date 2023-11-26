@@ -15,6 +15,8 @@ import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Response
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 class MapViewModel : BaseViewModel<MapRepository>() {
     val preSignLiveData = ResponseMutableLiveData<Response>()
@@ -103,4 +105,21 @@ class MapViewModel : BaseViewModel<MapRepository>() {
             }
         }
     }
+    fun preSignWebGet(it:String,onSuccess: (PreWeb) -> Unit = {}){
+        val html = Jsoup.parse(it)
+        val locationText = html.getElementById("locationText")?.`val`()
+        val latitude = html.getElementById("locationLatitude")?.`val`()
+        val longitude = html.getElementById("locationLongitude")?.`val`()
+        val statusContent =
+            html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
+
+        onSuccess(PreWeb(html,locationText,latitude,longitude,statusContent))
+
+    }
+    class PreWeb(
+        val html: Document,
+        val locationText:String?,
+        val latitude:String?,
+        val longitude:String?,
+        val statusContent:String)
 }
