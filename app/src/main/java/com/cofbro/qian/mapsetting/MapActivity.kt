@@ -63,11 +63,11 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var alreadySign = false
     private var cookies = ""
     private var remark = ""
-    private var preSignUrl = ""
     private var mStatus = true
     private var otherSignUsers: JSONArray? = null
     private var alreadySignCount = 0
     private var loadingDialog: Dialog? = null
+    private var preSignOther = false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         getAvtarImage()
@@ -472,9 +472,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
 
     }
-
     private fun signRecord(body: String = "", cookies: String = "") {
-
         if (alreadySign) return
         if(body.isNotEmpty()){
             val status = body.contains("成功") || body.contains("success")
@@ -486,24 +484,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         }
 
     }
-
     private fun record(uid: String, status: Boolean) {
         val courseName = viewModel.courseName
         val statusName = if (status) "成功" else "失败"
         val username = if (remark.isNotEmpty()) "$uid - ($remark)" else uid
         SignRecorder.record(applicationContext, username, courseName!!, statusName)
     }
-
-    //    private suspend fun signWith(id: String, code: String = "", cookies: String) {
-//        val uid = findUID(cookies)
-//        val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-//        viewModel.preSign(signWithPreSign, cookies)
-//        if (qrCodeId.isEmpty()) {
-//            signTogether(id, code, cookies)
-//        } else {
-//            signTogether(qrCodeId, cookies)
-//        }
-//    }
     private suspend fun analysisAndStartSign(aid: String) {
         viewModel.analysis(URL.getAnalysisPath(aid))
     }
@@ -557,70 +543,75 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 val data = it.data?.body?.string()
                 val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
                 viewModel.analysis2(URL.getAnalysis2Path(analysis2Code))
-//                lifecycleScope.launch(Dispatchers.IO) {
-//                    viewModel.sign(viewModel.signUrl)
-//                }
             }
 
         }
         viewModel.preSignLiveData.observe(this) {
             lifecycleScope.launch(Dispatchers.IO) {
                 it.data?.body?.string()?.let {
-                    val html = Jsoup.parse(it)
-                    val locationText = html.getElementById("locationText")?.`val`()
-
-                    val latitude = html.getElementById("locationLatitude")?.`val`()
-                    val longitude = html.getElementById("locationLongitude")?.`val`()
-                    val statusContent =
-                        html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
-                    binding?.mainKeywords?.apply {
-                        hint = if (locationText?.isNotEmpty() == true) {
-                            locationText
-                        } else {
-                            "老师未设置位置,请点击搜索"
-                        }
-                    }
-
-                    if (!latitude.isNullOrEmpty() && !longitude.isNullOrEmpty()) {
-                        viewModel.currentTipPoint =
-                            LatLng(latitude.toDouble(), longitude.toDouble())
-                        addLatLngMarker(
-                            LatLng(
-                                viewModel.currentTipPoint.latitude,
-                                viewModel.currentTipPoint.longitude
-                            ), default = true
-                        )
-                        viewModel.default_Sign_Location = locationText
-                        viewModel.default_Sign_Location = locationText
-                        viewModel.statuscontent = statusContent
-                        viewModel.default_Sign_Lating =
-                            LatLng(latitude.toDouble(), longitude.toDouble())
+                    if(preSignOther){
                         /**
-                         * 老师未设置位置 设置提醒
+                         * 代签无需进行操作
                          */
-                        if (locationText?.isEmpty() == true && statusContent != "签到成功") {
-                            ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
-                            viewModel.default_Sign_Lating = viewModel.default_My_Lating
+                    }else{
+                        viewModel.preSignWebGet(it,
+                        onSuccess = { preWeb->
+                            binding?.mainKeywords?.apply {
+                                hint = if (preWeb.locationText?.isNotEmpty() == true) {
+                                    preWeb.locationText
+                                } else {
+                                    "老师未设置位置,请点击搜索"
+                                }
+                            }
+                            if (!preWeb.latitude.isNullOrEmpty() && !preWeb.longitude.isNullOrEmpty()) {
+                                viewModel.currentTipPoint =
+                                    LatLng(preWeb.latitude.toDouble(), preWeb.longitude.toDouble())
+                                addLatLngMarker(
+                                    LatLng(
+                                        viewModel.currentTipPoint.latitude,
+                                        viewModel.currentTipPoint.longitude
+                                    ), default = true
+                                )
+                                viewModel.default_Sign_Location = preWeb.locationText
+                                viewModel.default_Sign_Location = preWeb.locationText
+                                viewModel.statuscontent = preWeb.statusContent
+                                viewModel.default_Sign_Lating =
+                                    LatLng(preWeb.latitude.toDouble(), preWeb.longitude.toDouble())
+                                /**
+                                 * 老师未设置位置 设置提醒
+                                 */
+                                if (preWeb.locationText?.isEmpty() == true && preWeb.statusContent != "签到成功") {
+                                    ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
+                                    viewModel.default_Sign_Lating = viewModel.default_My_Lating
+                                } else if (preWeb.statusContent == "签到成功") {
+                                    alreadySign = true
+                                }
+                                CacheUtils.cache["default_Sign_latitude"] = preWeb.latitude
+                                CacheUtils.cache["default_Sign_longitude"] = preWeb.longitude
+                            } else {
+                                val lat = preWeb.html.getElementById("latitude")?.`val`() ?: ""
+                                val long = preWeb.html.getElementById("longitude")?.`val`() ?: ""
+                                if (lat.isNotEmpty() && long.isNotEmpty()) {
+                                    viewModel.currentTipPoint = LatLng(lat.toDouble(), lat.toDouble())
+                                    addLatLngMarker(LatLng(lat.toDouble(), long.toDouble()), default = true)
+                                    viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
+                                    viewModel.default_Sign_Location = preWeb.locationText
+                                    viewModel.statuscontent = preWeb.statusContent
+                                    if (preWeb.locationText?.isEmpty() == true && preWeb.statusContent != "签到成功") {
+                                        ToastUtil.show(applicationContext, "老师未设置位置，默认位置为自己位置")
+                                        viewModel.default_Sign_Lating = viewModel.default_My_Lating
+                                    } else if (preWeb.statusContent == "签到成功") {
+                                        alreadySign = true
+                                    }
+                                    CacheUtils.cache["default_Sign_latitude"] = lat
+                                    CacheUtils.cache["default_Sign_longitude"] = long
+                                }
+                            }
 
-                        } else if (statusContent == "签到成功") {
-                            alreadySign = true
-                        }
-
-                        CacheUtils.cache["default_Sign_latitude"] = latitude
-                        CacheUtils.cache["default_Sign_longitude"] = longitude
-                    } else {
-                        val lat = html.getElementById("latitude")?.`val`() ?: ""
-                        val long = html.getElementById("longitude")?.`val`() ?: ""
-                        if (lat.isNotEmpty() && long.isNotEmpty()) {
-                            viewModel.currentTipPoint = LatLng(lat.toDouble(), lat.toDouble())
-                            addLatLngMarker(LatLng(lat.toDouble(), long.toDouble()), default = true)
-                            viewModel.default_Sign_Lating = LatLng(lat.toDouble(), lat.toDouble())
-                            viewModel.default_Sign_Location = locationText
-                            viewModel.statuscontent = statusContent
-                            CacheUtils.cache["default_Sign_latitude"] = lat
-                            CacheUtils.cache["default_Sign_longitude"] = long
-                        }
+                        })
+                        preSignOther = false
                     }
+
 
                 }
 
@@ -723,8 +714,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             signWithAccounts()
+            preSignOther=true
         }else{
             val intent = Intent(applicationContext, MainActivity::class.java)
+            preSignOther=false
             startActivity(intent)
         }
     }

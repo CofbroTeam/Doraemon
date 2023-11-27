@@ -1,7 +1,10 @@
 package com.cofbro.qian.utils
 
 import com.alibaba.fastjson.JSONObject
+import com.cofbro.qian.mapsetting.util.PreWeb
+import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 object HtmlParser {
     fun parseHomeworkHTML(html: String): List<JSONObject> {
@@ -64,4 +67,14 @@ object HtmlParser {
         val doc = Jsoup.parse(html)
         return doc.getElementById("signCode")?.`val`() ?: ""
     }
+    fun parsepreSignWebGet(it:String): PreWeb {
+        val html = Jsoup.parse(it)
+        val locationText = html.getElementById("locationText")?.`val`()
+        val latitude = html.getElementById("locationLatitude")?.`val`()
+        val longitude = html.getElementById("locationLongitude")?.`val`()
+        val statusContent =
+            html.getElementsByClass("zsign_success zsign_hook").select(">h1").text()
+        return PreWeb(html, locationText, latitude, longitude, statusContent)
+    }
+
 }
