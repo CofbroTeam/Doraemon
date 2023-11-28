@@ -21,8 +21,13 @@ import com.amap.api.maps2d.model.BitmapDescriptorFactory
 import com.amap.api.maps2d.model.LatLng
 import com.amap.api.maps2d.model.Marker
 import com.amap.api.maps2d.model.MarkerOptions
+import com.amap.api.services.core.LatLonPoint
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.core.SuggestionCity
+import com.amap.api.services.geocoder.GeocodeResult
+import com.amap.api.services.geocoder.GeocodeSearch
+import com.amap.api.services.geocoder.RegeocodeQuery
+import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.bumptech.glide.Glide
@@ -40,6 +45,7 @@ import com.cofbro.qian.mapsetting.util.Constants
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.mapsetting.viewmodel.MapViewModel
 import com.cofbro.qian.utils.AccountManager
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.dp2px
@@ -51,7 +57,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
@@ -59,7 +64,8 @@ import java.util.regex.Pattern
 
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
-    AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener {
+    AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener
+    {
     private var alreadySign = false
     private var cookies = ""
     private var remark = ""
@@ -78,6 +84,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         initMap(savedInstanceState)
         initLocationData()
     }
+
 
     private fun doNetwork() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -720,6 +727,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             preSignOther=false
             startActivity(intent)
         }
+        this
+
     }
 
     private suspend fun signWithAccounts() {
@@ -788,7 +797,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
 
             }
         }
-        getCurrentLocationLatLng()
+        AmapUtils.getCurrentLocationLatLng(applicationContext,
+            onSuccess = {amapLocation->
+                viewModel.default_My_Lating =
+                    LatLng(amapLocation.latitude, amapLocation.longitude)
+                addLatingDefaultMarker(viewModel.default_My_Lating)
+
+                Log.v("sss", amapLocation.address)
+            })
 
 
     }
@@ -812,5 +828,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         super.onStop()
         SignRecorder.writeJson(applicationContext)
     }
+
+
 
 }
