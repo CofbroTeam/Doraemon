@@ -10,6 +10,7 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ActivityLoginBinding
 import com.cofbro.qian.login.sms.SMSActivity
 import com.cofbro.qian.main.MainActivity
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.safeParseToJson
@@ -22,6 +23,7 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
     private var mUsername: String? = null
     private var mPassword: String? = null
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
         tryLogin()
         initObserver()
         initEvent()

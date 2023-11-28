@@ -18,6 +18,7 @@ import com.cofbro.qian.mapsetting.MapActivity
 import com.cofbro.qian.photo.PhotoSignActivity
 import com.cofbro.qian.scan.ScanActivity
 import com.cofbro.qian.utils.AccountManager
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.HtmlParser

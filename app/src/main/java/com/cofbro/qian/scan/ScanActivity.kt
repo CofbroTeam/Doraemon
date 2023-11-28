@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import cn.bingoogolapple.qrcode.core.QRCodeView
 import com.cofbro.qian.databinding.ActivityScanBinding
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.Downloader
 import com.cofbro.qian.utils.GlideEngine
 import com.cofbro.qian.utils.dp2px
@@ -47,6 +48,8 @@ class ScanActivity : AppCompatActivity(), QRCodeView.Delegate {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
+        AmapUtils.checkLocationPermission(this)
+        AmapUtils.openLocation(this)
         checkPermissions(this, PERMISSION_SCAN, 1)
         binding = ActivityScanBinding.inflate(layoutInflater, null, false)
         setContentView(binding?.root)

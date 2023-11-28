@@ -1,8 +1,12 @@
 package com.cofbro.qian.utils
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.content.pm.PackageManager
+import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -10,6 +14,12 @@ import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps2d.model.LatLng
 import com.cofbro.qian.mapsetting.util.ToastUtil
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.tasks.Task
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
@@ -20,6 +30,8 @@ object AmapUtils {
     //要申请的权限
     private val mPermissions =
         Manifest.permission.ACCESS_FINE_LOCATION
+
+    private  final var REQUEST_CODE_LOCATION_SETTINGS = 2
 
     /**
      * 判断是否缺少权限
@@ -111,5 +123,37 @@ object AmapUtils {
         }
         return url.replace(" ", "%20")
     }
+
+    /**直接跳转至位置信息设置界面 */
+    fun openLocation(context: Context) {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        context.startActivity(intent)
+    }
+    fun checkLocationopen(activity: Activity){
+        val locationRequest: LocationRequest = LocationRequest.create()
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+        val client = LocationServices.getSettingsClient(activity)
+
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+        task.addOnSuccessListener { locationSettingsResponse ->
+
+
+        }.addOnFailureListener { e ->
+            if (e is ResolvableApiException) {
+                try {
+                    // 位置设置未满足应用要求
+                    // 弹出对话框提示用户打开位置开关
+                    e.startResolutionForResult(activity, REQUEST_CODE_LOCATION_SETTINGS)
+
+                } catch (sendEx: SendIntentException) {
+                    // 忽略异常
+                }
+            }
+        }
+    }
+
 
 }

@@ -76,7 +76,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
     private var loadingDialog: Dialog? = null
     private var preSignOther = false
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-
+        AmapUtils.checkLocationPermission(this)
+        AmapUtils.openLocation(this)
         getAvtarImage()
         initArgs()
         initObserver()
@@ -806,7 +807,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 addLatingDefaultMarker(viewModel.default_My_Lating)
             },
             onError = {error->
-                ToastUtil.show(applicationContext,error)
+
             })
     }
 
