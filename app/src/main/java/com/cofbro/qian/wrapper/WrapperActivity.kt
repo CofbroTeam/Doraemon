@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityWrapperBinding
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.wrapper.homework.HomeworkFragment
 import com.cofbro.qian.wrapper.task.TaskFragment
 import com.google.android.material.tabs.TabLayoutMediator
@@ -27,34 +28,9 @@ class WrapperActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        getLocationPermission()
+        AmapUtils.checkLocationPermission(this)
         initArgs()
         initView()
-    }
-    private fun getLocationPermission(){
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    // Precise location access granted.
-                }
-                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    // Only approximate location access granted.
-                } else -> {
-                // No location access granted.
-            }
-            }
-        }
-
-// ...
-
-// Before you perform the actual permission request, check whether your app
-// already has the permissions, and whether your app needs to show a permission
-// rationale dialog. For more details, see Request permissions.
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION))
     }
     private fun initArgs() {
         courseId = intent.getStringExtra("courseId") ?: ""
