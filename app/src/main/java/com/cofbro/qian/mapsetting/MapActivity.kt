@@ -28,6 +28,7 @@ import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.GeocodeSearch
 import com.amap.api.services.geocoder.RegeocodeQuery
 import com.amap.api.services.geocoder.RegeocodeResult
+import com.amap.api.services.help.Tip
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
 import com.bumptech.glide.Glide
@@ -769,6 +770,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             addLatingDefaultMarker(viewModel.default_Sign_Lating)
         }
         if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+
             val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
             if (tip != null) {
                 /**
@@ -798,15 +800,14 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
         }
         AmapUtils.getCurrentLocationLatLng(applicationContext,
-            onSuccess = {amapLocation->
+            onSuccess = {amapLocation,address->
                 viewModel.default_My_Lating =
                     LatLng(amapLocation.latitude, amapLocation.longitude)
                 addLatingDefaultMarker(viewModel.default_My_Lating)
-
-                Log.v("sss", amapLocation.address)
+            },
+            onError = {error->
+                ToastUtil.show(applicationContext,error)
             })
-
-
     }
 
     private fun urlEncodeChinese(urlString: String): String {
