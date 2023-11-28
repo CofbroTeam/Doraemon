@@ -22,8 +22,8 @@ object URL {
     fun getSignCodePath(activeId: String, classId: String, courseId: String): String =
         "https://mobilelearn.chaoxing.com/widget/sign/pcTeaSignController/endSign?activeId=$activeId&classId=$classId&courseId=$courseId&isTeacherViewOpen=1"
 
-    fun getSignWithCameraPath(aid: String): String =
-        "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid"
+    fun getSignWithCameraPath(aid: String, location: String = ""): String =
+        "https://mobilelearn.chaoxing.com/pptSign/stuSignajax?activeId=$aid&location=$location"
 
     // 普通签到
     fun getNormalSignPath(

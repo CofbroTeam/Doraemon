@@ -25,6 +25,7 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.utils.urlEncodeChinese
 import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.GestureInputDialog
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URLEncoder
 
 /**
  * @author cofbro
@@ -193,7 +195,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signRecord(data)
                     responseUI(data)
                     // 开始代签
-                    showLoadingView()
                     startSignTogether(data)
                 }
             }
@@ -244,6 +245,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
+            showLoadingView()
             signWithAccounts()
         }
     }
@@ -372,7 +374,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         //val uid = CacheUtils.cache["uid"] ?: ""
         // 暂时不用在url中拼接uid
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.sign(URL.getSignWithCameraPath(id))
+            viewModel.preSign(preSignUrl)
+            delay(200)
+            val address = "{\"result\":1,\"latitude\":,\"longitude\":,\"address\":\"\"}"
+            val locationText = URLEncoder.encode(address, "UTF-8")
+            viewModel.sign(URL.getSignWithCameraPath(id, locationText))
         }
     }
 
