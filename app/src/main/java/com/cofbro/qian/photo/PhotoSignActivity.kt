@@ -127,15 +127,14 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                 })
         }
     }
+
     private suspend fun analysisAndStartSign(aid: String) {
         viewModel.analysis(URL.getAnalysisPath(aid))
     }
-    private fun sign() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val uid = CacheUtils.cache["uid"] ?: ""
-            viewModel.sign(URL.getSignWithPhoto(aid, uid, objectId))
-        }
 
+    private fun sign() {
+        val uid = CacheUtils.cache["uid"] ?: ""
+        viewModel.sign(URL.getSignWithPhoto(aid, uid, objectId))
     }
 
     private fun showLoadingView() {
