@@ -104,9 +104,9 @@ object AmapUtils {
             AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
 
         // 设置为单次定位  : 默认为false
-        mLocationOption.isOnceLocation = false
+        mLocationOption.isOnceLocation = true
+        mLocationOption.isLocationCacheEnable = true
         mLocationOption.httpTimeOut = 20000
-        mLocationOption.isLocationCacheEnable = false
         mLocationClient.setLocationOption(mLocationOption)
         //启动定位
         mLocationClient.startLocation()
