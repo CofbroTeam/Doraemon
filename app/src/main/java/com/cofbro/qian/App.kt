@@ -2,9 +2,12 @@ package com.cofbro.qian
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import cn.leancloud.LeanCloud
 import com.cofbro.hymvvmutils.lean.LeanCloudUtils
+import com.cofbro.qian.update.InstallCompleteReceiver
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.hjq.toast.ToastUtils
@@ -15,6 +18,13 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         ToastUtils.init(this)
         LeanCloudUtils.init(true)
         CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] = Constants.DataLoad.UNLOAD
+        registerInstallPackageReceiver()
+    }
+    private fun registerInstallPackageReceiver() {
+        val installCompleteReceiver = InstallCompleteReceiver()
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_ADDED)
+        filter.addDataScheme("package")
+        registerReceiver(installCompleteReceiver, filter)
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
