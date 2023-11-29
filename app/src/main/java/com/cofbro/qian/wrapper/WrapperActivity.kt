@@ -5,7 +5,6 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityWrapperBinding
-import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.wrapper.homework.HomeworkFragment
 import com.cofbro.qian.wrapper.task.TaskFragment
 import com.google.android.material.tabs.TabLayoutMediator
@@ -23,7 +22,6 @@ class WrapperActivity : AppCompatActivity() {
         setContentView(binding?.root)
         // 初始化工作
         init()
-        AmapUtils.openLocation(this)
     }
 
     private fun init() {
