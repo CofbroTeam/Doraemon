@@ -11,6 +11,7 @@ import com.cofbro.qian.databinding.ActivityMainBinding
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
+import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
@@ -25,10 +26,12 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var lastShowFragment: Fragment? = null
     private var contentId = -1
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        AmapUtils.checkLocationPermission(this)
         CacheUtils.activities[Constants.Cache.MAIN_ACTIVITY] = this
         initView()
         changeNavigationResponsively()
     }
+
 
 
     private fun initView() {

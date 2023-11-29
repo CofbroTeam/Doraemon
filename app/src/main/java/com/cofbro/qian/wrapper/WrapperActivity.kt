@@ -1,9 +1,7 @@
 package com.cofbro.qian.wrapper
 
-import android.Manifest
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityWrapperBinding
@@ -25,10 +23,10 @@ class WrapperActivity : AppCompatActivity() {
         setContentView(binding?.root)
         // 初始化工作
         init()
+
     }
 
     private fun init() {
-        AmapUtils.checkLocationPermission(this)
         initArgs()
         initView()
     }
