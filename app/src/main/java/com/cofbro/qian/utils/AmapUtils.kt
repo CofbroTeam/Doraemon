@@ -155,31 +155,4 @@ object AmapUtils {
         val lm = ctx.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
-    fun checkLocationopen(activity: Activity){
-        val locationRequest: LocationRequest = LocationRequest.create()
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
-        val client = LocationServices.getSettingsClient(activity)
-
-        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
-        task.addOnSuccessListener { locationSettingsResponse ->
-
-
-        }.addOnFailureListener { e ->
-            if (e is ResolvableApiException) {
-                try {
-                    // 位置设置未满足应用要求
-                    // 弹出对话框提示用户打开位置开关
-                    e.startResolutionForResult(activity, REQUEST_CODE_LOCATION_SETTINGS)
-
-                } catch (sendEx: SendIntentException) {
-                    // 忽略异常
-                }
-            }
-        }
-    }
-
-
 }
