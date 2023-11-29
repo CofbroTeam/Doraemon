@@ -12,6 +12,7 @@ import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.home.HomeFragment
 import com.cofbro.qian.profile.ProfileFragment
 import com.cofbro.qian.utils.AmapUtils
+import com.cofbro.qian.update.AutoUpdater
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Constants.BACK_PRESSED_INTERVAL
@@ -30,6 +31,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         CacheUtils.activities[Constants.Cache.MAIN_ACTIVITY] = this
         initView()
         changeNavigationResponsively()
+        AutoUpdater(this).checkUpdate()
     }
 
 

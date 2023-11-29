@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--安装包文件存储路径-->
+    <!--sd卡存储-->
+    <!--代表context.getExternalFilesDirs()-->
+    <!--<external-files-path
+        name="ioc-release-external"
+        path="Download" />-->
+    <!--代表Environment.getExternalStorageDirectory()-->
+    <!--<external-path
+        name="."
+        path="." />-->
+    <!--gpp内部存储-->
+    <!--代表context.getFilesDir()-->
+    <files-path
+        name="app-release-c"
+        path="."/>
+</paths>
