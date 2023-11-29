@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -126,8 +127,18 @@ object AmapUtils {
 
     /**直接跳转至位置信息设置界面 */
     fun openLocation(context: Context) {
-        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-        context.startActivity(intent)
+        if(getGpsStatus(context)){
+
+        }else{
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            context.startActivity(intent)
+        }
+
+    }
+    private  fun getGpsStatus(ctx: Context): Boolean {
+        //从系统服务中获取定位管理器
+        val lm = ctx.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
     fun checkLocationopen(activity: Activity){
         val locationRequest: LocationRequest = LocationRequest.create()

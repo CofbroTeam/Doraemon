@@ -23,7 +23,7 @@ class WrapperActivity : AppCompatActivity() {
         setContentView(binding?.root)
         // 初始化工作
         init()
-
+        AmapUtils.openLocation(this)
     }
 
     private fun init() {
