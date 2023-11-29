@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
+import com.amap.api.maps2d.model.LatLng
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.data.URL
@@ -26,6 +27,7 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
+import com.cofbro.qian.utils.urlEncodeChinese
 import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.GestureInputDialog
@@ -35,12 +37,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 /**
  * @author cofbro
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var latitude = 0.0
+    private var longitude = 0.0
+    private var locationText = ""
+    private var location = ""
     private var remark = ""
     private var alreadySignCount = 0
     private var otherSignUsers: JSONArray? = null
@@ -81,6 +89,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             // SIGNIN:aid=402742574&source=15&Code=402742574&enc=548DF0246153AF088E756B59F33BF3F4
             // https://mobilelearn.chaoxing.com/widget/sign/e?id=2000072435046&c=2000072435046&enc=BC9662672047A2F2E4A607CC59762973&DB_STRATEGY=PRIMARY_KEY&STRATEGY_PARA=id
             // 这里的id包含url中的所有参数
+            showLoadingView()
             val id = result?.substringAfter("id=")
             qrCodeId = id ?: ""
             lifecycleScope.launch(Dispatchers.IO) {
@@ -194,7 +203,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                     signRecord(data)
                     responseUI(data)
                     // 开始代签
-                    showLoadingView()
                     startSignTogether(data)
                 }
             }
@@ -245,6 +253,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
         if (signWith && (data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
+            showLoadingView()
             signWithAccounts()
         }
     }
@@ -370,11 +379,29 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private fun signWithCamera(id: String?) {
         if (id.isNullOrEmpty()) return
-        //val uid = CacheUtils.cache["uid"] ?: ""
-        // 暂时不用在url中拼接uid
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.sign(URL.getSignWithCameraPath(id))
+            viewModel.preSign(preSignUrl)
+            locate {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val address = "{\"result\":1,\"latitude\":$latitude,\"longitude\":$longitude,\"address\":\"$locationText\"}"
+                    location = URLEncoder.encode(address, "UTF-8")
+                    viewModel.sign(URL.getSignWithCameraPath(id, location))
+                }
+            }
         }
+    }
+
+    private fun locate(onLocated : () -> Unit) {
+        AmapUtils.getCurrentLocationLatLng(requireContext(),
+            onSuccess = { latLng, location ->
+                latitude = latLng.latitude
+                longitude = latLng.longitude
+                locationText = URLDecoder.decode(location, "UTF-8")
+                onLocated()
+            }, onError = {
+                ToastUtils.show(it)
+            }
+        )
     }
 
     private suspend fun signNormally(aid: String, signCode: String = "") {
@@ -383,6 +410,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    /**
+     * 除二维码签到的代签流程入口
+     */
     private suspend fun signTogether(aid: String, signCode: String = "", cookies: String) {
         activity?.let {
             viewModel.signTogether(
@@ -392,21 +422,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
+    /**
+     * 二维码代签流程入口
+     */
     private suspend fun signTogether(qrCodeId: String, cookies: String) {
         val uid = findUID(cookies)
-        viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId) + "&uid=$uid", cookies)
-    }
-
-    private suspend fun signTogether(
-        address: String?,
-        aid: String,
-        uid: String,
-        lat: String?,
-        long: String?,
-    ) {
-        activity?.let {
-            viewModel.signTogether(URL.getLocationSignPath(address, aid, uid, lat, long), cookies)
-        }
+        viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId, location) + "&uid=$uid", cookies)
     }
 
     /**
@@ -432,9 +453,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private fun showLoadingView() {
         if (loadingDialog == null) {
             loadingDialog = FullScreenDialog(requireContext())
+            loadingDialog?.setCancelable(false)
+            loadingDialog?.show()
         }
-        loadingDialog?.setCancelable(false)
-        loadingDialog?.show()
     }
 
     private fun hideLoadingView() {

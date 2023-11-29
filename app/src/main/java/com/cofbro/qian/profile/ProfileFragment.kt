@@ -1,5 +1,6 @@
 package com.cofbro.qian.profile
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -60,6 +61,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         val layoutParams = binding?.csMyInfo?.layoutParams as? MarginLayoutParams
         layoutParams?.topMargin = statusBarHeight + dp2px(requireContext(), 5)
     }
+    @SuppressLint("SetTextI18n")
     private fun profileMessageInfo(){
         viewModel.uid.let {
             val options = RequestOptions().transform(
@@ -73,6 +75,8 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         }
 
         binding?.tvProfileUsername?.text = CacheUtils.cache[Constants.USER.USERNAME] ?: "-"
+
+        binding?.tvProfileId?.text = "uid: ${CacheUtils.cache[Constants.USER.UID] ?: "-"}"
     }
     private fun initEvent(){
         binding?.tvLogin?.setOnClickListener {

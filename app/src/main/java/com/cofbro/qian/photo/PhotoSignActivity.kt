@@ -45,6 +45,7 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
     private fun doNetwork() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.requestToken(URL.getUploadToken())
+            analysisAndStartSign(aid)
         }
     }
 
@@ -76,6 +77,14 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                     finish()
                 }
             }
+        }
+        viewModel.analysisLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val data = it.data?.body?.string()
+                val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
+                viewModel.analysis2(URL.getAnalysis2Path(analysis2Code))
+            }
+
         }
     }
 
@@ -117,6 +126,10 @@ class PhotoSignActivity : BaseActivity<PhotoSignViewModel, ActivityPhotoSignBind
                     override fun onCancel() {}
                 })
         }
+    }
+
+    private suspend fun analysisAndStartSign(aid: String) {
+        viewModel.analysis(URL.getAnalysisPath(aid))
     }
 
     private fun sign() {

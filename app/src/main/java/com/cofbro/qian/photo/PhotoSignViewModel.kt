@@ -13,6 +13,21 @@ class PhotoSignViewModel : BaseViewModel<PhotoSignRepository>() {
     val tokenLiveData = ResponseMutableLiveData<Response>()
     val uploadImageLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
+    val analysisLiveData = ResponseMutableLiveData<Response>()
+    suspend fun analysis(url: String) {
+        repository.request(analysisLiveData, false) {
+            val request = NetworkUtils.buildClientRequest(url)
+            NetworkUtils.request(request)
+        }
+    }
+    suspend fun analysis2(url: String, cookies: String = "") {
+        repository.request(ResponseMutableLiveData(), false) {
+            val request = if (cookies.isEmpty()) {
+                NetworkUtils.buildClientRequest(url)
+            } else NetworkUtils.buildClientRequest(url, cookies)
+            NetworkUtils.request(request)
+        }
+    }
 
     suspend fun requestToken(url: String) {
         val request = NetworkUtils.buildClientRequest(url)

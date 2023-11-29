@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ItemRecordSignBinding
+import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getJSONArrayExt
@@ -64,7 +65,10 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
                 ?: JSONObject()
 
             // uid
-            val uid = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
+            var uid = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
+            // cache of uid
+            val cacheUid = CacheUtils.cache[Constants.USER.UID] ?: ""
+            uid = if (uid == cacheUid) "$uid - (主账号)" else uid
             binding.tvRecordUsername.text = uid
 
             // 签到状态

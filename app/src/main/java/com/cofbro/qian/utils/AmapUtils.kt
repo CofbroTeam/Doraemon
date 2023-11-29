@@ -29,7 +29,7 @@ import java.util.regex.Pattern
 
 object AmapUtils {
     //要申请的权限
-    private val mPermissions =
+    private const val mPermissions =
         Manifest.permission.ACCESS_FINE_LOCATION
 
     private  final var REQUEST_CODE_LOCATION_SETTINGS = 2
@@ -41,22 +41,24 @@ object AmapUtils {
         return ContextCompat.checkSelfPermission(mContexts, permission) ==
                 PackageManager.PERMISSION_DENIED
     }
+
     /*
     请求精确定位
      */
-    fun checkLocationPermission(activity:AppCompatActivity){
-        if (lacksPermission(activity.applicationContext, mPermissions)){
+    fun checkLocationPermission(activity: AppCompatActivity) {
+        if (lacksPermission(activity.applicationContext, mPermissions)) {
             /*
             缺少精确定位，提醒开启精确定位
              */
-            ToastUtil.show(activity.applicationContext,"请选择精确位置")
+            ToastUtil.show(activity.applicationContext, "请选择精确位置")
             getLocationPermission(activity)
-        }else{
+        } else {
             //权限开启
 
         }
     }
-    private fun getLocationPermission(activity:AppCompatActivity){
+
+    private fun getLocationPermission(activity: AppCompatActivity) {
         val locationPermissionRequest = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
@@ -64,32 +66,44 @@ object AmapUtils {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                     // Precise location access granted.
                 }
+
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                   ToastUtil.show(activity.applicationContext,"请选择精确位置")
-                } else -> {
-                // No location access granted.
-            }
+                    ToastUtil.show(activity.applicationContext, "请选择精确位置")
+                }
+
+                else -> {
+                    // No location access granted.
+                }
             }
         }
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION))
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
+
     /*
     获取自己的定位信息
      */
-     fun getCurrentLocationLatLng(applicationContext:Context, onSuccess:(LatLng,String)->Unit = { latLng: LatLng, s: String -> }, onError:(String)->Unit = {}) {
+    fun getCurrentLocationLatLng(
+        applicationContext: Context,
+        onSuccess: (LatLng, String) -> Unit = { _: LatLng, _: String -> },
+        onError: (String) -> Unit = {}
+    ) {
         AMapLocationClient.updatePrivacyAgree(applicationContext, true)
         AMapLocationClient.updatePrivacyShow(applicationContext, true, true)
         //初始化定位
-       val mLocationClient = AMapLocationClient(applicationContext)
+        val mLocationClient = AMapLocationClient(applicationContext)
         var mLocationOption: AMapLocationClientOption? = null
         //设置定位回调监听
         mLocationClient.setLocationListener { amapLocation ->
             if (amapLocation != null) {
                 if (amapLocation.errorCode == 0) {
-                    val address = urlEncodeChinese(amapLocation.country + " " + amapLocation.address)
-                    onSuccess(LatLng(amapLocation.latitude,amapLocation.longitude),address)
+                    val address =
+                        urlEncodeChinese(amapLocation.country + " " + amapLocation.address)
+                    onSuccess(LatLng(amapLocation.latitude, amapLocation.longitude), address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     onError("location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo)
@@ -103,13 +117,14 @@ object AmapUtils {
             AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
 
         // 设置为单次定位  : 默认为false
-        mLocationOption.isOnceLocation = false
+        mLocationOption.isOnceLocation = true
+        mLocationOption.isLocationCacheEnable = true
         mLocationOption.httpTimeOut = 20000
-        mLocationOption.isLocationCacheEnable = false
         mLocationClient.setLocationOption(mLocationOption)
         //启动定位
         mLocationClient.startLocation()
     }
+
     private fun urlEncodeChinese(urlString: String): String {
         var url = urlString
         try {
