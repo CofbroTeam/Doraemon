@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import cn.leancloud.LeanCloud
 import com.cofbro.hymvvmutils.lean.LeanCloudUtils
 import com.cofbro.qian.update.InstallCompleteReceiver
 import com.cofbro.qian.utils.CacheUtils
@@ -20,9 +19,10 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] = Constants.DataLoad.UNLOAD
         registerInstallPackageReceiver()
     }
+
     private fun registerInstallPackageReceiver() {
         val installCompleteReceiver = InstallCompleteReceiver()
-        val filter = IntentFilter(Intent.ACTION_PACKAGE_ADDED)
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_REPLACED)
         filter.addDataScheme("package")
         registerReceiver(installCompleteReceiver, filter)
     }

@@ -31,8 +31,8 @@ import java.util.regex.Pattern
 
 class AutoUpdater(private val mContext: Context) {
     private var apkFile = File(mContext.filesDir, "app-release-c.apk")
-    private var apkUrl = "https://halfsweet.cn/app-debug.apk"
-    private var checkUrl = "http://halfsweet.cn/output-metadata.json"
+    private var apkUrl = "https://halfsweet.cn/"
+    private var checkUrl = "https://halfsweet.cn/output-metadata.json"
     private var intercept = false
     private var downLoadThread: Thread? = null
     private var mProgress: ProgressBar? = null
@@ -97,7 +97,7 @@ class AutoUpdater(private val mContext: Context) {
                     }
                 }
             }
-            if (localVersion.toLong() > versionName.toLong()) {
+            if (localVersion.toLong() < versionName.toLong()) {
                 apkUrl += outputFile
                 mHandler?.sendEmptyMessage(DOWN_START)
             } else {
@@ -234,8 +234,8 @@ class AutoUpdater(private val mContext: Context) {
         private const val DOWN_START = 3
     }
 
-    private class DownloadHandler(activity: AutoUpdater) : Handler(Looper.getMainLooper()) {
-        private val mUpdateRef: WeakReference<AutoUpdater> = WeakReference(activity)
+    private class DownloadHandler(updater: AutoUpdater) : Handler(Looper.getMainLooper()) {
+        private val mUpdateRef: WeakReference<AutoUpdater> = WeakReference(updater)
 
         override fun handleMessage(msg: Message) {
             val mUpdater = mUpdateRef.get() ?: return
