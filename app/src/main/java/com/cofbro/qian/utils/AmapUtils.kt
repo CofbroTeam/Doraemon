@@ -18,6 +18,10 @@ import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 object AmapUtils {
@@ -96,7 +100,7 @@ object AmapUtils {
                 if (amapLocation.errorCode == 0) {
                     val address =
                         urlEncodeChinese(amapLocation.country + " " + amapLocation.address)
-                    onSuccess(LatLng(amapLocation.latitude, amapLocation.longitude), address)
+                    onSuccess(bdEncrypt(amapLocation.latitude, amapLocation.longitude), address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     onError("location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo)
@@ -145,4 +149,17 @@ object AmapUtils {
             context.startActivity(intent)
         }
     }
+    //高德转百度
+     fun  bdEncrypt( gg_lat:Double, gg_lon:Double):LatLng{
+         val x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+        val x = gg_lon
+        val y = gg_lat;
+        val z = sqrt(x * x + y * y) + 0.00002 * sin(y * x_pi);
+        val theta = atan2(y, x) + 0.000003 * cos(x * x_pi);
+        val bd_lon = z * cos(theta) + 0.0065;
+        val bd_lat = z * sin(theta) + 0.006;
+        return LatLng(bd_lat,bd_lon);
+    }
+
+
 }

@@ -407,13 +407,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
                     if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
+                        val Lating = AmapUtils.bdEncrypt( viewModel.currentTipPoint.latitude,
+                            viewModel.currentTipPoint.longitude)
                         viewModel.signUrl =
                             URL.getLocationSignPath(
                                 address,
                                 viewModel.aid,
                                 viewModel.uid,
-                                viewModel.currentTipPoint.latitude.toString(),
-                                viewModel.currentTipPoint.longitude.toString()
+                                Lating.latitude.toString(),
+                                Lating.longitude.toString()
                             )
                         sign(viewModel.signUrl)
                         /**
@@ -452,13 +454,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                  * 选择上传让老师看到的位置
                  */
                 if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
+                    val Lating = AmapUtils.bdEncrypt( viewModel.currentTipPoint.latitude,
+                        viewModel.currentTipPoint.longitude)
                     viewModel.signUrl =
                         URL.getLocationSignPath(
                             address = binding?.etLocationName?.text.toString(),
                             viewModel.aid,
                             viewModel.uid,
-                            viewModel.currentTipPoint.latitude.toString(),
-                            viewModel.currentTipPoint.longitude.toString()
+                            Lating.latitude.toString(),
+                            Lating.longitude.toString()
                         )
                     sign(viewModel.signUrl)
                 } else {
