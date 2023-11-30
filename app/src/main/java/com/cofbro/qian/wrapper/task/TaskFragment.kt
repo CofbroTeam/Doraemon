@@ -393,10 +393,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
 
     private fun locate(onLocated : () -> Unit) {
         AmapUtils.getCurrentLocationLatLng(requireContext(),
-            onSuccess = { latLng, location ->
-                latitude = latLng.latitude
-                longitude = latLng.longitude
-                locationText = URLDecoder.decode(location, "UTF-8")
+            onSuccess = { lat, lon, location ->
+                latitude = lat
+                longitude = lon
+                locationText = location
                 onLocated()
             }, onError = {
                 ToastUtils.show(it)
