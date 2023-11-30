@@ -99,7 +99,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             CacheUtils.cache["default_Sign_latitude"]?.toDouble()
                 ?.let {
                     CacheUtils.cache["default_Sign_longitude"]?.toDouble()
-                        ?.let { it1 -> BDLating(it, it1) }
+                        ?.let { it1 -> LatLng(it, it1) }
                 }
     }
     private fun initArgs() {
@@ -277,7 +277,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.mPoiMarker!!.snippet = tip[1]
     }
 
-    private fun addLatingDefaultMarker(LatLng: BDLating?) {
+    private fun addLatingDefaultMarker(LatLng: LatLng?) {
         if (LatLng == null) {
             return
         }
@@ -523,9 +523,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                         "老师未设置位置,请点击搜索"
                                     }
                                 }
-                                if (!preWeb.latitude.isNullOrEmpty() && !preWeb.longitude.isNullOrEmpty()) {
+                                if (!preWeb.latitude.isNullOrEmpty()&& preWeb.latitude!="-1"&& !preWeb.longitude.isNullOrEmpty()&&preWeb.longitude!="-1") {
                                     viewModel.currentTipPoint =
-                                        BDLating(
+                                        LatLng(
                                             preWeb.latitude.toDouble(),
                                             preWeb.longitude.toDouble()
                                         )
@@ -539,7 +539,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                     viewModel.default_Sign_Location = preWeb.locationText
                                     viewModel.statuscontent = preWeb.statusContent
                                     viewModel.default_Sign_Lating =
-                                        BDLating(
+                                        LatLng(
                                             preWeb.latitude.toDouble(),
                                             preWeb.longitude.toDouble()
                                         )
@@ -561,15 +561,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                     val lat = preWeb.html.getElementById("latitude")?.`val`() ?: ""
                                     val long =
                                         preWeb.html.getElementById("longitude")?.`val`() ?: ""
-                                    if (lat.isNotEmpty() && long.isNotEmpty()) {
+                                    if (lat != "-1" && long !="-1") {
                                         viewModel.currentTipPoint =
-                                            BDLating(lat.toDouble(), lat.toDouble())
+                                            LatLng(lat.toDouble(), lat.toDouble())
                                         addLatLngMarker(
                                             LatLng(lat.toDouble(), long.toDouble()),
                                             default = true
                                         )
                                         viewModel.default_Sign_Lating =
-                                            BDLating(lat.toDouble(), lat.toDouble())
+                                            LatLng(lat.toDouble(), lat.toDouble())
                                         viewModel.default_Sign_Location = preWeb.locationText
                                         viewModel.statuscontent = preWeb.statusContent
                                         if (preWeb.locationText?.isEmpty() == true && preWeb.statusContent != "签到成功") {
@@ -737,7 +737,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng, default = true)
-            viewModel.currentTipPoint = BDLating(latLng.latitude,latLng.longitude)
+            viewModel.currentTipPoint = LatLng(latLng.latitude,latLng.longitude)
             addLatingDefaultMarker(viewModel.default_Sign_Lating)
         }
         if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
@@ -748,7 +748,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 获取完整Tip
                  */
                 binding?.maps?.map?.clear()
-                viewModel.currentTipPoint = BDLating(tip[3].toDouble(), tip[4].toDouble())
+                viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
                 if (tip[2] == null || tip[2] == "") {
                     doSearchQuery(tip[0])
                 } else {
@@ -773,7 +773,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         AmapUtils.getCurrentLocationLatLng(applicationContext,
             onSuccess = { lat, lon, address ->
                 viewModel.default_My_Lating =
-                    BDLating(lat, lon)
+                    LatLng(lat, lon)
                 addLatingDefaultMarker(viewModel.default_My_Lating)
             },
             onError = { error ->
