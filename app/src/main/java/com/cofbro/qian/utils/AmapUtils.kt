@@ -9,23 +9,19 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
-import com.amap.api.maps2d.model.LatLng
 import com.cofbro.qian.mapsetting.util.ToastUtil
-import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 object AmapUtils {
     //要申请的权限
     private const val mPermissions =
         Manifest.permission.ACCESS_FINE_LOCATION
-
-    private final var REQUEST_CODE_LOCATION_SETTINGS = 2
 
     /**
      * 判断是否缺少权限
@@ -82,7 +78,7 @@ object AmapUtils {
      */
     fun getCurrentLocationLatLng(
         applicationContext: Context,
-        onSuccess: (LatLng, String) -> Unit = { _: LatLng, _: String -> },
+        onSuccess: (Double, Double, String) -> Unit = { _: Double, _: Double, _: String -> },
         onError: (String) -> Unit = {}
     ) {
         AMapLocationClient.updatePrivacyAgree(applicationContext, true)
@@ -95,8 +91,9 @@ object AmapUtils {
             if (amapLocation != null) {
                 if (amapLocation.errorCode == 0) {
                     val address =
-                        urlEncodeChinese(amapLocation.country + " " + amapLocation.address)
-                    onSuccess(LatLng(amapLocation.latitude, amapLocation.longitude), address)
+                        amapLocation.country + " " + amapLocation.address
+                    val latLng = mapPointGdTurnBaiDu(amapLocation.longitude, amapLocation.latitude)
+                    onSuccess(latLng[0], latLng[1], address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     onError("location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo)
@@ -118,21 +115,6 @@ object AmapUtils {
         mLocationClient.startLocation()
     }
 
-    private fun urlEncodeChinese(urlString: String): String {
-        var url = urlString
-        try {
-            val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
-            var tmp = ""
-            while (matcher.find()) {
-                tmp = matcher.group()
-                url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
-            }
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
-        }
-        return url.replace(" ", "%20")
-    }
-
     /**直接跳转至位置信息设置界面 */
     fun openLocation(context: Context) {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
@@ -144,5 +126,14 @@ object AmapUtils {
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             context.startActivity(intent)
         }
+    }
+
+    fun mapPointGdTurnBaiDu(lon: Double, lat: Double): List<Double> {
+        val pi = 3.14159265358979324
+        val z = sqrt(lon * lon + lat * lat) + 0.00002 * sin(lat * pi)
+        val theta = atan2(lat, lon) + 0.000003 * cos(lon * pi)
+        val bdLon = z * cos(theta) + 0.0065
+        val bdLat = z * sin(theta) + 0.006
+        return arrayListOf(bdLat, bdLon)
     }
 }
