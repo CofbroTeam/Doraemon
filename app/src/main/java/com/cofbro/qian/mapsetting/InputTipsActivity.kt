@@ -80,7 +80,7 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
 
                     val intent = Intent(this, MapActivity::class.java)
 
-                    intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
+                    intent.putExtra(Constants.EXTRA_TIP, TipUtils.TipParseToArray(it))
                     intent.putExtra("aid",aid)
                     /**
                      * 保存并传递数据

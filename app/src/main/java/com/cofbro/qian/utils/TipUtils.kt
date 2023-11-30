@@ -2,7 +2,7 @@ package com.cofbro.qian.utils
 
 import com.amap.api.services.help.Tip
 
-class TipUtils {
+object TipUtils {
 
     /*
     为适配部分机型不适配getParcelableExtra，API33可以使用，使用将Tip转换为ArrayString
