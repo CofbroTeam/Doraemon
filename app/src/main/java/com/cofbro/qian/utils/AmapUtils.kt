@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.maps2d.model.LatLng
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -128,13 +129,13 @@ object AmapUtils {
         }
     }
 
-    fun mapPointGdTurnBaiDu(lon: Double, lat: Double): BDLating {
+    fun mapPointGdTurnBaiDu(lon: Double, lat: Double): LatLng {
         val pi = 3.14159265358979324
         val z = sqrt(lon * lon + lat * lat) + 0.00002 * sin(lat * pi)
         val theta = atan2(lat, lon) + 0.000003 * cos(lon * pi)
         val bdLon = z * cos(theta) + 0.0065
         val bdLat = z * sin(theta) + 0.006
-        return BDLating(bdLat, bdLon)
+        return LatLng(bdLat, bdLon)
     }
     class BDLating( val latitude: Double ,val longitude: Double)
 

@@ -529,6 +529,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                             preWeb.latitude.toDouble(),
                                             preWeb.longitude.toDouble()
                                         )
+
                                     addLatLngMarker(
                                         LatLng(
                                             viewModel.currentTipPoint.latitude,
