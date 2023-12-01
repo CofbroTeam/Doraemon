@@ -85,7 +85,10 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                     /**
                      * 保存并传递数据
                      */
-                    startActivity(intent)
+                    setResult(100,intent)
+                    finish()
+//                    startActivity(intent)
+//                    finish()
                 }
             }
         } else {

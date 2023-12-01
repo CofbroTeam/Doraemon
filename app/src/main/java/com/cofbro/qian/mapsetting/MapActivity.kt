@@ -422,7 +422,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 /**
                  * 保存并传递数据
                  */
-                startActivity(intent)
+                startActivityForResult(intent,100)
+//                startActivity(intent)
+//                finish()
             }
 
         }
@@ -700,7 +702,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             preSignOther = false
             startActivity(intent)
         }
-        this
+
 
     }
 
@@ -729,7 +731,42 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         val uid = cookies.substringAfter("UID=")
         return uid.substringBefore(";")
     }
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        when (requestCode) {
+            100 -> {
+                    if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+                        val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
+                        if (tip != null) {
+                            /**
+                            获取完整Tip
+                             */
+                            binding?.maps?.map?.clear()
+                            viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
+                            if (tip[2] == null || tip[2] == "") {
+                                doSearchQuery(tip[0])
+                            } else {
+                                addTipMarker(tip)
+                            }
+                            if (tip[0].isNotEmpty()) {
+                                binding?.selectButton?.visibility = View.VISIBLE
+                                binding?.etLocationName?.visibility = View.VISIBLE
+                                binding?.mainKeywords?.text = tip[0]
+                            }
 
+                            if (tip[0] != "") {
+                                //binding?.cleanKeywords?.visibility = View.VISIBLE
+                            }
+                            // 获取完整的name和address
+                            viewModel.Tip_name = tip[0]
+                            viewModel.Tip_address = tip[1]
+                            viewModel.Tip_City = tip[5]
+                        }
+                    }
+            }
+        }
+    }
     private fun initMap(savedInstanceState: Bundle?) {
         binding?.maps!!.onCreate(savedInstanceState)
         if (binding?.maps?.map == null) {
