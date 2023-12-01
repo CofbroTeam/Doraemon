@@ -40,7 +40,7 @@
         tools:targetApi="31">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="797648bd1ff4e06dd433af6e4f3b87fc" />
+            android:value="787057d8a10578894fc4719a3bd274dc" />
 
         <service android:name="cn.leancloud.push.PushService" />
         <receiver

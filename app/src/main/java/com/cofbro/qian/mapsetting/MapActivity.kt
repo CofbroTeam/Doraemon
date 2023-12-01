@@ -344,13 +344,12 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
             if (viewModel.statuscontent != "签到成功" && viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
-                Toast.makeText(this, "修改位置成功", Toast.LENGTH_SHORT).show()
                 if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
                     if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
-                        val Lating = AmapUtils.mapPointGdTurnBaiDu( viewModel.currentTipPoint.latitude,
-                            viewModel.currentTipPoint.longitude)
+                        val Lating = AmapUtils.mapPointGdTurnBaiDu(
+                            viewModel.currentTipPoint.longitude,viewModel.currentTipPoint.latitude)
                         viewModel.signUrl =
                             URL.getLocationSignPath(
                                 address,
@@ -464,6 +463,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                      * 回到TaskActivity
                      */
                     if (data == "不在可签到范围内") {
+                        ToastUtils.show("签到失败")
+                        signRecord(data)
                         finish()
                     } else {
                         /**
@@ -471,7 +472,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                          */
                         if (data!!.contains("success")) {
                             mStatus = true
-                            ToastUtil.show(applicationContext, "签到已成功")
+                            ToastUtils.show("签到已成功")
 
                             signRecord(data)
                             /**
@@ -591,11 +592,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             })
                         preSignOther = false
                     }
-
-
                 }
-
-
             }
         }
         // 尝试登录
@@ -774,8 +771,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng, default = true)
             viewModel.currentTipPoint = LatLng(latLng.latitude,latLng.longitude)
-            val latLng = AmapUtils.mapPointBaiduTurnDG(viewModel.default_Sign_Lating!!.latitude,viewModel.default_Sign_Lating!!.longitude)
-            addLatingDefaultMarker(latLng)
+            val latLngs = AmapUtils.mapPointBaiduTurnDG(viewModel.default_Sign_Lating!!.longitude,viewModel.default_Sign_Lating!!.latitude)
+//            Log.v("TAG",latLngs.toString())
+
+            addLatingDefaultMarker(latLngs)
         }
         AmapUtils.getCurrentLocationLatLng(applicationContext,
             onSuccess = { lat, lon, address ->
