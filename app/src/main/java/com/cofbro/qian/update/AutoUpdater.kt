@@ -31,8 +31,8 @@ import java.util.regex.Pattern
 
 class AutoUpdater(private val mContext: Context) {
     private var apkFile = File(mContext.filesDir, "app-release-c.apk")
-    private var apkUrl = "https://halfsweet.cn/"
-    private var checkUrl = "https://halfsweet.cn/output-metadata.json"
+    private var apkUrl = "https://doraemon.halfsweet.cn/"
+    private var checkUrl = "https://doraemon.halfsweet.cn/output-metadata.json"
     private var intercept = false
     private var downLoadThread: Thread? = null
     private var mProgress: ProgressBar? = null
@@ -100,6 +100,8 @@ class AutoUpdater(private val mContext: Context) {
             if (localVersion.toLong() < versionName.toLong()) {
                 apkUrl += outputFile
                 mHandler?.sendEmptyMessage(DOWN_START)
+            } else if (localVersion.toLong() == versionName.toLong()) {
+                apkFile.delete()
             } else {
                 return@Runnable
             }

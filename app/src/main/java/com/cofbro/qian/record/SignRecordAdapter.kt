@@ -65,11 +65,11 @@ class SignRecordAdapter : RecyclerView.Adapter<SignRecordAdapter.SignRecordViewH
                 ?: JSONObject()
 
             // uid
-            var uid = "uid: ${record.getStringExt(Constants.Recorder.UID)}"
+            var uid = record.getStringExt(Constants.Recorder.UID)
             // cache of uid
             val cacheUid = CacheUtils.cache[Constants.USER.UID] ?: ""
             uid = if (uid == cacheUid) "$uid - (主账号)" else uid
-            binding.tvRecordUsername.text = uid
+            binding.tvRecordUsername.text = "uid: $uid"
 
             // 签到状态
             val status = record.getStringExt(Constants.Recorder.STATUS)
