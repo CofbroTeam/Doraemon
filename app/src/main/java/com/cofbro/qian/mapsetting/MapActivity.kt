@@ -62,7 +62,7 @@ import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-
+import com.cofbro.qian.utils.AmapUtils.BDLating
 
 class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMarkerClickListener,
     AMap.InfoWindowAdapter, PoiSearchV2.OnPoiSearchListener {
@@ -99,64 +99,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             CacheUtils.cache["default_Sign_latitude"]?.toDouble()
                 ?.let {
                     CacheUtils.cache["default_Sign_longitude"]?.toDouble()
-                        ?.let { it1 -> LatLng(it, it1) }
+                        ?.let { it1 -> BDLating(it, it1) }
                 }
     }
-
-    private fun getCurrentLocationLatLng() {
-        AMapLocationClient.updatePrivacyAgree(applicationContext, true)
-        AMapLocationClient.updatePrivacyShow(applicationContext, true, true)
-        //初始化定位
-        viewModel.mLocationClient = AMapLocationClient(applicationContext)
-        //设置定位回调监听
-        viewModel.mLocationClient?.setLocationListener { amapLocation ->
-            if (amapLocation != null) {
-                if (amapLocation.errorCode == 0) {
-//                    amapLocation.locationType //获取当前定位结果来源，如网络定位结果，详见定位类型表
-//                    amapLocation.latitude //获取纬度
-//                    amapLocation.longitude //获取经度
-//                    amapLocation.accuracy //获取精度信息
-//                    amapLocation.address //地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
-//                    amapLocation.country //国家信息
-//                    amapLocation.province //省信息
-//                    amapLocation.city //城市信息
-//                    amapLocation.district //城区信息
-//                    amapLocation.street //街道信息
-//                    amapLocation.streetNum //街道门牌号信息
-//                    amapLocation.cityCode //城市编码
-//                    amapLocation.adCode //地区编码
-//                    amapLocation.aoiName //获取当前定位点的AOI信息
-//                    amapLocation.buildingId //获取当前室内定位的建筑物Id
-//                    amapLocation.floor //获取当前室内定位的楼层
-//                    amapLocation.gpsAccuracyStatus //获取GPS的当前状态
-                    viewModel.default_My_Lating =
-                        LatLng(amapLocation.latitude, amapLocation.longitude)
-                    addLatingDefaultMarker(viewModel.default_My_Lating)
-                    Log.v("sss", amapLocation.address)
-                } else {
-                    //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
-                    Log.e(
-                        "AmapError",
-                        "location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo
-                    )
-                }
-            }
-        }
-        //初始化AMapLocationClientOption对象
-        viewModel.mLocationOption = AMapLocationClientOption()
-
-        viewModel.mLocationOption?.locationMode =
-            AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
-
-        // 设置为单次定位  : 默认为false
-        viewModel.mLocationOption?.isOnceLocation = true
-        viewModel.mLocationOption?.httpTimeOut = 20000
-        viewModel.mLocationOption?.isLocationCacheEnable = false
-        viewModel.mLocationClient?.setLocationOption(viewModel.mLocationOption)
-        //启动定位
-        viewModel.mLocationClient?.startLocation()
-    }
-
     private fun initArgs() {
         viewModel.aid = intent.getStringExtra("aid") ?: ""
         viewModel.preUrl = intent.getStringExtra("preUrl") ?: ""
@@ -332,7 +277,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         viewModel.mPoiMarker!!.snippet = tip[1]
     }
 
-    private fun addLatingDefaultMarker(LatLng: LatLng?) {
+    private fun addLatingDefaultMarker(LatLng: BDLating?) {
         if (LatLng == null) {
             return
         }
@@ -373,8 +318,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 .load(URL.getAvtarImgPath(it))
                 .apply(options)
                 .into(binding!!.search)
-
-
         }
 
     }
@@ -401,18 +344,19 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             }
             if (viewModel.statuscontent != "签到成功" && viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
                 // 成功初始化mark并成功定位
-                Toast.makeText(this, "修改位置成功", Toast.LENGTH_SHORT).show()
                 if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
                     val cityName = viewModel.Tip_City
                     val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
                     if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
+                        val Lating = AmapUtils.mapPointGdTurnBaiDu(
+                            viewModel.currentTipPoint.longitude,viewModel.currentTipPoint.latitude)
                         viewModel.signUrl =
                             URL.getLocationSignPath(
                                 address,
                                 viewModel.aid,
                                 viewModel.uid,
-                                viewModel.currentTipPoint.latitude.toString(),
-                                viewModel.currentTipPoint.longitude.toString()
+                                Lating.latitude.toString(),
+                                Lating.longitude.toString()
                             )
                         sign(viewModel.signUrl)
                         /**
@@ -451,13 +395,15 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                  * 选择上传让老师看到的位置
                  */
                 if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
+                    val Lating = AmapUtils.mapPointGdTurnBaiDu( viewModel.currentTipPoint.latitude,
+                        viewModel.currentTipPoint.longitude)
                     viewModel.signUrl =
                         URL.getLocationSignPath(
                             address = binding?.etLocationName?.text.toString(),
                             viewModel.aid,
                             viewModel.uid,
-                            viewModel.currentTipPoint.latitude.toString(),
-                            viewModel.currentTipPoint.longitude.toString()
+                            Lating.latitude.toString(),
+                            Lating.longitude.toString()
                         )
                     sign(viewModel.signUrl)
                 } else {
@@ -473,7 +419,9 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 /**
                  * 保存并传递数据
                  */
-                startActivity(intent)
+                startActivityForResult(intent,100)
+//                startActivity(intent)
+//                finish()
             }
 
         }
@@ -515,6 +463,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                      * 回到TaskActivity
                      */
                     if (data == "不在可签到范围内") {
+                        ToastUtils.show("签到失败")
+                        signRecord(data)
                         finish()
                     } else {
                         /**
@@ -522,7 +472,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                          */
                         if (data!!.contains("success")) {
                             mStatus = true
-                            ToastUtil.show(applicationContext, "签到已成功")
+                            ToastUtils.show("签到已成功")
 
                             signRecord(data)
                             /**
@@ -574,12 +524,13 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                         "老师未设置位置,请点击搜索"
                                     }
                                 }
-                                if (!preWeb.latitude.isNullOrEmpty() && !preWeb.longitude.isNullOrEmpty()) {
+                                if (!preWeb.latitude.isNullOrEmpty()&& preWeb.latitude!="-1"&& !preWeb.longitude.isNullOrEmpty()&&preWeb.longitude!="-1") {
                                     viewModel.currentTipPoint =
                                         LatLng(
                                             preWeb.latitude.toDouble(),
                                             preWeb.longitude.toDouble()
                                         )
+
                                     addLatLngMarker(
                                         LatLng(
                                             viewModel.currentTipPoint.latitude,
@@ -590,7 +541,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                     viewModel.default_Sign_Location = preWeb.locationText
                                     viewModel.statuscontent = preWeb.statusContent
                                     viewModel.default_Sign_Lating =
-                                        LatLng(
+                                        BDLating(
                                             preWeb.latitude.toDouble(),
                                             preWeb.longitude.toDouble()
                                         )
@@ -612,7 +563,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                     val lat = preWeb.html.getElementById("latitude")?.`val`() ?: ""
                                     val long =
                                         preWeb.html.getElementById("longitude")?.`val`() ?: ""
-                                    if (lat.isNotEmpty() && long.isNotEmpty()) {
+                                    if (lat != "-1" && long !="-1") {
                                         viewModel.currentTipPoint =
                                             LatLng(lat.toDouble(), lat.toDouble())
                                         addLatLngMarker(
@@ -620,7 +571,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                                             default = true
                                         )
                                         viewModel.default_Sign_Lating =
-                                            LatLng(lat.toDouble(), lat.toDouble())
+                                            BDLating(lat.toDouble(), lat.toDouble())
                                         viewModel.default_Sign_Location = preWeb.locationText
                                         viewModel.statuscontent = preWeb.statusContent
                                         if (preWeb.locationText?.isEmpty() == true && preWeb.statusContent != "签到成功") {
@@ -641,11 +592,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                             })
                         preSignOther = false
                     }
-
-
                 }
-
-
             }
         }
         // 尝试登录
@@ -750,7 +697,7 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             preSignOther = false
             startActivity(intent)
         }
-        this
+
 
     }
 
@@ -779,7 +726,42 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         val uid = cookies.substringAfter("UID=")
         return uid.substringBefore(";")
     }
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        when (requestCode) {
+            100 -> {
+                    if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+                        val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
+                        if (tip != null) {
+                            /**
+                            获取完整Tip
+                             */
+                            binding?.maps?.map?.clear()
+                            viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
+                            if (tip[2] == null || tip[2] == "") {
+                                doSearchQuery(tip[0])
+                            } else {
+                                addTipMarker(tip)
+                            }
+                            if (tip[0].isNotEmpty()) {
+                                binding?.selectButton?.visibility = View.VISIBLE
+                                binding?.etLocationName?.visibility = View.VISIBLE
+                                binding?.mainKeywords?.text = tip[0]
+                            }
 
+                            if (tip[0] != "") {
+                                //binding?.cleanKeywords?.visibility = View.VISIBLE
+                            }
+                            // 获取完整的name和address
+                            viewModel.Tip_name = tip[0]
+                            viewModel.Tip_address = tip[1]
+                            viewModel.Tip_City = tip[5]
+                        }
+                    }
+            }
+        }
+    }
     private fun initMap(savedInstanceState: Bundle?) {
         binding?.maps!!.onCreate(savedInstanceState)
         if (binding?.maps?.map == null) {
@@ -788,47 +770,21 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         binding?.maps?.map?.setOnMapClickListener { latLng -> // 地图 点击 更换marker的经纬度
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng, default = true)
-            viewModel.currentTipPoint = latLng
-            addLatingDefaultMarker(viewModel.default_Sign_Lating)
-        }
-        if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
+            viewModel.currentTipPoint = LatLng(latLng.latitude,latLng.longitude)
+            val latLngs = AmapUtils.mapPointBaiduTurnDG(viewModel.default_Sign_Lating!!.longitude,viewModel.default_Sign_Lating!!.latitude)
+//            Log.v("TAG",latLngs.toString())
 
-            val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
-            if (tip != null) {
-                /**
-                获取完整Tip
-                 */
-                binding?.maps?.map?.clear()
-                viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
-                if (tip[2] == null || tip[2] == "") {
-                    doSearchQuery(tip[0])
-                } else {
-                    addTipMarker(tip)
-                }
-                if (tip[0].isNotEmpty()) {
-                    binding?.selectButton?.visibility = View.VISIBLE
-                    binding?.etLocationName?.visibility = View.VISIBLE
-                    binding?.mainKeywords?.text = tip[0]
-                }
-
-                if (tip[0] != "") {
-                    //binding?.cleanKeywords?.visibility = View.VISIBLE
-                }
-                // 获取完整的name和address
-                viewModel.Tip_name = tip[0]
-                viewModel.Tip_address = tip[1]
-                viewModel.Tip_City = tip[5]
-
-            }
+            addLatingDefaultMarker(latLngs)
         }
         AmapUtils.getCurrentLocationLatLng(applicationContext,
             onSuccess = { lat, lon, address ->
                 viewModel.default_My_Lating =
-                    LatLng(lat, lon)
+                    BDLating(lat, lon)
+                val latLng= AmapUtils.mapPointGdTurnBaiDu(lat, lon)
                 addLatingDefaultMarker(viewModel.default_My_Lating)
             },
             onError = { error ->
-                ToastUtils.show(error)
+//                ToastUtils.show(error)
             })
     }
 

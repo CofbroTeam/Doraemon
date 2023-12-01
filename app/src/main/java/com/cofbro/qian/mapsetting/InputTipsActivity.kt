@@ -77,15 +77,17 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                     /**
                      *  实现跳转
                      */
-
                     val intent = Intent(this, MapActivity::class.java)
+                    if(it.point!=null){
+                        intent.putExtra(Constants.EXTRA_TIP, TipUtils.TipParseToArray(it))
+                        intent.putExtra("aid",aid)
+                        /**
+                         * 保存并传递数据
+                         */
+                        setResult(100,intent)
+                        finish()
+                    }
 
-                    intent.putExtra(Constants.EXTRA_TIP, TipUtils().TipParseToArray(it))
-                    intent.putExtra("aid",aid)
-                    /**
-                     * 保存并传递数据
-                     */
-                    startActivity(intent)
                 }
             }
         } else {

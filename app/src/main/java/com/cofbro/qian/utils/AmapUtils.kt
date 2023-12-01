@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.maps2d.model.LatLng
 import com.cofbro.qian.mapsetting.util.ToastUtil
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -93,7 +94,7 @@ object AmapUtils {
                     val address =
                         amapLocation.country + " " + amapLocation.address
                     val latLng = mapPointGdTurnBaiDu(amapLocation.longitude, amapLocation.latitude)
-                    onSuccess(latLng[0], latLng[1], address)
+                    onSuccess(latLng.latitude, latLng.longitude, address)
                 } else {
                     //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                     onError("location Error, ErrCode:" + amapLocation.errorCode + ", errInfo:" + amapLocation.errorInfo)
@@ -128,12 +129,22 @@ object AmapUtils {
         }
     }
 
-    fun mapPointGdTurnBaiDu(lon: Double, lat: Double): List<Double> {
+    fun mapPointGdTurnBaiDu(lon: Double, lat: Double): BDLating {
         val pi = 3.14159265358979324
         val z = sqrt(lon * lon + lat * lat) + 0.00002 * sin(lat * pi)
         val theta = atan2(lat, lon) + 0.000003 * cos(lon * pi)
         val bdLon = z * cos(theta) + 0.0065
         val bdLat = z * sin(theta) + 0.006
-        return arrayListOf(bdLat, bdLon)
+        return BDLating(bdLat, bdLon)
     }
+    fun mapPointBaiduTurnDG(lon: Double, lat: Double): BDLating {
+        val pi = 3.14159265358979324
+        val z = sqrt(lon * lon + lat * lat) - 0.00002 * sin(lat * pi)
+        val theta = atan2(lat, lon) - 0.000003 * cos(lon * pi)
+        val bdLon = z * cos(theta) - 0.0065
+        val bdLat = z * sin(theta) - 0.006
+        return BDLating(bdLat, bdLon)
+    }
+    class BDLating( val latitude: Double ,val longitude: Double)
+
 }
