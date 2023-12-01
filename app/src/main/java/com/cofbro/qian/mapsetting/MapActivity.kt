@@ -318,8 +318,6 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 .load(URL.getAvtarImgPath(it))
                 .apply(options)
                 .into(binding!!.search)
-
-
         }
 
     }
@@ -776,36 +774,8 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
             binding?.maps?.map?.clear()
             addLatLngMarker(latLng, default = true)
             viewModel.currentTipPoint = LatLng(latLng.latitude,latLng.longitude)
-            val latLng = AmapUtils.mapPointGdTurnBaiDu(viewModel.default_Sign_Lating!!.latitude,viewModel.default_Sign_Lating!!.longitude)
+            val latLng = AmapUtils.mapPointBaiduTurnDG(viewModel.default_Sign_Lating!!.latitude,viewModel.default_Sign_Lating!!.longitude)
             addLatingDefaultMarker(latLng)
-        }
-        if (intent != null && intent.hasExtra(Constants.EXTRA_TIP)) {
-            val tip = intent.getStringArrayListExtra(Constants.EXTRA_TIP)
-            if (tip != null) {
-                /**
-                获取完整Tip
-                 */
-                binding?.maps?.map?.clear()
-                viewModel.currentTipPoint = LatLng(tip[3].toDouble(), tip[4].toDouble())
-                if (tip[2] == null || tip[2] == "") {
-                    doSearchQuery(tip[0])
-                } else {
-                    addTipMarker(tip)
-                }
-                if (tip[0].isNotEmpty()) {
-                    binding?.selectButton?.visibility = View.VISIBLE
-                    binding?.etLocationName?.visibility = View.VISIBLE
-                    binding?.mainKeywords?.text = tip[0]
-                }
-
-                if (tip[0] != "") {
-                    //binding?.cleanKeywords?.visibility = View.VISIBLE
-                }
-                // 获取完整的name和address
-                viewModel.Tip_name = tip[0]
-                viewModel.Tip_address = tip[1]
-                viewModel.Tip_City = tip[5]
-            }
         }
         AmapUtils.getCurrentLocationLatLng(applicationContext,
             onSuccess = { lat, lon, address ->

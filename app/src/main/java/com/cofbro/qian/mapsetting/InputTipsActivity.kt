@@ -87,8 +87,6 @@ class InputTipsActivity : BaseActivity<InputTipViewModel,ActivityInputTipsBindin
                      */
                     setResult(100,intent)
                     finish()
-//                    startActivity(intent)
-//                    finish()
                 }
             }
         } else {
