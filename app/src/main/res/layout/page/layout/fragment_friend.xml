@@ -82,7 +82,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tool_bar">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editText"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"

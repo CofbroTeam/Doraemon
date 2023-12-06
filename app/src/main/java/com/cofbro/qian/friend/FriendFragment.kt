@@ -1,5 +1,6 @@
 package com.cofbro.qian.friend
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -32,6 +33,7 @@ import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.friend.im.MessageSubscriber
+import com.cofbro.qian.friend.search.SearchFriendActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.MsgFactory
@@ -52,26 +54,32 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-//        initEventManager()
-//        initView()
-//        initObserver()
-//        doNetwork()
-//        initEvent()
+        initEventManager()
+        initView()
+        initObserver()
+        doNetwork()
+        initEvent()
+
     }
 
     private fun initEvent() {
         binding?.ivMore?.setOnClickListener {
             showFriendRequestFragment(friendRequestConv)
             //responseFriendRequest(friendRequestConv[0], true)
+
         }
 
         binding?.tvTitle?.setOnClickListener {
 
         }
 
-        binding?.ivUserSearch?.setOnClickListener {
-            searchUser()
+        binding?.editText?.setOnClickListener {
+//            searchUser()
+            val intent = Intent(requireActivity(),SearchFriendActivity::class.java)
+            startActivityForResult(intent,100)
+//            startActivityForResult(intent,100)
         }
+
     }
 
     private fun initView() {
@@ -364,7 +372,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun clearText() {
         binding?.editText?.hint = "搜索用户名字"
-        binding?.editText?.text?.clear()
+//        binding?.editText?.text?.clear()
     }
 
     override fun showLoading(msg: String?) {

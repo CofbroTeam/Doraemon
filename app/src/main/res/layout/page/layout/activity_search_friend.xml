@@ -10,6 +10,7 @@
         android:id="@+id/constraintLayout11"
         android:layout_width="415dp"
         android:layout_height="65dp"
+        android:layout_marginTop="44dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -18,15 +19,19 @@
             android:id="@+id/backtomain"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginStart="16dp"
             android:background="@drawable/back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.533" />
 
-        <com.google.android.material.search.SearchView
+        <EditText
             android:id="@+id/searchFriends"
-            android:layout_width="290dp"
-            android:layout_height="50dp"
+            android:layout_width="260dp"
+            android:layout_height="47dp"
+            android:hint="搜索用户名字"
+            android:inputType="number"
             app:layout_constraintBottom_toBottomOf="@+id/backtomain"
             app:layout_constraintStart_toEndOf="@+id/backtomain"
             app:layout_constraintTop_toTopOf="@+id/backtomain"
@@ -41,14 +46,16 @@
             android:textColor="@color/appColor"
             app:layout_constraintBottom_toBottomOf="@+id/searchFriends"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/searchFriends"
-            app:layout_constraintTop_toTopOf="@+id/searchFriends" />
+            app:layout_constraintTop_toTopOf="@+id/searchFriends"
+            app:layout_constraintVertical_bias="0.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friendsrecyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="823dp"
+        android:layout_width="413dp"
+        android:layout_height="634dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
