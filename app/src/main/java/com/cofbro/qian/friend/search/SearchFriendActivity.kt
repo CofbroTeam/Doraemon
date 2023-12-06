@@ -5,6 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivitySearchFriendBinding
 import com.cofbro.qian.friend.im.IMClientUtils
@@ -29,31 +31,44 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFr
     }
 
     private fun initView() {
+        binding?.backtomain?.setOnClickListener {
+            finish()
+        }
+        binding?.delete?.setOnClickListener {
+            clearText()
+        }
        binding?.searchFriends?.apply {
            addTextChangedListener(DelayedTextWatcher(this,3000,
                action = {
                    FriendList.clear()
+                   this.text
                    searchUser(this.text.toString())
-                   FriendsAdapter = FriendsAdapter(this@SearchFriendActivity, FriendList){
-                       sendFriendRequest(it.objectId)
-                   }
+
                },
                preAction = {
 
                }
            ))
        }
-       binding?.friendsrecyclerview?.apply {
-           adapter = FriendsAdapter
-       }
+
     }
     private fun searchUser(username:String) {
         IMClientUtils.querySingleUserByUsernameFuzzy(
             username,
             onSuccess = {
-                it.forEach {Object->
-                    FriendList.add(Friends(Object.objectId,Object.getString("username"),Object.getString("avatar")))
+                it.forEach {user->
+                    FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: ""))
                 }
+                FriendsAdapter = FriendsAdapter( itemclick = {friend->
+                      sendFriendRequest(friend?.objectId?:"")
+                }).apply {
+                    currentFriends = FriendList
+                }
+                binding?.friendsrecyclerview?.apply {
+                    adapter = FriendsAdapter
+                    layoutManager = LinearLayoutManager(this@SearchFriendActivity, RecyclerView.VERTICAL,false)
+                }
+
             }, onError = {
                 ToastUtils.show("好友申请发送失败")
             }

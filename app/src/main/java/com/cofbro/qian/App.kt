@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import cn.leancloud.LeanCloud
 import com.cofbro.hymvvmutils.lean.LeanCloudUtils
 import com.cofbro.qian.update.InstallCompleteReceiver
 import com.cofbro.qian.utils.CacheUtils
@@ -16,6 +17,7 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         super.onCreate()
         ToastUtils.init(this)
         LeanCloudUtils.init(true)
+
         CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] = Constants.DataLoad.UNLOAD
         registerInstallPackageReceiver()
     }

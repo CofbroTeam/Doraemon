@@ -115,13 +115,13 @@ object IMClientUtils {
      */
     fun createNewConversation(
         uid: String,
-        onSuccess: (LCIMConversation) -> Unit = {},
+        onSuccess: (LCIMConversation?) -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
         getIMClient()?.createConversation(
             mutableListOf(uid), "${getCntUser()?.objectId ?: ""} & $uid", null, false, false,
             object : LCIMConversationCreatedCallback() {
-                override fun done(conversation: LCIMConversation, e: LCIMException?) {
+                override fun done(conversation: LCIMConversation?, e: LCIMException?) {
                     if (e == null) {
                         onSuccess(conversation)
                     } else {

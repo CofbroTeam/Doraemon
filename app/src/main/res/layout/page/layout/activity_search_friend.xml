@@ -54,7 +54,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/friendsrecyclerview"
-        android:layout_width="413dp"
+        android:layout_width="match_parent"
         android:layout_height="634dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

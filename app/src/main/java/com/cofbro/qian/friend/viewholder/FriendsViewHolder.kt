@@ -8,24 +8,20 @@ import com.cofbro.qian.friend.search.adapter.FriendsAdapter
 
 class FriendsViewHolder<T : Friends>(private val binding: ItemSearchfrendsListBinding) :
     DefaultViewHolder<T>(binding){
-     var itemClick: ((itemTip: T) -> Unit?)? = null
+     var itemClick: (() -> Unit?)? = null
     override fun bind(position: Int, t: T?) {
         binding.friendicon.apply {
             Glide.with(this.context)
                 .load(t?.src)
                 .into(this)
         }
+        setImage(binding.friendicon,t?.src)
         binding.friendname.text = t?.name
         binding.addfriend.setOnClickListener {
-           /*
-           添加用户
-            */
-            if (t != null) {
-                itemClick?.invoke(t)
-            }
+                itemClick?.invoke()
         }
     }
-      fun setItemClickListener(itemClickListener: (itemTip: T) -> Unit){
+      fun setItemClickListener(itemClickListener: () -> Unit){
         itemClick = itemClickListener
     }
 }
