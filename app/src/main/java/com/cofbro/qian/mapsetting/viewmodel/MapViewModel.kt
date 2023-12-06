@@ -12,14 +12,11 @@ import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
 import com.cofbro.qian.mapsetting.repository.MapRepository
 import com.cofbro.qian.mapsetting.util.PreWeb
-import com.cofbro.qian.utils.AmapUtils
 import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Response
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import com.cofbro.qian.utils.AmapUtils.BDLating
 class MapViewModel : BaseViewModel<MapRepository>() {
     val preSignLiveData = ResponseMutableLiveData<Response>()
@@ -109,7 +106,7 @@ class MapViewModel : BaseViewModel<MapRepository>() {
         }
     }
     fun preSignWebGet(it:String,onSuccess: (PreWeb) -> Unit = {}){
-        onSuccess(HtmlParser.parsepreSignWebGet(it))
+        onSuccess(HtmlParser.parsePreSignWebGet(it))
     }
 
 }

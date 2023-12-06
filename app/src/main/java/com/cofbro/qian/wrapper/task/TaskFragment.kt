@@ -4,13 +4,11 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
-import com.amap.api.maps2d.model.LatLng
 import com.cofbro.hymvvmutils.base.BaseFragment
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.data.URL
@@ -27,7 +25,6 @@ import com.cofbro.qian.utils.SignRecorder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
-import com.cofbro.qian.utils.urlEncodeChinese
 import com.cofbro.qian.view.CodingDialog
 import com.cofbro.qian.view.FullScreenDialog
 import com.cofbro.qian.view.GestureInputDialog
@@ -37,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.URLDecoder
 import java.net.URLEncoder
 
 /**
@@ -221,6 +217,14 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             }
         }
 
+        // cookie签到
+        viewModel.cookieSignLiveData.observe(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                cookies = it
+                signWith(id, code, cookies)
+            }
+        }
+
         // 绑定签到
         // todo 修改签到逻辑
         viewModel.signTogetherLiveData.observe(this) { response ->
@@ -228,12 +232,12 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val body = data.body?.string() ?: ""
                 signRecord(body, cookies)
+                alreadySignCount++
                 if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
                     val itemUser =
                         otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
                     remark = itemUser.getStringExt(Constants.Account.REMARK)
                     tryLogin(itemUser)
-                    alreadySignCount++
                 } else {
                     withContext(Dispatchers.Main) {
                         hideLoadingView()
@@ -383,7 +387,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             viewModel.preSign(preSignUrl)
             locate {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val address = "{\"result\":1,\"latitude\":$latitude,\"longitude\":$longitude,\"address\":\"$locationText\"}"
+                    val address =
+                        "{\"result\":1,\"latitude\":$latitude,\"longitude\":$longitude,\"address\":\"$locationText\"}"
                     location = URLEncoder.encode(address, "UTF-8")
                     viewModel.sign(URL.getSignWithCameraPath(id, location))
                 }
@@ -391,7 +396,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private fun locate(onLocated : () -> Unit) {
+    private fun locate(onLocated: () -> Unit) {
         AmapUtils.getCurrentLocationLatLng(requireContext(),
             onSuccess = { lat, lon, location ->
                 latitude = lat
@@ -516,10 +521,13 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWithAccounts() {
         withContext(Dispatchers.IO) {
             val data = AccountManager.loadAllAccountData(requireContext())
-            otherSignUsers = data.getJSONArray(Constants.Account.USERS)
+            val cookieSignData = AccountManager.loadAllAccountData(requireContext(), Constants.RecycleJson.COOKIE_JSON_DATA)
+            otherSignUsers = data.getJSONArray(Constants.Account.USERS) ?: JSONArray()
+            cookieSignData.getJSONArray(Constants.Account.USERS).forEach { user ->
+                otherSignUsers?.add(user)
+            }
             val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
             if (firstUser != null) {
-                alreadySignCount++
                 remark = firstUser.getStringExt(Constants.Account.REMARK)
                 tryLogin(firstUser)
             }
@@ -543,8 +551,11 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private fun tryLogin(user: JSONObject) {
         val username = user.getStringExt(Constants.Account.USERNAME)
         val password = user.getStringExt(Constants.Account.PASSWORD)
+        val cookieSign = user.getStringExt(Constants.Account.COOKIE)
         if (username.isNotEmpty() && password.isNotEmpty()) {
             viewModel.tryLogin(URL.getLoginPath(username, password))
+        } else {
+            viewModel.tryLoginWithCookies(cookieSign)
         }
     }
 

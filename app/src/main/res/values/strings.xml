@@ -14,6 +14,8 @@
 
     <string name="pop_add_remark">添加备注</string>
     <string name="pop_delete">删除账号</string>
+    <string name="pop_request_option_sign">请求cookie代签(1天)</string>
+    <string name="pop_request_option_homework">请求作业</string>
 
     <string name="add_file">添加附件</string>
     <string name="submit_file">提 交</string>
@@ -36,4 +38,7 @@
     <string name="account_add_remark_hint">点击输入备注</string>
     <string name="account_add_remark_title">添加备注</string>
     <string name="account_add_remark_content">为该账号添加备注后，可在日志页面快速查看代签账号是否签到成功。</string>
+
+    <string name="chat_request_cookie_sign_title">确定将cookie发送给对方吗？</string>
+    <string name="chat_request_cookie_sign_content">确定后会将cookie发送至对方，当对方签到时，会自动为自己代签(有效期1天)。</string>
 </resources>

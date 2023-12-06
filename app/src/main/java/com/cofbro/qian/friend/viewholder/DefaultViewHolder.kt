@@ -1,6 +1,7 @@
 package com.cofbro.qian.friend.viewholder
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -14,6 +15,10 @@ import java.util.Date
 
 open class DefaultViewHolder<T>(private val layoutBinding: ViewBinding) : RecyclerView.ViewHolder(layoutBinding.root) {
     open fun bind(position: Int, t: T?) {
+    }
+
+    fun getHolderContext(): Context {
+        return layoutBinding.root.context
     }
 
     @SuppressLint("SimpleDateFormat")

@@ -1,6 +1,7 @@
 package com.cofbro.qian.friend.im
 
 import android.util.Log
+import cn.leancloud.LCException
 import cn.leancloud.LCObject
 import cn.leancloud.LCQuery
 import cn.leancloud.LCUser
@@ -13,17 +14,16 @@ import cn.leancloud.im.v2.callback.LCIMClientCallback
 import cn.leancloud.im.v2.callback.LCIMConversationCallback
 import cn.leancloud.im.v2.callback.LCIMConversationCreatedCallback
 import cn.leancloud.im.v2.callback.LCIMConversationQueryCallback
+import cn.leancloud.im.v2.callback.LCIMMessageUpdatedCallback
 import cn.leancloud.im.v2.callback.LCIMMessagesQueryCallback
 import cn.leancloud.im.v2.messages.LCIMTextMessage
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 
 
-
-
-
 object IMClientUtils {
     private val TAG = "IMClientUtils"
+
     object IMConstants {
         const val NOT_RESPONSE = "notResponse"
         const val AGREED = "agreed"
@@ -152,6 +152,61 @@ object IMClientUtils {
                     onSuccess()
                 } else {
                     onError(e.message.toString())
+                }
+            }
+        })
+    }
+
+    /**
+     * 发送消息
+     * @param conversation the LcConversation after login
+     * @param text text string you want to send
+     * @param ext the ext attrs for this message
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun sendMsg(
+        conversation: LCIMConversation,
+        text: String,
+        ext: HashMap<String, Any>,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val msg = LCIMTextMessage()
+        msg.text = text
+        msg.attrs = ext
+        conversation.sendMessage(msg, object : LCIMConversationCallback() {
+            override fun done(e: LCIMException?) {
+                if (e == null) {
+                    onSuccess()
+                } else {
+                    onError(e.message.toString())
+                }
+            }
+        })
+    }
+
+    /**
+     * 发送消息
+     * @param conversation the LcConversation after login
+     * @param oldMsg the oldMessage you want to modify
+     * @param newMsg the newMessage
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun updateMsg(
+        conversation: LCIMConversation?,
+        oldMsg: LCIMMessage,
+        newMsg: LCIMMessage,
+        onSuccess: (LCIMMessage?) -> Unit,
+        onError: (String?) -> Unit
+    ) {
+        conversation?.updateMessage(oldMsg, newMsg, object : LCIMMessageUpdatedCallback() {
+            override fun done(message: LCIMMessage?, e: LCException?) {
+                if (e == null) {
+                    onSuccess(message)
+                } else {
+                    onError(e.message)
                 }
             }
         })
@@ -289,6 +344,39 @@ object IMClientUtils {
                 }
             }
         })
+    }
+
+    fun createCookieCard(
+        cardId: String,
+        onSuccess: (LCObject) -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val todo = LCObject("CookieCard")
+        todo.put("cardId", cardId)
+        todo.put("agree", "")
+        todo.saveInBackground().subscribe(DefaultObserver<LCObject>(onSuccess, onError))
+    }
+
+    fun findCookieCardInfo(
+        cardId: String,
+        onSuccess: (List<LCObject>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val query = LCQuery<LCObject>("CookieCard")
+        query.whereEqualTo("cardId", cardId)
+        query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
+    }
+
+    fun updateCookieCardInfo(
+        objectId: String,
+        ifAgree: Boolean,
+        onSuccess: (LCObject) -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val agree = if (ifAgree) "agree" else "refuse"
+        val todo = LCObject.createWithoutData("CookieCard", objectId)
+        todo.put("agree", agree)
+        todo.saveInBackground().subscribe(DefaultObserver<LCObject>(onSuccess, onError))
     }
 
     class DefaultObserver<T : Any>(

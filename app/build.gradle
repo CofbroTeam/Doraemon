@@ -36,6 +36,12 @@ android {
             keyAlias System.getenv("ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")
         }
+        debug {
+            storeFile file("key/debugkey.jks")
+            keyAlias 'key0'
+            keyPassword '123456'
+            storePassword '123456'
+        }
     }
 
     buildTypes {

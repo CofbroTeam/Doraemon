@@ -6,7 +6,10 @@ import com.cofbro.qian.friend.viewholder.DefaultViewHolder
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 
-class NormalUserSendViewHolder(private val binding: ItemChatNormalFriendBinding,private val avatar: String) : DefaultViewHolder<LCIMMessage>(binding) {
+class NormalUserSendViewHolder(
+    private val binding: ItemChatNormalFriendBinding,
+    private val avatar: String
+) : DefaultViewHolder<LCIMMessage>(binding) {
     override fun bind(position: Int, t: LCIMMessage?) {
         // 消息
         binding.tvMessage.text = t?.content?.safeParseToJson()?.getStringExt("_lctext") ?: ""
