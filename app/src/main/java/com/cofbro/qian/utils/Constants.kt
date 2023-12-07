@@ -373,6 +373,7 @@ object Constants {
     object RecycleJson {
         const val HOME_JSON_DATA = "home_json_data"
         const val ACCOUNT_JSON_DATA = "account_data"
+        const val COOKIE_JSON_DATA = "cookie_sign"
     }
 
 
@@ -421,12 +422,13 @@ object Constants {
         const val UID = "uid"
         const val REMARK = "remark"
         const val FID = "fid"
-        const val COOKIE = "cookie"
+        const val COOKIE = "cookies"
         const val USERNAME = "username"
         const val PASSWORD = "password"
         const val PIC_URL = "picUrl"
         const val USERS = "users"
         const val SIZE = "size"
+        const val TIME = "time"
         const val HISTORY = "history"
     }
 
@@ -473,8 +475,16 @@ object Constants {
         const val CONV = "conv"
     }
 
+    object Login {
+        const val UID = "uid"
+        const val COOKIES = "cookies"
+        const val FID = "fid"
+    }
+
     object HolderType {
         const val NORMAL_USER_SEND = 100
         const val NORMAL_SELF_SEND = 101
+        const val REQUEST_COOKIE_CARD_SELF_SEND = 102
+        const val REQUEST_COOKIE_CARD_USER_SEND = 103
     }
 }

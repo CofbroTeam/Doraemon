@@ -1,5 +1,6 @@
 package com.cofbro.qian.wrapper.task
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.cofbro.hymvvmutils.base.BaseViewModel
 import com.cofbro.hymvvmutils.base.ResponseMutableLiveData
@@ -9,7 +10,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 
 class TaskViewModel : BaseViewModel<TaskRepository>() {
-    val preSignLiveData = ResponseMutableLiveData<Response>()
+    private val preSignLiveData = ResponseMutableLiveData<Response>()
     val queryActiveTaskListLiveData = ResponseMutableLiveData<Response>()
     val signTypeLiveData = ResponseMutableLiveData<Response>()
     val signLiveData = ResponseMutableLiveData<Response>()
@@ -17,6 +18,7 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
     val signTogetherLiveData = ResponseMutableLiveData<Response>()
     val loginLiveData = ResponseMutableLiveData<Response>()
     val analysisLiveData = ResponseMutableLiveData<Response>()
+    val cookieSignLiveData = MutableLiveData<String>()
 
 
     fun queryActiveTaskList(url: String) {
@@ -78,6 +80,10 @@ class TaskViewModel : BaseViewModel<TaskRepository>() {
                 NetworkUtils.request(request)
             }
         }
+    }
+
+    fun tryLoginWithCookies(cookie: String) {
+        cookieSignLiveData.postValue(cookie)
     }
 
     suspend fun request(url: String, cookies: String = "") {
