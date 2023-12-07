@@ -24,8 +24,6 @@ import kotlinx.coroutines.launch
 class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFriendBinding>() {
     private var FriendsAdapter: FriendsAdapter? = null
     private var FriendList:MutableList<Friends> = mutableListOf()
-
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
           initView()
     }

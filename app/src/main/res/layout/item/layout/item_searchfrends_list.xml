@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp">
 
     <ImageView
         android:id="@+id/friendicon"
@@ -20,13 +21,14 @@
 
     <TextView
         android:id="@+id/friendname"
-        android:layout_width="109dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="12dp"
+        android:layout_width="157dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="12dp"
         android:text="用户"
-        android:textSize="10dp"
         android:textAlignment="center"
+        android:textSize="10dp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/friendicon"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -34,15 +36,15 @@
 
     <Button
         android:id="@+id/addfriend"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginEnd="68dp"
-        android:background="@drawable/input_bk_bottom"
+        android:layout_width="51dp"
+        android:layout_height="31dp"
+        android:layout_marginEnd="48dp"
+        android:background="@drawable/add_bk"
         android:text="添加"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.545">
 
     </Button>
 </androidx.constraintlayout.widget.ConstraintLayout>

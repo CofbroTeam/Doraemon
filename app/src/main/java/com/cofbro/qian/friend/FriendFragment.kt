@@ -74,10 +74,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
 
         binding?.editText?.setOnClickListener {
-//            searchUser()
             val intent = Intent(requireActivity(),SearchFriendActivity::class.java)
             startActivityForResult(intent,100)
-//            startActivityForResult(intent,100)
         }
 
     }
@@ -340,36 +338,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             it.put("uid", uid)
         }
     }
-
-    private fun searchUser() {
-        val username = binding?.editText?.text.toString()
-        IMClientUtils.querySingleUserByUsernameFuzzy(
-            username,
-            onSuccess = {
-                it.getOrNull(0)?.apply {
-                    sendFriendRequest(objectId)
-                }
-            }, onError = {
-                ToastUtils.show("好友申请发送失败")
-            }
-        )
-    }
-
-    private fun sendFriendRequest(uid: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            IMClientUtils.createNewConversation(
-                uid,
-                onSuccess = {
-                    clearText()
-                    ToastUtils.show("好友申请发送成功")
-                },
-                onError = {
-                    ToastUtils.show("好友申请发送失败")
-                }
-            )
-        }
-    }
-
     private fun clearText() {
         binding?.editText?.hint = "搜索用户名字"
 //        binding?.editText?.text?.clear()
