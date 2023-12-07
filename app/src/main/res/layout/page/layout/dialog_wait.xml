@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="为好友代签"
+        android:text="@string/cookie_sign_wait_dialog_user_title"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
@@ -37,13 +37,33 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:text="同意代签后，会在签到时帮他一起签到，有效时期1天。"
+        android:text="@string/cookie_sign_wait_dialog_user_content"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/animationView" />
 
+    <TextView
+        android:id="@+id/tv_tip_sure"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/app_comm_radius_bg"
+        android:gravity="center"
+        android:text="知 道 了"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_cookie_sign_dialog_content" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cs_bottom"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="16dp"

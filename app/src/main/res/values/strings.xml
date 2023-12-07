@@ -41,4 +41,11 @@
 
     <string name="chat_request_cookie_sign_title">确定将cookie发送给对方吗？</string>
     <string name="chat_request_cookie_sign_content">确定后会将cookie发送至对方，当对方签到时，会自动为自己代签(有效期1天)。</string>
+
+    <string name="cookie_sign_wait_dialog_user_title">为好友代签</string>
+    <string name="cookie_sign_wait_dialog_user_content">同意代签后，会在签到时帮他一起签到，有效时期1天。</string>
+    <string name="cookie_sign_wait_dialog_self_title_not_response">等待对方响应</string>
+    <string name="cookie_sign_wait_dialog_self_title_agree">对方已同意</string>
+    <string name="cookie_sign_wait_dialog_self_title_refuse">对方已拒绝</string>
+    <string name="cookie_sign_wait_dialog_self_content">对方同意后，当他签到时会自动帮你一起签到（需要让他打开代签按钮）。</string>
 </resources>
