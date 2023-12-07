@@ -51,12 +51,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-        initEventManager()
-        initView()
-        initObserver()
-        doNetwork()
-        initEvent()
-
+//        initEventManager()
+//        initView()
+//        initObserver()
+//        doNetwork()
+//        initEvent()
     }
 
     private fun initEvent() {
