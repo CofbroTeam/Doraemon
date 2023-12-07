@@ -63,12 +63,12 @@ class CookieSignCardUserViewHolder(
         // 首先判断卡片是否过期
         if (checkCookieIfValid(msg)) {
             // agree，云端记录是否被同意
-            findCookieCardInfo {
+            findCookieCardInfo(cookie) {
                 val agree = it?.get("agree").toString()
                 val cookieCardId = it?.objectId ?: ""
                 if (agree.isEmpty() || agree == "agree") {
                     // 检测本地是否有cookie记录
-                    writeCookieAccountIfNeeded(getHolderContext(), cookie, avatar)
+                    writeCookieAccountIfNeeded(getHolderContext(), cookie, avatar, msg.timestamp)
                     if (agree == "agree") {
                         ToastUtils.show("你已经同意过了~")
                         return@findCookieCardInfo
@@ -99,14 +99,15 @@ class CookieSignCardUserViewHolder(
     private fun writeCookieAccountIfNeeded(
         context: Context,
         cookie: String,
-        avatar: String
+        avatar: String,
+        time: Long
     ) {
         thread {
             val cookieSignData =
                 AccountManager.loadAllAccountData(context, Constants.RecycleJson.COOKIE_JSON_DATA)
             // 检测本地是否有cookie记录
             if (checkCookieIfValidInLocal(cookieSignData, cookie)) {
-                val account = AccountManager.buildCookieSignAccount(cookie, avatar)
+                val account = AccountManager.buildCookieSignAccount(cookie, avatar, time)
                 val data = AccountManager.bindAccounts(
                     context,
                     cookieSignData,
@@ -150,8 +151,8 @@ class CookieSignCardUserViewHolder(
         return targetId
     }
 
-    private fun findCookieCardInfo(callback: (LCObject?) -> Unit) {
-        val cardId = targetUserId()
+    private fun findCookieCardInfo(cookie: String, callback: (LCObject?) -> Unit) {
+        val cardId = targetUserId() + cookie
         IMClientUtils.findCookieCardInfo(cardId, onSuccess = {
             callback(it.getOrNull(0))
         }, onError = {})

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -521,10 +522,17 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun signWithAccounts() {
         withContext(Dispatchers.IO) {
             val data = AccountManager.loadAllAccountData(requireContext())
-            val cookieSignData = AccountManager.loadAllAccountData(requireContext(), Constants.RecycleJson.COOKIE_JSON_DATA)
+            val cookieSignData = AccountManager.loadAllAccountData(
+                requireContext(),
+                Constants.RecycleJson.COOKIE_JSON_DATA
+            )
             otherSignUsers = data.getJSONArray(Constants.Account.USERS) ?: JSONArray()
             cookieSignData.getJSONArray(Constants.Account.USERS).forEach { user ->
-                otherSignUsers?.add(user)
+                val timestamp =
+                    (user as? JSONObject)?.getStringExt(Constants.Account.TIME)?.toLong() ?: 0L
+                if (System.currentTimeMillis() - timestamp <= 24 * 60 * 60 * 1000) {
+                    otherSignUsers?.add(user)
+                }
             }
             val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
             if (firstUser != null) {

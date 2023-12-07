@@ -77,7 +77,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     }
 
     private fun doNetwork() {
-        requestHistoryMessage()
+        requestHistoryMessageFirstly()
     }
 
     private fun initView() {
@@ -91,7 +91,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             setOnRefreshListener {
                 autoRefresh()
                 refreshing = true
-                requestHistoryMessage(20)
+                requestHistoryMessage()
             }
         }
     }
@@ -157,7 +157,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         KeyboardUtil.unregisterKeyboardHeightListener(this)
     }
 
-    private fun requestHistoryMessage(count: Int = 0) {
+    private fun requestHistoryMessageFirstly(count: Int = 0) {
         conv?.let {
             var realCount = it.unreadMessagesCount.takeIf { c ->
                 c != 0
@@ -178,11 +178,30 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         }
     }
 
+    private fun requestHistoryMessage(count: Int = 15) {
+        conv?.let { conversation ->
+            val firstMsg = msgData.getOrNull(0)
+            firstMsg?.let {
+                IMClientUtils.queryHistoryMessage(conversation, count, it,
+                    onSuccess = { msg ->
+                        msg?.let {
+                            insertRangedData(msg)
+                        }
+                    }, onError = {
+                        ToastUtils.show("历史数据拉取失败！")
+                        finishRefresh()
+                    }
+                )
+            }
+        }
+    }
+
     private fun insertRangedData(msg: List<LCIMMessage>) {
         if (msg.isNotEmpty()) {
             // 手动拉取历史数据
             if (refreshing) {
                 refreshing = false
+                msgData.addAll(0, msg)
                 mAdapter?.insertDataAtFirst(msg)
             } else {
                 // 首次进入拉取历史数据
@@ -308,7 +327,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
                     val cookieCard = MsgFactory.createCookieSignLCMessage(text, cookie)
                     insertMsg(cookieCard)
                     clear()
-                    saveCookieInLc()
+                    saveCookieInLc(cookie)
                 }, onError = {
                     ToastUtils.show("消息发送失败")
                 }
@@ -316,8 +335,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         }
     }
 
-    private fun saveCookieInLc() {
+    private fun saveCookieInLc(cookie: String) {
         // 使用自己的objectId作为cardId
-        IMClientUtils.createCookieCard(IMClientUtils.getCntUser()?.objectId ?: "")
+        IMClientUtils.createCookieCard(IMClientUtils.getCntUser()?.objectId + cookie, cookie)
     }
 }

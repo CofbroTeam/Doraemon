@@ -428,6 +428,7 @@ object Constants {
         const val PIC_URL = "picUrl"
         const val USERS = "users"
         const val SIZE = "size"
+        const val TIME = "time"
         const val HISTORY = "history"
     }
 

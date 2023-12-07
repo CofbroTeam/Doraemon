@@ -257,6 +257,35 @@ object IMClientUtils {
     }
 
     /**
+     * 从新到旧，查询指定消息前的历史消息
+     * @param conv LCIMConversation
+     * @param count the count of messages you want to query
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun queryHistoryMessage(
+        conv: LCIMConversation,
+        count: Int = 20,
+        oldMsg: LCIMMessage,
+        onSuccess: (List<LCIMMessage>?) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        conv.queryMessages(
+            oldMsg.messageId,
+            oldMsg.timestamp,
+            count,
+            object : LCIMMessagesQueryCallback() {
+                override fun done(messages: List<LCIMMessage>?, e: LCIMException?) {
+                    if (e == null) {
+                        onSuccess(messages)
+                    } else {
+                        onError(e.message.toString())
+                    }
+                }
+            })
+    }
+
+    /**
      * 查询所有参与过的对话
      * @param array the condition of query array
      * @param onSuccess success callback
@@ -327,6 +356,13 @@ object IMClientUtils {
         query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
     }
 
+    /**
+     * 更新cookie卡片
+     * @param conversation conversation
+     * @param accept status of agree signing
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     fun updateConversationInfo(
         conversation: LCIMConversation,
         accept: Boolean,
@@ -346,13 +382,22 @@ object IMClientUtils {
         })
     }
 
+    /**
+     * 创建cookie卡片
+     * @param cardId userId + cookie
+     * @param cookie cookie
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     fun createCookieCard(
         cardId: String,
+        cookie: String,
         onSuccess: (LCObject) -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
         val todo = LCObject("CookieCard")
         todo.put("cardId", cardId)
+        todo.put("cookie", cookie)
         todo.put("agree", "")
         todo.saveInBackground().subscribe(DefaultObserver<LCObject>(onSuccess, onError))
     }

@@ -56,11 +56,11 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
 
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--            </intent-filter>-->
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".wrapper.did.DoHomeworkActivity" />

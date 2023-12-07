@@ -16,13 +16,14 @@ object AccountManager {
         Downloader.download(context, key, data)
     }
 
-    fun buildCookieSignAccount(cookie: String, avatar: String): JSONObject {
+    fun buildCookieSignAccount(cookie: String, avatar: String, time: Long): JSONObject {
         val data = JSONObject()
         data[Constants.Account.USERNAME] = ""
         data[Constants.Account.PASSWORD] = ""
         data[Constants.Account.UID] = ""
         data[Constants.Account.COOKIE] = cookie
         data[Constants.Account.FID] = ""
+        data[Constants.Account.TIME] = time
         data[Constants.Account.PIC_URL] = avatar
         return data
     }
