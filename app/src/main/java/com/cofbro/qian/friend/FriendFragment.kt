@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -40,8 +39,6 @@ import com.cofbro.qian.utils.MsgFactory
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
@@ -66,7 +63,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         binding?.ivMore?.setOnClickListener {
             showFriendRequestFragment(friendRequestConv)
             //responseFriendRequest(friendRequestConv[0], true)
-
         }
 
         binding?.tvTitle?.setOnClickListener {
@@ -74,16 +70,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
 
         binding?.editText?.setOnClickListener {
-            val intent = Intent(requireActivity(),SearchFriendActivity::class.java)
-            val friendsObjects:ArrayList<String> = arrayListOf()
-            Log.v("ss",friendList.toString())
-            friendList.forEach {
-                friendsObjects.add(it.getString("owner"))
-            }
-            intent.putExtra("friends",friendsObjects)
-            startActivity(intent)
+            toUserSearchActivity()
         }
-
     }
 
     private fun initView() {
@@ -276,7 +264,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             it.forEachIndexed { index, user ->
                 val username = user["username"].toString()
                 val url = user["avatar"].toString()
-                val data = MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
+                val data =
+                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
                 messageConv.add(data)
                 messageConv.add(data)
                 messageConv.add(data)
@@ -316,7 +305,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         IMClientUtils.queryToFindExistFriend(
             onSuccess = {
                 formatUsersInfo(it)
-
                 friendList.addAll(it)
                 userListAdapter?.setData(it)
             },
@@ -345,6 +333,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             it.put("uid", uid)
         }
     }
+
     private fun clearText() {
         binding?.editText?.hint = "搜索用户名字"
 //        binding?.editText?.text?.clear()
@@ -368,7 +357,10 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         MessageSubscriber.dispatch(conversation, message)
     }
 
-    private fun insertUserListIfNewFriend(message: LCIMMessage?, onSuccess: (String, String) -> Unit) {
+    private fun insertUserListIfNewFriend(
+        message: LCIMMessage?,
+        onSuccess: (String, String) -> Unit
+    ) {
         friendList.forEach {
             if (message?.from == (it.getString("uid") ?: "")) {
                 // 是好友
@@ -394,7 +386,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         )
     }
 
-    private fun insertMessageAccordingToConv(conversation: LCIMConversation?, username: String = "", url: String = "") {
+    private fun insertMessageAccordingToConv(
+        conversation: LCIMConversation?,
+        username: String = "",
+        url: String = ""
+    ) {
         notifyConversationMsgChanged(conversation)
         // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
         val data = MsgFactory.createConversationMsg(conversation, url, username)
@@ -550,5 +546,15 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun showFriendRequestFragment(conv: List<LCIMConversation>) {
         val fragment = FriendRequestFragment(conv)
         fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
+    }
+
+    private fun toUserSearchActivity() {
+        val intent = Intent(requireActivity(), SearchFriendActivity::class.java)
+        val friendsObjects: ArrayList<String> = arrayListOf()
+        friendList.forEach {
+            friendsObjects.add(it.getString("uid"))
+        }
+        intent.putExtra("friends", friendsObjects)
+        startActivity(intent)
     }
 }

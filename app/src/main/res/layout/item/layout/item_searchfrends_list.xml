@@ -3,27 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp">
+    android:layout_height="wrap_content">
 
     <View
-        android:layout_width="300dp"
-        android:layout_height="2dp"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
         android:layout_marginTop="8dp"
-        android:background="#E4E3D6"
+        android:layout_marginEnd="16dp"
+        android:background="#cccccc"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/friendicon">
+        app:layout_constraintStart_toStartOf="@+id/tv_friend_tip"
+        app:layout_constraintTop_toBottomOf="@+id/iv_friend_icon" />
 
-    </View>
     <ImageView
-        android:id="@+id/friendicon"
+        android:id="@+id/iv_friend_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
-        android:src="@color/black"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -32,44 +31,47 @@
     </ImageView>
 
     <TextView
-        android:id="@+id/friendname"
-        android:layout_width="157dp"
+        android:id="@+id/tv_friend_name"
+        android:layout_width="0dp"
         android:layout_height="18dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="用户"
-        android:textSize="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/friendicon"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toStartOf="@+id/tv_add_friend"
+        app:layout_constraintStart_toEndOf="@+id/iv_friend_icon"
+        app:layout_constraintTop_toTopOf="@+id/iv_friend_icon">
 
     </TextView>
 
-    <Button
-        android:id="@+id/addfriend"
-        android:layout_width="51dp"
-        android:layout_height="31dp"
-        android:layout_marginEnd="48dp"
-        android:background="@drawable/add_bk"
+    <TextView
+        android:id="@+id/tv_add_friend"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/app_white_small_radius_bg"
+        android:gravity="center"
         android:text="添加"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.545">
-
-    </Button>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/isfriends"
-        android:layout_width="157dp"
-        android:layout_height="17dp"
-        android:layout_marginStart="76dp"
-        android:layout_marginTop="3dp"
-        android:text="新朋友"
+        android:id="@+id/tv_friend_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/app_small_gray_radius_bg"
+        android:ellipsize="end"
+        android:textColor="@color/white"
+        android:maxLines="1"
+        android:paddingStart="5dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="5dp"
+        android:paddingBottom="2dp"
         android:textSize="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/friendname"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintStart_toStartOf="@+id/tv_friend_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_friend_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>

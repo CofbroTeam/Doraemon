@@ -17,7 +17,6 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         super.onCreate()
         ToastUtils.init(this)
         LeanCloudUtils.init(true)
-
         CacheUtils.cache[Constants.DataLoad.FIRST_LOAD] = Constants.DataLoad.UNLOAD
         registerInstallPackageReceiver()
     }

@@ -1,17 +1,15 @@
 package com.cofbro.qian.friend.search.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.alibaba.fastjson.JSONObject
-import com.amap.api.services.help.Tip
 import com.cofbro.qian.databinding.ItemSearchfrendsListBinding
 import com.cofbro.qian.friend.viewholder.FriendsViewHolder
 
-class FriendsAdapter(private val itemclick: (Friends?) -> Unit): RecyclerView.Adapter<FriendsViewHolder<Friends>>() {
-     var currentFriends: MutableList<Friends>  = mutableListOf()
+class FriendsAdapter : RecyclerView.Adapter<FriendsViewHolder<Friends>>() {
+    private var itemClickListener: ((Friends?) -> Unit)? = null
+    private val data = arrayListOf<Friends>()
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -25,14 +23,27 @@ class FriendsAdapter(private val itemclick: (Friends?) -> Unit): RecyclerView.Ad
         holder: FriendsViewHolder<Friends>,
         position: Int
     ) {
-        holder.bind(position, currentFriends.getOrNull(position))
+        holder.bind(position, data.getOrNull(position))
         holder.setItemClickListener {
-            itemclick.invoke(currentFriends.getOrNull(position))
+            itemClickListener?.invoke(data.getOrNull(position))
         }
     }
+
     override fun getItemCount(): Int {
-        return currentFriends.size
+        return data.size
     }
 
+    fun setOnItemClickListener(listener: (Friends?) -> Unit) {
+        itemClickListener = listener
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(t: List<Friends>?) {
+        data.clear()
+        t?.let {
+            data.addAll(it)
+        }
+        notifyDataSetChanged()
+    }
 
 }
