@@ -1,5 +1,6 @@
 package com.cofbro.qian.friend.search
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -7,6 +8,7 @@ import android.os.Message
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cn.leancloud.LCObject
 import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.qian.databinding.ActivitySearchFriendBinding
 import com.cofbro.qian.friend.im.IMClientUtils
@@ -16,6 +18,7 @@ import com.cofbro.qian.mapsetting.adapter.InputTipsAdapter
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 /**
  * 完成用户搜索功能
@@ -24,8 +27,11 @@ import kotlinx.coroutines.launch
 class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFriendBinding>() {
     private var FriendsAdapter: FriendsAdapter? = null
     private var FriendList:MutableList<Friends> = mutableListOf()
+    private  var  friendsList:ArrayList<String>? = ArrayList()
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+          initArgs()
           initView()
+
     }
 
     private fun initView() {
@@ -55,7 +61,11 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFr
             username,
             onSuccess = {
                 it.forEach {user->
-                    FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: ""))
+                    if (friendsList?.contains(user.objectId) == true){
+                        FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: "",true))
+                    }else{
+                        FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: ""))
+                    }
                 }
                 FriendsAdapter = FriendsAdapter( itemclick = {friend->
                       sendFriendRequest(friend?.objectId?:"")
@@ -86,6 +96,11 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFr
             )
         }
     }
+   fun initArgs(){
+         val intent = Intent()
+         friendsList = intent.getStringArrayListExtra("friends")
+
+   }
     private fun clearText() {
         binding?.searchFriends?.hint = "搜索用户名字"
         binding?.searchFriends?.text?.clear()

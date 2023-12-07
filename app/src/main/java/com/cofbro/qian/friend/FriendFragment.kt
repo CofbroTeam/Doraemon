@@ -75,6 +75,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
         binding?.editText?.setOnClickListener {
             val intent = Intent(requireActivity(),SearchFriendActivity::class.java)
+            val friendsObjects = arrayListOf<String>()
+            friendList.forEach {
+                friendsObjects.add(it.objectId)
+            }
+            intent.putExtra("friends",friendsObjects)
             startActivityForResult(intent,100)
         }
 
@@ -310,6 +315,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         IMClientUtils.queryToFindExistFriend(
             onSuccess = {
                 formatUsersInfo(it)
+
                 friendList.addAll(it)
                 userListAdapter?.setData(it)
             },
