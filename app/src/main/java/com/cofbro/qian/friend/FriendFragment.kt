@@ -75,12 +75,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
         binding?.editText?.setOnClickListener {
             val intent = Intent(requireActivity(),SearchFriendActivity::class.java)
-            val friendsObjects = arrayListOf<String>()
+            val friendsObjects:ArrayList<String> = arrayListOf()
+            Log.v("ss",friendList.toString())
             friendList.forEach {
-                friendsObjects.add(it.objectId)
+                friendsObjects.add(it.getString("owner"))
             }
             intent.putExtra("friends",friendsObjects)
-            startActivityForResult(intent,100)
+            startActivity(intent)
         }
 
     }

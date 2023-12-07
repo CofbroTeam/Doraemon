@@ -61,7 +61,7 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFr
             username,
             onSuccess = {
                 it.forEach {user->
-                    if (friendsList?.contains(user.objectId) == true){
+                    if (friendsList?.contains(user.getString("username")) == true){
                         FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: "",true))
                     }else{
                         FriendList.add(Friends(user.objectId?: "",user.getString("username")?: "",user.getString("avatar")?: ""))
@@ -97,9 +97,7 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel,ActivitySearchFr
         }
     }
    fun initArgs(){
-         val intent = Intent()
          friendsList = intent.getStringArrayListExtra("friends")
-
    }
     private fun clearText() {
         binding?.searchFriends?.hint = "搜索用户名字"

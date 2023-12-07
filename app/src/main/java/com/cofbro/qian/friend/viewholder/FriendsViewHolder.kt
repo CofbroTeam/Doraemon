@@ -18,18 +18,18 @@ class FriendsViewHolder<T : Friends>(private val binding: ItemSearchfrendsListBi
         }
         setImage(binding.friendicon,t?.src)
         binding.friendname.text = t?.name
-        binding.isfriends.text = (if (t?.isfriend != true){
+        binding.isfriends.text = (if (t?.isfriend == true){
             "老朋友~"
         } else {
             "新朋友~"
         }).toString()
         binding.addfriend.apply {
             if (t?.isfriend == true){
+                visibility = View.GONE
+            }else{
                 setItemClickListener {
                     itemClick?.invoke()
                 }
-            }else{
-                visibility = View.GONE
             }
         }
 
