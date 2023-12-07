@@ -67,11 +67,11 @@
         <activity
             android:name=".main.MainActivity"
             android:exported="true">
-                        <intent-filter>
-                            <category android:name="android.intent.category.LAUNCHER" />
+<!--                        <intent-filter>-->
+<!--                            <category android:name="android.intent.category.LAUNCHER" />-->
 
-                            <action android:name="android.intent.action.MAIN" />
-                        </intent-filter>
+<!--                            <action android:name="android.intent.action.MAIN" />-->
+<!--                        </intent-filter>-->
         </activity>
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".account.manager.AccountManagerActivity" />
@@ -83,7 +83,7 @@
         <activity android:name=".record.SignRecordActivity" />
         <activity android:name=".login.sms.SMSActivity" />
         <activity android:name=".friend.chat.ChatActivity" />
-
+        <activity android:name=".friend.search.SearchFriendActivity"/>
         <service android:name="com.amap.api.location.APSService" />
         <provider
             android:name="androidx.core.content.FileProvider"

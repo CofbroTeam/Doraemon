@@ -7,50 +7,62 @@
     tools:context=".friend.search.SearchFriendActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout11"
-        android:layout_width="415dp"
-        android:layout_height="65dp"
+        android:id="@+id/user_search_bar"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.47"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/backtomain"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+        <ImageView
+            android:id="@+id/tv_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="16dp"
             android:background="@drawable/back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.478" />
 
-        <com.google.android.material.search.SearchView
+        <EditText
             android:id="@+id/searchFriends"
-            android:layout_width="290dp"
-            android:layout_height="50dp"
-            app:layout_constraintBottom_toBottomOf="@+id/backtomain"
-            app:layout_constraintStart_toEndOf="@+id/backtomain"
-            app:layout_constraintTop_toTopOf="@+id/backtomain"
-            app:searchIcon="@drawable/ic_search" />
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:background="@null"
+            android:hint="点击搜索用户名字"
+            android:inputType="number"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:textColor="@color/black"
+            android:textColorHint="#7E7A7A"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_back"
+            app:layout_constraintEnd_toStartOf="@+id/tv_delete"
+            app:layout_constraintStart_toEndOf="@+id/tv_back"
+            app:layout_constraintTop_toTopOf="@+id/tv_back"
+            android:drawableEnd="@drawable/ic_search" />
 
-        <Button
-            android:id="@+id/delete"
+        <TextView
+            android:id="@+id/tv_delete"
             android:layout_width="55dp"
-            android:layout_height="50dp"
-            android:background="#ffff"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
             android:text="取消"
             android:textColor="@color/appColor"
-            app:layout_constraintBottom_toBottomOf="@+id/searchFriends"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/searchFriends"
-            app:layout_constraintTop_toTopOf="@+id/searchFriends" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/friendsrecyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="823dp"
+        android:id="@+id/rv_friend_search"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout11" />
+        app:layout_constraintTop_toBottomOf="@+id/user_search_bar" />
 </androidx.constraintlayout.widget.ConstraintLayout>
