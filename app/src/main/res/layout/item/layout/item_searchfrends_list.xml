@@ -5,11 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:background="#cccccc"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_friend_tip"
+        app:layout_constraintTop_toBottomOf="@+id/iv_friend_icon" />
+
     <ImageView
-        android:id="@+id/friendicon"
-        android:layout_width="47dp"
-        android:layout_height="42dp"
-        android:layout_marginStart="24dp"
+        android:id="@+id/iv_friend_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,24 +31,47 @@
     </ImageView>
 
     <TextView
-        android:id="@+id/friendname"
-        android:layout_width="77dp"
-        android:layout_height="30dp"
-        app:layout_constraintStart_toEndOf="@+id/friendicon"
-        app:layout_constraintTop_toTopOf="parent">
+        android:id="@+id/tv_friend_name"
+        android:layout_width="0dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/tv_add_friend"
+        app:layout_constraintStart_toEndOf="@+id/iv_friend_icon"
+        app:layout_constraintTop_toTopOf="@+id/iv_friend_icon">
 
     </TextView>
 
-    <Button
-        android:id="@+id/addfriend"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_marginEnd="32dp"
-        android:background="@drawable/input_bk_bottom"
+    <TextView
+        android:id="@+id/tv_add_friend"
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/app_white_small_radius_bg"
+        android:gravity="center"
         android:text="添加"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-    </Button>
+    <TextView
+        android:id="@+id/tv_friend_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/app_small_gray_radius_bg"
+        android:ellipsize="end"
+        android:textColor="@color/white"
+        android:maxLines="1"
+        android:paddingStart="5dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="5dp"
+        android:paddingBottom="2dp"
+        android:textSize="10dp"
+        app:layout_constraintStart_toStartOf="@+id/tv_friend_name"
+        app:layout_constraintTop_toBottomOf="@+id/tv_friend_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>
