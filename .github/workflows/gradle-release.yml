@@ -41,4 +41,15 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           # allowUpdates: true
-          artifacts: "${{github.workspace}}/app/build/outputs/apk/release/app-release.apk"
+          artifacts: "${{github.workspace}}/app/build/outputs/apk/release/*.apk"
+      
+      # Upload to COS
+      - uses: git9527/setup-coscli@v2
+        with:
+          region: ${{ secrets.COS_REGION }}
+          secret-id: ${{ secrets.COS_SECRET_ID }}
+          secret-key: ${{ secrets.COS_SECRET_KEY }}
+          bucket: ${{ secrets.COS_BUCKET }}
+          coscli-version: 'v0.12.0-beta' # Optional, default to 'v0.12.0-beta'.  Use 'latest' to get the latest version.
+      - run: |
+          coscli sync ${{github.workspace}}/app/build/outputs/apk/release cos://${{ secrets.COS_BUCKET }} --recursive --thread-num 20
