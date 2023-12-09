@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -32,6 +33,7 @@ import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.friend.im.MessageSubscriber
+import com.cofbro.qian.friend.login.IMLoginActivity
 import com.cofbro.qian.friend.search.SearchFriendActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
@@ -42,6 +44,8 @@ import com.hjq.toast.ToastUtils
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
+    private val requestCodeLogin = 1001
+    private var loginStatus = false
     private var friendList = arrayListOf<LCObject>()
     private var userListAdapter: UserListAdapter? = null
     private var messageListAdapter: MessageListAdapter? = null
@@ -51,11 +55,49 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-//        initEventManager()
-//        initView()
-//        initObserver()
-//        doNetwork()
-//        initEvent()
+        checkUserValidAndInit()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            checkUserValidAndInit()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == requestCodeLogin) {
+            val result = data?.getBooleanExtra("login", false) ?: false
+            if (result) {
+                init(true)
+                loginStatus = true
+            }
+        }
+    }
+
+    private fun init(already: Boolean = false) {
+        initEventManager()
+        initView()
+        initObserver()
+        doNetwork(already)
+        initEvent()
+    }
+
+    private fun checkUserValidAndInit() {
+        if (loginStatus) return
+        val account = requireActivity().getBySp("account")
+        val password = requireActivity().getBySp("account_password")
+        if (!account.isNullOrEmpty() && !password.isNullOrEmpty()) {
+            init()
+        } else {
+            toIMLoginActivity()
+        }
+    }
+
+    private fun toIMLoginActivity() {
+        val intent = Intent(requireActivity(), IMLoginActivity::class.java)
+        startActivityForResult(intent, requestCodeLogin)
     }
 
     private fun initEvent() {
@@ -296,8 +338,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         IMEventManager.init(this)
     }
 
-    private fun doNetwork() {
-        loginIM()
+    private fun doNetwork(already: Boolean) {
+        loginIM(already)
     }
 
     private fun loadUserList() {
@@ -429,9 +471,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         ToastUtils.show("属性改变")
     }
 
-    private fun loginIM() {
-        val username = mContext?.getBySp(SP_USER_NAME) ?: ""
-        val password = mContext?.getBySp(SP_PASSWORD) ?: ""
+    private fun loginIM(alreadyLogin: Boolean = false) {
+        if (alreadyLogin) {
+            viewModel.loginIMLiveData.postValue(LCUser())
+            return
+        }
+        val username = mContext?.getBySp("account") ?: ""
+        val password = mContext?.getBySp("account_password") ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
             IMClientUtils.loginIM(username, password,
                 onSuccess = {
