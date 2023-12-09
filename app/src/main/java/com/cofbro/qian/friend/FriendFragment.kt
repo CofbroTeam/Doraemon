@@ -1,11 +1,12 @@
 package com.cofbro.qian.friend
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -32,17 +33,19 @@ import com.cofbro.qian.friend.im.IEventCallback
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.im.IMEventManager
 import com.cofbro.qian.friend.im.MessageSubscriber
+import com.cofbro.qian.friend.login.IMLoginActivity
+import com.cofbro.qian.friend.search.SearchFriendActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.MsgFactory
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.hjq.toast.ToastUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), IEventCallback {
+    private val requestCodeLogin = 1001
+    private var loginStatus = false
     private var friendList = arrayListOf<LCObject>()
     private var userListAdapter: UserListAdapter? = null
     private var messageListAdapter: MessageListAdapter? = null
@@ -52,11 +55,49 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private var toolbarHeight = 0
     private val TAG = "FriendFragment"
     override fun onAllViewCreated(savedInstanceState: Bundle?) {
-//        initEventManager()
-//        initView()
-//        initObserver()
-//        doNetwork()
-//        initEvent()
+        checkUserValidAndInit()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            checkUserValidAndInit()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == requestCodeLogin) {
+            val result = data?.getBooleanExtra("login", false) ?: false
+            if (result) {
+                init(true)
+                loginStatus = true
+            }
+        }
+    }
+
+    private fun init(already: Boolean = false) {
+        initEventManager()
+        initView()
+        initObserver()
+        doNetwork(already)
+        initEvent()
+    }
+
+    private fun checkUserValidAndInit() {
+        if (loginStatus) return
+        val account = requireActivity().getBySp("account")
+        val password = requireActivity().getBySp("account_password")
+        if (!account.isNullOrEmpty() && !password.isNullOrEmpty()) {
+            init()
+        } else {
+            toIMLoginActivity()
+        }
+    }
+
+    private fun toIMLoginActivity() {
+        val intent = Intent(requireActivity(), IMLoginActivity::class.java)
+        startActivityForResult(intent, requestCodeLogin)
     }
 
     private fun initEvent() {
@@ -69,8 +110,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
         }
 
-        binding?.ivUserSearch?.setOnClickListener {
-            searchUser()
+        binding?.editText?.setOnClickListener {
+            toUserSearchActivity()
         }
     }
 
@@ -264,7 +305,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
             it.forEachIndexed { index, user ->
                 val username = user["username"].toString()
                 val url = user["avatar"].toString()
-                val data = MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
+                val data =
+                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
                 messageConv.add(data)
                 messageConv.add(data)
                 messageConv.add(data)
@@ -296,8 +338,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         IMEventManager.init(this)
     }
 
-    private fun doNetwork() {
-        loginIM()
+    private fun doNetwork(already: Boolean) {
+        loginIM(already)
     }
 
     private fun loadUserList() {
@@ -333,38 +375,9 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
-    private fun searchUser() {
-        val username = binding?.editText?.text.toString()
-        IMClientUtils.querySingleUserByUsernameFuzzy(
-            username,
-            onSuccess = {
-                it.getOrNull(0)?.apply {
-                    sendFriendRequest(objectId)
-                }
-            }, onError = {
-                ToastUtils.show("好友申请发送失败")
-            }
-        )
-    }
-
-    private fun sendFriendRequest(uid: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            IMClientUtils.createNewConversation(
-                uid,
-                onSuccess = {
-                    clearText()
-                    ToastUtils.show("好友申请发送成功")
-                },
-                onError = {
-                    ToastUtils.show("好友申请发送失败")
-                }
-            )
-        }
-    }
-
     private fun clearText() {
         binding?.editText?.hint = "搜索用户名字"
-        binding?.editText?.text?.clear()
+//        binding?.editText?.text?.clear()
     }
 
     override fun showLoading(msg: String?) {
@@ -385,7 +398,10 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         MessageSubscriber.dispatch(conversation, message)
     }
 
-    private fun insertUserListIfNewFriend(message: LCIMMessage?, onSuccess: (String, String) -> Unit) {
+    private fun insertUserListIfNewFriend(
+        message: LCIMMessage?,
+        onSuccess: (String, String) -> Unit
+    ) {
         friendList.forEach {
             if (message?.from == (it.getString("uid") ?: "")) {
                 // 是好友
@@ -411,7 +427,11 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         )
     }
 
-    private fun insertMessageAccordingToConv(conversation: LCIMConversation?, username: String = "", url: String = "") {
+    private fun insertMessageAccordingToConv(
+        conversation: LCIMConversation?,
+        username: String = "",
+        url: String = ""
+    ) {
         notifyConversationMsgChanged(conversation)
         // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
         val data = MsgFactory.createConversationMsg(conversation, url, username)
@@ -451,9 +471,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         ToastUtils.show("属性改变")
     }
 
-    private fun loginIM() {
-        val username = mContext?.getBySp(SP_USER_NAME) ?: ""
-        val password = mContext?.getBySp(SP_PASSWORD) ?: ""
+    private fun loginIM(alreadyLogin: Boolean = false) {
+        if (alreadyLogin) {
+            viewModel.loginIMLiveData.postValue(LCUser())
+            return
+        }
+        val username = mContext?.getBySp("account") ?: ""
+        val password = mContext?.getBySp("account_password") ?: ""
         if (username.isNotEmpty() && password.isNotEmpty()) {
             IMClientUtils.loginIM(username, password,
                 onSuccess = {
@@ -567,5 +591,15 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     private fun showFriendRequestFragment(conv: List<LCIMConversation>) {
         val fragment = FriendRequestFragment(conv)
         fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
+    }
+
+    private fun toUserSearchActivity() {
+        val intent = Intent(requireActivity(), SearchFriendActivity::class.java)
+        val friendsObjects: ArrayList<String> = arrayListOf()
+        friendList.forEach {
+            friendsObjects.add(it.getString("uid"))
+        }
+        intent.putExtra("friends", friendsObjects)
+        startActivity(intent)
     }
 }

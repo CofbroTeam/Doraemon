@@ -1,7 +1,10 @@
 package com.cofbro.qian.friend.chat
 
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseActivity
+import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityChatBinding
 import com.cofbro.qian.friend.FriendFragment
 import com.cofbro.qian.friend.im.IMClientUtils
@@ -24,6 +28,7 @@ import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.KeyboardUtil
 import com.cofbro.qian.utils.MsgFactory
+import com.cofbro.qian.view.TipDialog
 import com.hjq.toast.ToastUtils
 
 class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessageDispatchEvent {
@@ -72,7 +77,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     }
 
     private fun doNetwork() {
-        requestHistoryMessage()
+        requestHistoryMessageFirstly()
     }
 
     private fun initView() {
@@ -86,13 +91,13 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             setOnRefreshListener {
                 autoRefresh()
                 refreshing = true
-                requestHistoryMessage(20)
+                requestHistoryMessage()
             }
         }
     }
 
     private fun initRecyclerView() {
-        mAdapter = ChatAdapter(avatarUrl)
+        mAdapter = ChatAdapter(conv, avatarUrl)
         binding?.rvChat?.apply {
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
@@ -129,6 +134,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             val msg = binding?.etSendMsg?.text.toString()
             sendMsg(msg)
         }
+
+        binding?.ivMoreOption?.setOnClickListener {
+            showPopMenu(it)
+        }
     }
 
     private fun registerKeyboardHeight() {
@@ -148,7 +157,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         KeyboardUtil.unregisterKeyboardHeightListener(this)
     }
 
-    private fun requestHistoryMessage(count: Int = 0) {
+    private fun requestHistoryMessageFirstly(count: Int = 0) {
         conv?.let {
             var realCount = it.unreadMessagesCount.takeIf { c ->
                 c != 0
@@ -169,11 +178,30 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         }
     }
 
+    private fun requestHistoryMessage(count: Int = 15) {
+        conv?.let { conversation ->
+            val firstMsg = msgData.getOrNull(0)
+            firstMsg?.let {
+                IMClientUtils.queryHistoryMessage(conversation, count, it,
+                    onSuccess = { msg ->
+                        msg?.let {
+                            insertRangedData(msg)
+                        }
+                    }, onError = {
+                        ToastUtils.show("历史数据拉取失败！")
+                        finishRefresh()
+                    }
+                )
+            }
+        }
+    }
+
     private fun insertRangedData(msg: List<LCIMMessage>) {
         if (msg.isNotEmpty()) {
             // 手动拉取历史数据
             if (refreshing) {
                 refreshing = false
+                msgData.addAll(0, msg)
                 mAdapter?.insertDataAtFirst(msg)
             } else {
                 // 首次进入拉取历史数据
@@ -209,7 +237,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private fun sendMsg(msg: String) {
         conv?.let {
             IMClientUtils.sendMsg(it, msg, onSuccess = {
-                val lcMsg = MsgFactory.createLCMessage(msg)
+                val lcMsg = MsgFactory.createNormalLCMessage(msg)
                 insertMsg(lcMsg)
                 clear()
             })
@@ -235,7 +263,9 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     private fun changeNavigationResponsively() {
         binding?.root?.post {
             val windowInsects = ViewCompat.getRootWindowInsets(window.decorView)
-            val height = windowInsects?.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
+            val height =
+                windowInsects?.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())?.bottom
+                    ?: 0
             updateLayoutParams(height)
         }
     }
@@ -246,5 +276,67 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
             layout?.bottomMargin = height
             binding?.root?.layoutParams = layout
         }
+    }
+
+    private fun showPopMenu(view: View) {
+        val menu = PopupMenu(this, view)
+        menu.gravity = Gravity.RIGHT
+        menu.menuInflater.inflate(R.menu.pop_request_option, menu.menu)
+        menu.setOnMenuItemClickListener {
+            if (it.itemId == R.id.pop_request_sign) {
+                menu.dismiss()
+                showSignWithCookieTipDialog()
+                return@setOnMenuItemClickListener true
+            } else if (it.itemId == R.id.pop_request_homework) {
+                menu.dismiss()
+                return@setOnMenuItemClickListener true
+            }
+            false
+        }
+        menu.show()
+    }
+
+    private fun showSignWithCookieTipDialog() {
+        TipDialog(this).apply {
+            show()
+            setCancelable(false)
+            setTitle(context.resources.getString(R.string.chat_request_cookie_sign_title))
+            setContent(context.resources.getString(R.string.chat_request_cookie_sign_content))
+            setPositiveClickListener {
+                sendCookieToFriend()
+                dismiss()
+            }
+
+            setNegativeClickListener {
+                dismiss()
+            }
+        }
+    }
+
+    private fun sendCookieToFriend() {
+        val text = "好哥们er，帮我代签一次呗~"
+        val map = hashMapOf<String, Any>()
+        val who = IMClientUtils.getCntUser()?.objectId ?: ""
+        val cookie = CacheUtils.cache[Constants.Login.COOKIES] ?: ""
+        map[MsgFactory.who] = who
+        map[MsgFactory.cookieSign] = cookie
+        map[MsgFactory.agree] = ""
+        conv?.let {
+            IMClientUtils.sendMsg(it, text, map,
+                onSuccess = {
+                    val cookieCard = MsgFactory.createCookieSignLCMessage(text, cookie)
+                    insertMsg(cookieCard)
+                    clear()
+                    saveCookieInLc(cookie)
+                }, onError = {
+                    ToastUtils.show("消息发送失败")
+                }
+            )
+        }
+    }
+
+    private fun saveCookieInLc(cookie: String) {
+        // 使用自己的objectId作为cardId
+        IMClientUtils.createCookieCard(IMClientUtils.getCntUser()?.objectId + cookie, cookie)
     }
 }

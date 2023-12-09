@@ -3,15 +3,45 @@ package com.cofbro.qian.utils
 import cn.leancloud.LCObject
 import cn.leancloud.im.v2.LCIMConversation
 import cn.leancloud.im.v2.LCIMMessage
+import cn.leancloud.im.v2.messages.LCIMTextMessage
 import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.friend.im.IMClientUtils
 
 object MsgFactory {
-    fun createLCMessage(msg: String): LCIMMessage {
+    const val who = "who"
+    const val cookieSign = "cookie"
+    const val agree = "agree"
+    fun createNormalLCMessage(msg: String): LCIMMessage {
         val lcMsg = LCIMMessage("", IMClientUtils.getCntUser()?.objectId ?: "")
         lcMsg.content = "{\"_lctext\":\"${msg}\",\"_lctype\":-1}"
         lcMsg.timestamp = System.currentTimeMillis()
         return lcMsg
+    }
+
+    fun createCookieSignLCMessage(msg: String, cookie: String): LCIMTextMessage {
+        val objectId = IMClientUtils.getCntUser()?.objectId ?: ""
+        val lcMsg = LCIMTextMessage()
+        val map = hashMapOf<String, Any>()
+        map[cookieSign] = cookie
+        map[who] = objectId
+        lcMsg.from = objectId
+        lcMsg.content = "{\"_lctext\":\"${msg}\",\"_lctype\":-1}"
+        lcMsg.timestamp = System.currentTimeMillis()
+        lcMsg.attrs = map
+        return lcMsg
+    }
+
+    fun mockCookieSignLCMessage(oldMsg: LCIMTextMessage?, ifAgree: Boolean): LCIMTextMessage {
+        val newMsg = LCIMTextMessage()
+        val attrsMap = hashMapOf<String, Any>()
+        attrsMap[cookieSign] = oldMsg?.attrs?.getOrDefault(cookieSign, "") ?: ""
+        attrsMap[who] = oldMsg?.attrs?.getOrDefault(who, "") ?: ""
+        attrsMap[agree] = if (ifAgree) "agree" else "refuse"
+        newMsg.from = oldMsg?.from ?: ""
+        newMsg.content = oldMsg?.content ?: ""
+        newMsg.timestamp = oldMsg?.timestamp ?: 0L
+        newMsg.attrs = attrsMap
+        return newMsg
     }
 
     fun createConversationMsg(

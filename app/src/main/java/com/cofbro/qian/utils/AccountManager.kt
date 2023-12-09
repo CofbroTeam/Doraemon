@@ -7,13 +7,25 @@ import com.cofbro.qian.data.URL
 import java.io.File
 
 object AccountManager {
-    fun loadAllAccountData(context: Context): JSONObject {
-        return Downloader.acquire(context, Constants.RecycleJson.ACCOUNT_JSON_DATA)
+    fun loadAllAccountData(context: Context, key: String =  Constants.RecycleJson.ACCOUNT_JSON_DATA): JSONObject {
+        return Downloader.acquire(context, key)
             .safeParseToJson()
     }
 
-    fun updateAccountData(context: Context, data: String) {
-        Downloader.download(context, Constants.RecycleJson.ACCOUNT_JSON_DATA, data)
+    fun updateAccountData(context: Context, data: String, key: String =  Constants.RecycleJson.ACCOUNT_JSON_DATA) {
+        Downloader.download(context, key, data)
+    }
+
+    fun buildCookieSignAccount(cookie: String, avatar: String, time: Long): JSONObject {
+        val data = JSONObject()
+        data[Constants.Account.USERNAME] = ""
+        data[Constants.Account.PASSWORD] = ""
+        data[Constants.Account.UID] = ""
+        data[Constants.Account.COOKIE] = cookie
+        data[Constants.Account.FID] = ""
+        data[Constants.Account.TIME] = time
+        data[Constants.Account.PIC_URL] = avatar
+        return data
     }
 
     fun buildAccount(username: String, password: String, uid: String, fid: String, cookies:String): JSONObject {
@@ -27,9 +39,9 @@ object AccountManager {
         return data
     }
 
-    fun bindAccounts(context: Context, loadedData: JSONObject?, newData: JSONObject): JSONObject? {
+    fun bindAccounts(context: Context, loadedData: JSONObject?, newData: JSONObject, key: String = Constants.RecycleJson.ACCOUNT_JSON_DATA): JSONObject? {
         var data = loadedData
-        val path = context.filesDir.path + File.separatorChar + Constants.RecycleJson.ACCOUNT_JSON_DATA
+        val path = context.filesDir.path + File.separatorChar + key
         val file = File(path)
         if (file.exists()) {
             val newSize = data?.getIntExt(Constants.Account.SIZE).takeIf {

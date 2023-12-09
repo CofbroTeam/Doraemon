@@ -45,15 +45,26 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="24dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/topAvatar"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_more_option"
             app:layout_constraintStart_toEndOf="@+id/topAvatar"
             app:layout_constraintTop_toTopOf="@+id/topAvatar"
+            app:layout_constraintVertical_bias="0.576"
             app:layout_constraintVertical_chainStyle="spread" />
+
+        <ImageView
+            android:id="@+id/iv_more_option"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_more"
+            app:layout_constraintBottom_toBottomOf="@+id/topName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/topName" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

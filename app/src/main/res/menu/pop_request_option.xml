@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/pop_request_sign"
+        android:title="@string/pop_request_option_sign" />
+
+    <item
+        android:id="@+id/pop_request_homework"
+        android:title="@string/pop_request_option_homework" />
+</menu>

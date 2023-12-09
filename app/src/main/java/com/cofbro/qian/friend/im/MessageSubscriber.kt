@@ -10,7 +10,6 @@ object MessageSubscriber {
         subscribeObject.add(subscriber)
     }
 
-
     fun dispatch(conversation: LCIMConversation?, message: LCIMMessage?,) {
         subscribeObject.forEach {
             if (conversation?.conversationId == it.getConversationId()) {

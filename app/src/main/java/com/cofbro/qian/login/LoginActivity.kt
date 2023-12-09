@@ -62,9 +62,9 @@ class LoginActivity : BaseActivity<LoginViewModel, ActivityLoginBinding>() {
                         ToastUtils.show("Cookies获取失败!")
                     }
                     saveUserInfo()
-                    CacheUtils.cache["uid"] = uid ?: ""
-                    CacheUtils.cache["cookies"] = cookies.toString()
-                    CacheUtils.cache["fid"] = fid ?: ""
+                    CacheUtils.cache[Constants.Login.UID] = uid ?: ""
+                    CacheUtils.cache[Constants.Login.COOKIES] = cookies.toString()
+                    CacheUtils.cache[Constants.Login.FID] = fid ?: ""
                     lifecycleScope.launch(Dispatchers.Main) {
                         ToastUtils.show("登录成功！")
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
