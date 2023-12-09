@@ -8,7 +8,6 @@ import com.alibaba.fastjson.JSONObject
 import com.cofbro.qian.databinding.ItemChatCookieSignCardUserSendBinding
 import com.cofbro.qian.friend.chat.ChatAdapter
 import com.cofbro.qian.friend.im.IMClientUtils
-import com.cofbro.qian.friend.im.MessageSubscriber
 import com.cofbro.qian.friend.viewholder.DefaultViewHolder
 import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.Constants

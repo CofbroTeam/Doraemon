@@ -1,6 +1,5 @@
 package com.cofbro.qian.friend.chat.viewholder
 
-import android.opengl.Visibility
 import android.view.View
 import cn.leancloud.LCObject
 import cn.leancloud.im.v2.LCIMMessage
@@ -10,7 +9,6 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.ItemChatCookieSignCardMyselfBinding
 import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.viewholder.DefaultViewHolder
-import com.cofbro.qian.mapsetting.util.ToastUtil
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.MsgFactory
 import com.cofbro.qian.view.WaitDialog
