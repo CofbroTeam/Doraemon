@@ -40,6 +40,9 @@ class FriendRequestAdapter : RecyclerView.Adapter<FriendRequestAdapter.FriendReq
                     }
                     "notResponse" -> {
                         binding.tvTime.text = "同意"
+                        binding.tvTime.setOnClickListener {
+                            onItemClick?.invoke(position)
+                        }
                     }
                     else -> {
                         binding.tvTime.text = "已拒绝"
@@ -49,10 +52,6 @@ class FriendRequestAdapter : RecyclerView.Adapter<FriendRequestAdapter.FriendReq
             binding.tvUsername.text = t?.getStringExt("username")
             binding.tvLastMessage.text = t?.getString("content")
             setImage(binding.ivAvatar, t?.getString("avatar"))
-
-            binding.tvTime.setOnClickListener {
-                onItemClick?.invoke(position)
-            }
         }
     }
 

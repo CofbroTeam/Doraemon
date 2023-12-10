@@ -63,7 +63,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".wrapper.did.DoHomeworkActivity" />
         <activity
             android:name=".main.MainActivity"
             android:exported="true">
@@ -74,6 +73,7 @@
 <!--                        </intent-filter>-->
         </activity>
         <activity android:name=".friend.login.IMLoginActivity"/>
+        <activity android:name=".wrapper.did.DoHomeworkActivity" />
         <activity android:name=".scan.ScanActivity" />
         <activity android:name=".account.manager.AccountManagerActivity" />
         <activity android:name=".wrapper.WrapperActivity" />

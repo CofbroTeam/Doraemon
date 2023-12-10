@@ -91,21 +91,14 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
     }
 
     private fun sortConvData(users: List<LCObject>) {
-        users.forEachIndexed { index, lcObject ->
+        users.forEachIndexed { index, user ->
             // 好友申请列表
-            val item = JSONObject()
-            val conversation = conv.getOrNull(index)
-            item["username"] = lcObject.getString("username")
-            item["avatar"] = lcObject.getString("avatar")
-            item["uid"] = lcObject.getString("objectId")
-            item["isCreator"] = conversation?.creator == IMClientUtils.getCntUser()?.objectId
-            item["content"] = "请求添加好友"
-            item["status"] = conversation?.get("agree").toString()
-            data.add(item)
+            val friendRequestItem = MsgFactory.createFriendRequestMsg(conv.getOrNull(index), user)
+            data.add(friendRequestItem)
 
             // 好友列表
-            val o = MsgFactory.createUserInfoMsg(lcObject)
-            usersTemp.add(o)
+            val userItem = MsgFactory.createUserInfoMsg(user)
+            usersTemp.add(userItem)
         }
     }
 
