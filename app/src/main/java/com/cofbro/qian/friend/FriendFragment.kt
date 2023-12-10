@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -21,8 +20,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
-import com.cofbro.hymvvmutils.base.SP_PASSWORD
-import com.cofbro.hymvvmutils.base.SP_USER_NAME
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentFriendBinding
@@ -308,26 +305,25 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 val data =
                     MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
                 messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
             }
             viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
@@ -350,7 +346,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 userListAdapter?.setData(it)
             },
             onError = {
-                Log.d(TAG, "loadUserList: 加载好友失败")
+                ToastUtils.show("加载好友失败")
             }
         )
     }
@@ -481,6 +477,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         if (username.isNotEmpty() && password.isNotEmpty()) {
             IMClientUtils.loginIM(username, password,
                 onSuccess = {
+                    loginStatus = true
                     viewModel.loginIMLiveData.postValue(it)
                 },
                 onError = {
@@ -525,7 +522,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                         // 2.4 补全Relation表中的关系
                         saveFriendRelation(it)
                     }
-
                 },
                 onError = {
                     Log.d(TAG, "responseFriendRequest: 问候语发送失败")

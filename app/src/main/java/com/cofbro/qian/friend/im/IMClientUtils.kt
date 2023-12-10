@@ -357,7 +357,7 @@ object IMClientUtils {
     }
 
     /**
-     * 更新cookie卡片
+     * 更新Conversation的agree字段，表示已成为好友
      * @param conversation conversation
      * @param accept status of agree signing
      * @param onSuccess success callback
