@@ -22,6 +22,7 @@ import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.SignRecorder
+import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
@@ -526,8 +527,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 requireContext(),
                 Constants.RecycleJson.COOKIE_JSON_DATA
             )
-            otherSignUsers = data.getJSONArray(Constants.Account.USERS) ?: JSONArray()
-            cookieSignData.getJSONArray(Constants.Account.USERS).forEach { user ->
+            otherSignUsers = data.getJSONArrayExt(Constants.Account.USERS)
+            cookieSignData.getJSONArrayExt(Constants.Account.USERS).forEach { user ->
                 val timestamp =
                     (user as? JSONObject)?.getStringExt(Constants.Account.TIME)?.toLong() ?: 0L
                 if (System.currentTimeMillis() - timestamp <= 24 * 60 * 60 * 1000) {
@@ -538,6 +539,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             if (firstUser != null) {
                 remark = firstUser.getStringExt(Constants.Account.REMARK)
                 tryLogin(firstUser)
+            } else {
+                withContext(Dispatchers.Main) {
+                    hideLoadingView()
+                }
             }
         }
     }
