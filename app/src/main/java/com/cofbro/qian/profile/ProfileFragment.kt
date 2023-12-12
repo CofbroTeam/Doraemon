@@ -20,6 +20,7 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentProfileBinding
 import com.cofbro.qian.login.LoginActivity
 import com.cofbro.qian.profile.advice.AdviceFragment
+import com.cofbro.qian.profile.update.UpdateDetailActivity
 import com.cofbro.qian.record.SignRecordActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
@@ -38,11 +39,9 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
     }
 
     private fun initObserver() {
-
     }
 
     private fun doNetWork() {
-
     }
 
     private fun initView() {
@@ -61,6 +60,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         val layoutParams = binding?.csMyInfo?.layoutParams as? MarginLayoutParams
         layoutParams?.topMargin = statusBarHeight + dp2px(requireContext(), 5)
     }
+
     @SuppressLint("SetTextI18n")
     private fun profileMessageInfo(){
         viewModel.uid.let {
@@ -78,6 +78,7 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
 
         binding?.tvProfileId?.text = "uid: ${CacheUtils.cache[Constants.USER.UID] ?: "-"}"
     }
+
     private fun initEvent(){
         binding?.tvLogin?.setOnClickListener {
             /**
@@ -119,7 +120,13 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
             val fragment = AdviceFragment()
             fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
         }
+
+        binding?.checkUpdate?.setOnClickListener {
+            val intent = Intent(requireActivity(), UpdateDetailActivity::class.java)
+            startActivity(intent)
+        }
     }
+
     private fun clearUserInfo(context: Context){
         context.saveUsedSp("username", "")
         context.saveUsedSp("password", "")

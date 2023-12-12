@@ -14,6 +14,8 @@ import android.view.LayoutInflater
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.FileProvider
+import com.cofbro.hymvvmutils.base.getBySp
+import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.R
 import com.hjq.toast.ToastUtils
 import java.io.BufferedReader
@@ -81,7 +83,7 @@ class AutoUpdater(private val mContext: Context) {
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
             }
-            var versionName = "1"
+            var remoteVersion = "1"
             var outputFile = ""
             val config = doGet(checkUrl)
             if (!config.isNullOrEmpty()) {
@@ -92,20 +94,34 @@ class AutoUpdater(private val mContext: Context) {
                     }
                     m = Pattern.compile("\"versionName\":\\s*\"(?<m>[^\"]*?)\"").matcher(config)
                     if (m.find()) {
-                        val v = m.group("m")
-                        versionName = m.group("m")?.replace("v1.0.", "") ?: ""
+                        remoteVersion = m.group("m")?.replace("v1.0.", "") ?: ""
                     }
                 }
             }
-            if (localVersion.toLong() < versionName.toLong()) {
-                apkUrl += outputFile
-                mHandler?.sendEmptyMessage(DOWN_START)
-            } else if (localVersion.toLong() == versionName.toLong()) {
-                apkFile.delete()
-            } else {
-                return@Runnable
+            if (checkIfValid(remoteVersion)) {
+                if (localVersion.toLong() < remoteVersion.toLong()) {
+                    apkUrl += outputFile
+                    mHandler?.sendEmptyMessage(DOWN_START)
+                } else if (localVersion.toLong() == remoteVersion.toLong()) {
+                    apkFile.delete()
+                } else {
+                    return@Runnable
+                }
             }
         }).start()
+    }
+
+    private fun checkIfValid(remoteVersion: String): Boolean {
+        mContext.saveUsedSp("remoteVersion", remoteVersion)
+        val localUpdateVersion = mContext.getBySp("localVersion")?.toLong() ?: 0L
+        if (localUpdateVersion == 0L || localUpdateVersion < remoteVersion.toLong()) {
+            mContext.saveUsedSp("localVersion", remoteVersion)
+            return true
+        }
+        if (localUpdateVersion == remoteVersion.toLong()) {
+            return false
+        }
+        return false
     }
 
     private fun downloadApk() {
