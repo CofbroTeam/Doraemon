@@ -113,15 +113,23 @@ class AutoUpdater(private val mContext: Context) {
 
     private fun checkIfValid(remoteVersion: String): Boolean {
         mContext.saveUsedSp("remoteVersion", remoteVersion)
-        val localUpdateVersion = mContext.getBySp("localVersion")?.toLong() ?: 0L
-        if (localUpdateVersion == 0L || localUpdateVersion < remoteVersion.toLong()) {
+        val remoteUpdateVersion = parse2Long(remoteVersion)
+        val localUpdateVersion = parse2Long(mContext.getBySp("localVersion"))
+        if (localUpdateVersion == 0L || localUpdateVersion < remoteUpdateVersion) {
             mContext.saveUsedSp("localVersion", remoteVersion)
             return true
         }
-        if (localUpdateVersion == remoteVersion.toLong()) {
+        if (localUpdateVersion == remoteUpdateVersion) {
             return false
         }
         return false
+    }
+
+    private fun parse2Long(numString: String?): Long {
+        if (numString.isNullOrEmpty()) {
+            return 0L
+        }
+        return numString.toLong()
     }
 
     private fun downloadApk() {

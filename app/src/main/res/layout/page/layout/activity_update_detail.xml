@@ -25,12 +25,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/textView20"
+        android:id="@+id/tv_version_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
-        android:text="Doraemon App"
-        android:textSize="34sp"
+        android:text="@string/update_detail_version_title"
+        android:textSize="38sp"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:letterSpacing="0.04"
@@ -38,23 +38,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_tool" />
 
+    <ImageView
+        android:id="@+id/tv_version_detail_mask"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/text_gradient"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_version_detail_title"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_title"
+        app:layout_constraintTop_toTopOf="@+id/tv_version_detail_title" />
+
     <TextView
         android:id="@+id/textView23"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="学习通智能签到助手 | Android"
+        android:textColor="#3A3A3A"
+        android:text="@string/update_detail_version_subtitle"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@+id/textView20"
-        app:layout_constraintStart_toStartOf="@+id/textView20"
-        app:layout_constraintTop_toBottomOf="@+id/textView20" />
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_version_detail_title" />
 
     <TextView
-        android:id="@+id/tv_update_detail"
+        android:id="@+id/tv_version_detail_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="100dp"
-        android:text="版本详情 >"
+        android:text="@string/update_detail_version_detail_info"
         android:textColor="@color/appColor"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -62,27 +73,45 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView25"
+        android:id="@+id/tv_version_detail_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
-        android:text="DAX_20231212"
-        app:layout_constraintBottom_toTopOf="@+id/tv_update_detail"
-        app:layout_constraintEnd_toEndOf="@+id/tv_update_detail"
-        app:layout_constraintStart_toStartOf="@+id/tv_update_detail" />
+        android:text="DAMX_20231212 | DEVELOP"
+        app:layout_constraintBottom_toTopOf="@+id/tv_version_detail_detail"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_detail"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_detail" />
 
     <TextView
-        android:id="@+id/tv_version_tip"
+        android:id="@+id/tv_version_detail_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
-        android:text="已是最新版本"
+        android:text="@string/update_detail_version_tip_latest"
         android:letterSpacing="0.03"
         android:textStyle="bold"
         android:textColor="#323131"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/textView25"
-        app:layout_constraintEnd_toEndOf="@+id/textView25"
-        app:layout_constraintStart_toStartOf="@+id/textView25" />
+        app:layout_constraintBottom_toTopOf="@+id/tv_version_detail_number"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_number"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_number" />
+
+    <TextView
+        android:id="@+id/tv_version_detail_update"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:text="@string/update_detail_version_update_button_title"
+        android:letterSpacing="0.1"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:background="@drawable/app_comm_radius_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

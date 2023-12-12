@@ -48,4 +48,12 @@
     <string name="cookie_sign_wait_dialog_self_title_agree">对方已同意</string>
     <string name="cookie_sign_wait_dialog_self_title_refuse">对方已拒绝</string>
     <string name="cookie_sign_wait_dialog_self_content">对方同意后，当他签到时会自动帮你一起签到（需要让他打开代签按钮）。</string>
+
+    <string name="update_detail_version_tip_latest">已是最新版本</string>
+    <string name="update_detail_version_tip_not_latest">请更新至最新版本</string>
+    <string name="update_detail_version_detail_info">版本详情 ></string>
+    <string name="update_detail_version_title">Doraemon App</string>
+    <string name="update_detail_version_subtitle">学习通智能签到助手 | Android</string>
+    <string name="update_detail_version_update_button_title">点击更新至新版本</string>
+    <string name="update_detail_version_number">DAMX_%1$s | DEVELOP</string>
 </resources>
