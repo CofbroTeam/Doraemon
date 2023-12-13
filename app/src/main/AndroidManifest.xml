@@ -72,6 +72,7 @@
 <!--                            <action android:name="android.intent.action.MAIN" />-->
 <!--                        </intent-filter>-->
         </activity>
+        <activity android:name=".profile.update.UpdateDetailActivity"/>
         <activity android:name=".friend.login.IMLoginActivity"/>
         <activity android:name=".wrapper.did.DoHomeworkActivity" />
         <activity android:name=".scan.ScanActivity" />

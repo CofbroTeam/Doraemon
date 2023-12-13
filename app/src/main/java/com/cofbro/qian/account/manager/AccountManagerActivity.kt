@@ -112,7 +112,7 @@ class AccountManagerActivity :
             behavior = BottomSheetBehavior.from(it)
             behavior?.apply {
                 isFitToContents = false
-                expandedOffset = getStatusBarHeight(this@AccountManagerActivity) + 40
+                expandedOffset = toolbarHeight
                 halfExpandedRatio = 0.5f
                 isHideable = false
                 isDraggable = true

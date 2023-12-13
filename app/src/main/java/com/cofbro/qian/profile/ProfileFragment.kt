@@ -20,12 +20,14 @@ import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentProfileBinding
 import com.cofbro.qian.login.LoginActivity
 import com.cofbro.qian.profile.advice.AdviceFragment
+import com.cofbro.qian.profile.update.UpdateDetailActivity
 import com.cofbro.qian.record.SignRecordActivity
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
+import com.cofbro.qian.view.AutoUpdateTipDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -38,11 +40,9 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
     }
 
     private fun initObserver() {
-
     }
 
     private fun doNetWork() {
-
     }
 
     private fun initView() {
@@ -61,8 +61,9 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
         val layoutParams = binding?.csMyInfo?.layoutParams as? MarginLayoutParams
         layoutParams?.topMargin = statusBarHeight + dp2px(requireContext(), 5)
     }
+
     @SuppressLint("SetTextI18n")
-    private fun profileMessageInfo(){
+    private fun profileMessageInfo() {
         viewModel.uid.let {
             val options = RequestOptions().transform(
                 CenterCrop(),
@@ -78,28 +79,24 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
 
         binding?.tvProfileId?.text = "uid: ${CacheUtils.cache[Constants.USER.UID] ?: "-"}"
     }
-    private fun initEvent(){
+
+    private fun initEvent() {
         binding?.tvLogin?.setOnClickListener {
-            /**
-             * 登出出现dialog
-             */
             viewModel.logoutDialog = LogoutDialog(requireContext()).apply {
-                this.setCancelClickListener {
+                setCancelClickListener {
                     viewModel.logoutDialog?.dismiss()
                 }
-                this.setConfirmClickListener {
-                    /**
-                     * dialog 清除数据中，并回到主登录界面
-                     */
-                    val intent = Intent(requireActivity(),LoginActivity::class.java)
+                setConfirmClickListener {
+                    val intent = Intent(requireActivity(), LoginActivity::class.java)
                     clearUserInfo(context)
                     startActivity(intent)
                     requireActivity().finish()
                 }
+                setCancelable(false)
+                show()
             }
-            viewModel.logoutDialog?.setCancelable(false)
-            viewModel.logoutDialog?.show()
         }
+
         binding?.bindAccounts?.setOnClickListener {
             val intent = Intent(requireActivity(), AccountManagerActivity::class.java)
             startActivity(intent)
@@ -119,8 +116,14 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
             val fragment = AdviceFragment()
             fragment.show(requireActivity().supportFragmentManager, "AdviceFragment")
         }
+
+        binding?.checkUpdate?.setOnClickListener {
+            val intent = Intent(requireActivity(), UpdateDetailActivity::class.java)
+            startActivity(intent)
+        }
     }
-    private fun clearUserInfo(context: Context){
+
+    private fun clearUserInfo(context: Context) {
         context.saveUsedSp("username", "")
         context.saveUsedSp("password", "")
         // 异步删除数据
@@ -134,5 +137,4 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
             Downloader.delete(requireContext(), Constants.RecycleJson.HOME_JSON_DATA)
         }
     }
-
 }

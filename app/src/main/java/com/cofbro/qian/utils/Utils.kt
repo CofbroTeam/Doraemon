@@ -55,23 +55,16 @@ fun Context.saveJsonArraySp(key: String, value: List<*>){
     editor.putString(key, json.toJSONString()).apply()
 
 }
+
 fun Context.getJsonArraySp(key: String): String? {
     val sp = getSharedPreferences("sp_data", Context.MODE_PRIVATE)
     return sp.getString(key, "")
 }
- fun urlEncodeChinese(urlString: String): String {
-    var url = urlString
-    try {
-        val matcher: Matcher = Pattern.compile("[\\u4e00-\\u9fa5]").matcher(url)
-        var tmp = ""
-        while (matcher.find()) {
-            tmp = matcher.group()
-            url = url.replace(tmp.toRegex(), URLEncoder.encode(tmp, "UTF-8"))
-        }
-    } catch (e: UnsupportedEncodingException) {
-        e.printStackTrace()
-    }
-    return url.replace(" ", "%20")
-}
 
+fun parse2Long(numString: String?): Long {
+    if (numString.isNullOrEmpty()) {
+        return 0L
+    }
+    return numString.toLong()
+}
 

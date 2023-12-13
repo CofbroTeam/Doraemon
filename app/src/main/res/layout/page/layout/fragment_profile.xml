@@ -91,7 +91,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tab_profile"/>
+            app:srcCompat="@drawable/ic_profile_log"/>
 
         <TextView
             android:id="@+id/textView43"
@@ -125,7 +125,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tab_profile"/>
+            app:srcCompat="@drawable/ic_profile_association"/>
 
         <TextView
             android:id="@+id/textView44"
@@ -159,7 +159,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tab_profile"/>
+            app:srcCompat="@drawable/ic_profile_notification"/>
 
         <TextView
             android:id="@+id/textView45"
@@ -171,20 +171,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageView19"
             app:layout_constraintStart_toEndOf="@+id/imageView19"
             app:layout_constraintTop_toTopOf="@+id/imageView19" />
-
-<!--        <TextView-->
-<!--            android:id="@+id/textView37"-->
-<!--            android:layout_width="18dp"-->
-<!--            android:layout_height="18dp"-->
-<!--            android:layout_marginEnd="10dp"-->
-<!--            android:background="@drawable/app_green_circle_bg"-->
-<!--            android:gravity="center"-->
-<!--            android:text="10"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:textSize="10sp"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -207,7 +193,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tab_profile" />
+            app:srcCompat="@drawable/ic_profile_advice" />
 
         <TextView
             android:id="@+id/textView46"
@@ -222,6 +208,39 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/check_update"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/app_white_radius_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/advice">
+
+        <ImageView
+            android:id="@+id/imageView10"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_profile_check_update" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="检查更新"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+            app:layout_constraintStart_toEndOf="@+id/imageView10"
+            app:layout_constraintTop_toTopOf="@+id/imageView10" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout23"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -231,7 +250,7 @@
         android:background="@drawable/app_white_radius_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/advice">
+        app:layout_constraintTop_toBottomOf="@+id/check_update">
 
         <ImageView
             android:id="@+id/imageView21"
@@ -241,7 +260,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/tab_profile"/>
+            app:srcCompat="@drawable/ic_profile_dai" />
 
         <TextView
             android:id="@+id/textView47"
@@ -258,12 +277,12 @@
             android:id="@+id/sign_with_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:track="@drawable/switch_track_bg"
-            app:thumbTint="@color/appColor"
             android:layout_marginEnd="3dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:thumbTint="@color/appColor"
+            app:track="@drawable/switch_track_bg"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

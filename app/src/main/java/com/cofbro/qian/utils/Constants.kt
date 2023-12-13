@@ -487,4 +487,13 @@ object Constants {
         const val REQUEST_COOKIE_CARD_SELF_SEND = 102
         const val REQUEST_COOKIE_CARD_USER_SEND = 103
     }
+
+    object Update {
+        // 0 -> 提示 1 -> 不再提示
+        const val UPDATE_TIP = "updateTip"
+        const val SHOW = "0"
+        const val NO_SHOW = "1"
+        const val REMOTE_VERSION = "remoteVersion"
+        const val LOCAL_VERSION = "localVersion"
+    }
 }
