@@ -56,4 +56,10 @@
     <string name="update_detail_version_subtitle">学习通智能签到助手 | Android</string>
     <string name="update_detail_version_update_button_title">点击更新至新版本</string>
     <string name="update_detail_version_number">DAMX_%1$s | DEVELOP</string>
+
+    <string name="auto_update_title">发现新版本</string>
+    <string name="auto_update_content">检测到有新版本！建议您更新至新版本，以体验最新功能！</string>
+    <string name="auto_update_tip_no_more">不要再提示我</string>
+    <string name="auto_update_update_right_now">立即更新</string>
+    <string name="auto_update_update_later">以后再说</string>
 </resources>

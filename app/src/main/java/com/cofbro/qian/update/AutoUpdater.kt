@@ -1,6 +1,7 @@
 package com.cofbro.qian.update
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,10 @@ import androidx.core.content.FileProvider
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.R
+import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.parse2Long
+import com.cofbro.qian.view.AutoUpdateTipDialog
+import com.cofbro.qian.view.TipDialog
 import com.hjq.toast.ToastUtils
 import java.io.BufferedReader
 import java.io.File
@@ -73,13 +78,20 @@ class AutoUpdater(private val mContext: Context) {
         }
     }
 
-    fun checkUpdate() {
+    fun checkUpdate(
+        forced: Boolean = false,
+        onPreCheck: () -> Unit = {},
+        onShowDownloadDialog: () -> Unit = {}
+    ) {
+        onPreCheck.invoke()
         mHandler = DownloadHandler(this)
         Thread(Runnable {
             var localVersion = "1"
             try {
                 localVersion =
                     mContext.packageManager.getPackageInfo(mContext.packageName, 0).versionName
+                // 存储本地版本
+                mContext.saveUsedSp(Constants.Update.LOCAL_VERSION, localVersion)
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
             }
@@ -98,38 +110,33 @@ class AutoUpdater(private val mContext: Context) {
                     }
                 }
             }
-            if (checkIfValid(remoteVersion)) {
-                if (localVersion.toLong() < remoteVersion.toLong()) {
-                    apkUrl += outputFile
-                    mHandler?.sendEmptyMessage(DOWN_START)
-                } else if (localVersion.toLong() == remoteVersion.toLong()) {
-                    apkFile.delete()
-                } else {
-                    return@Runnable
-                }
+            val tipShow = mContext.getBySp(Constants.Update.UPDATE_TIP)
+            if (tipShow == Constants.Update.NO_SHOW && !forced) {
+                return@Runnable
+            }
+            if (checkIfValidVersion(remoteVersion)) {
+                apkUrl += outputFile
+                mHandler?.sendEmptyMessage(DOWN_START)
+                (mContext as? Activity)?.runOnUiThread(onShowDownloadDialog)
+            } else {
+                return@Runnable
             }
         }).start()
     }
 
-    private fun checkIfValid(remoteVersion: String): Boolean {
-        mContext.saveUsedSp("remoteVersion", remoteVersion)
+    private fun checkIfValidVersion(remoteVersion: String): Boolean {
+        // 存储远端最新版本号
+        mContext.saveUsedSp(Constants.Update.REMOTE_VERSION, remoteVersion)
         val remoteUpdateVersion = parse2Long(remoteVersion)
-        val localUpdateVersion = parse2Long(mContext.getBySp("localVersion"))
+        val localUpdateVersion = parse2Long(mContext.getBySp(Constants.Update.LOCAL_VERSION))
         if (localUpdateVersion == 0L || localUpdateVersion < remoteUpdateVersion) {
-            mContext.saveUsedSp("localVersion", remoteVersion)
             return true
         }
         if (localUpdateVersion == remoteUpdateVersion) {
+            apkFile.delete()
             return false
         }
         return false
-    }
-
-    private fun parse2Long(numString: String?): Long {
-        if (numString.isNullOrEmpty()) {
-            return 0L
-        }
-        return numString.toLong()
     }
 
     private fun downloadApk() {
@@ -221,21 +228,16 @@ class AutoUpdater(private val mContext: Context) {
     }
 
     fun showUpdateDialog() {
-        val builder = AlertDialog.Builder(mContext)
-        builder.setCancelable(false)
-        builder.setTitle("软件版本更新")
-        builder.setMessage("有最新的软件包，请下载并安装!")
-        builder.setPositiveButton(
-            "立即下载"
-        ) { _, _ ->
-            showDownloadDialog()
+        AutoUpdateTipDialog(mContext).apply {
+            show()
+            setOnPositiveListener {
+                showDownloadDialog()
+                dismiss()
+            }
+            setOnNegativeListener {
+                dismiss()
+            }
         }
-        builder.setNegativeButton(
-            "以后再说"
-        ) { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
     }
 
     private fun showDownloadDialog() {

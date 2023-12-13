@@ -1,6 +1,8 @@
 package com.cofbro.qian.profile.update
 
 import android.animation.ObjectAnimator
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -10,20 +12,38 @@ import com.cofbro.hymvvmutils.base.BaseActivity
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.R
 import com.cofbro.qian.databinding.ActivityUpdateDetailBinding
+import com.cofbro.qian.update.AutoUpdater
+import com.cofbro.qian.utils.Constants
+import com.cofbro.qian.utils.dp2px
+import com.cofbro.qian.utils.getStatusBarHeight
+import com.cofbro.qian.view.FullScreenDialog
 
 
 class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateDetailBinding>() {
+    private var clickIntercept = false
+    private var loadingView: FullScreenDialog? = null
     private var remoteVersion = 0L
     private var localVersion = 0L
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         initArgs()
         initView()
+        initEvent()
+    }
+
+    private fun initEvent() {
+        binding?.tvVersionDetailDetail?.setOnClickListener {
+            toUpdateDetailWebPage()
+        }
+
+        binding?.tvVersionDetailUpdate?.setOnClickListener {
+            checkUpdate()
+        }
     }
 
     private fun initArgs() {
-        remoteVersion = getBySp("remoteVersion")?.toLong() ?: 0L
-        localVersion = getBySp("localVersion")?.toLong() ?: 0L
+        remoteVersion = getBySp(Constants.Update.REMOTE_VERSION)?.toLong() ?: 0L
+        localVersion = getBySp(Constants.Update.LOCAL_VERSION)?.toLong() ?: 0L
     }
 
     private fun initView() {
@@ -31,6 +51,40 @@ class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateD
         startTitleAnimation()
         checkIfLatest()
         initVersionNumber()
+        initToolbar()
+    }
+
+    private fun initToolbar() {
+        // height of toolbar
+        binding?.appTool?.apply {
+            val toolbarHeight = getStatusBarHeight(this@UpdateDetailActivity) + dp2px(
+                this@UpdateDetailActivity,
+                50
+            )
+            val csLayout = layoutParams
+            csLayout.height = toolbarHeight
+        }
+    }
+
+    private fun checkUpdate() {
+        if (clickIntercept) return
+        clickIntercept = true
+        AutoUpdater(this).checkUpdate(true,
+            onPreCheck = {
+                showLoadingView()
+            }, onShowDownloadDialog = {
+                hideLoadingView()
+                clickIntercept = false
+            }
+        )
+    }
+
+    private fun toUpdateDetailWebPage() {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://www.yuque.com/cofbro/doraemon/krann1gxgu1c52b9")
+        )
+        startActivity(intent)
     }
 
     private fun startTitleAnimation() {
@@ -50,7 +104,8 @@ class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateD
     }
 
     private fun initVersionNumber() {
-        binding?.tvVersionDetailNumber?.text = resources.getString(R.string.update_detail_version_number, localVersion.toString())
+        binding?.tvVersionDetailNumber?.text =
+            resources.getString(R.string.update_detail_version_number, localVersion.toString())
     }
 
     private fun checkIfLatest() {
@@ -81,5 +136,18 @@ class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateD
             layout?.bottomMargin = height
             binding?.root?.layoutParams = layout
         }
+    }
+
+    private fun showLoadingView() {
+        if (loadingView == null) {
+            loadingView = FullScreenDialog(this)
+        }
+        loadingView?.setCancelable(false)
+        loadingView?.show()
+    }
+
+    private fun hideLoadingView() {
+        loadingView?.dismiss()
+        loadingView = null
     }
 }
