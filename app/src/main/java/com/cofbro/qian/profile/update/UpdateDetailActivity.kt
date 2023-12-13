@@ -39,6 +39,10 @@ class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateD
         binding?.tvVersionDetailUpdate?.setOnClickListener {
             checkUpdate()
         }
+
+        binding?.tvDetailBack?.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initArgs() {
