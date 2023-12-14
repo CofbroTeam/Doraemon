@@ -62,4 +62,7 @@
     <string name="auto_update_tip_no_more">不要再提示我</string>
     <string name="auto_update_update_right_now">立即更新</string>
     <string name="auto_update_update_later">以后再说</string>
+
+    <string name="search_friend_hint">点击搜索用户名字</string>
+    <string name="search_friend_cancel">取消</string>
 </resources>
