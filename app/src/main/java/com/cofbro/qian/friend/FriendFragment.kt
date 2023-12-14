@@ -264,6 +264,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
          */
         viewModel.realConversationLiveData.observe(this) {
             messageListAdapter?.setData(it)
+            userListAdapter?.setMessageConv(it)
         }
 
         viewModel.friendRequestLiveData.observe(this) {
@@ -303,7 +304,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 val username = user["username"].toString()
                 val url = user["avatar"].toString()
                 val data =
-                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
+                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username, user.objectId)
                 messageConv.add(data)
 //                messageConv.add(data)
 //                messageConv.add(data)
@@ -353,9 +354,9 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun formatUsersInfo(users: List<LCObject>) {
         users.forEach {
-            var name = ""
-            var url = ""
-            var uid = ""
+            val name: String
+            val url: String
+            val uid: String
             if (it.getString("ownerId") == IMClientUtils.getCntUser()?.objectId.toString()) {
                 url = it.getString("targetAvatar") ?: ""
                 name = it.getString("targetName") ?: ""
@@ -371,10 +372,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
-    private fun clearText() {
-        binding?.editText?.hint = "搜索用户名字"
-//        binding?.editText?.text?.clear()
-    }
 
     override fun showLoading(msg: String?) {
         if (!msg.isNullOrEmpty()) {

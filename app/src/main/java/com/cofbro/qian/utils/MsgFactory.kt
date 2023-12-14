@@ -47,13 +47,17 @@ object MsgFactory {
     fun createConversationMsg(
         conv: LCIMConversation?,
         url: String = "",
-        username: String = ""
+        username: String = "",
+        objectId: String = "",
     ): JSONObject {
         val data = JSONObject()
         data["conv"] = conv
         data["content"] = conv?.lastMessage?.content.toString()
         data["time"] = conv?.lastMessageAt?.time.toString()
         data["unReadCount"] = conv?.unreadMessagesCount.toString()
+        if (objectId.isNotEmpty()) {
+            data["objectId"] = objectId
+        }
         if (url.isNotEmpty()) {
             data["avatar"] = url
         }
