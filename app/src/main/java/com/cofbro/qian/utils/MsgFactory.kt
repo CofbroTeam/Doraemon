@@ -47,13 +47,17 @@ object MsgFactory {
     fun createConversationMsg(
         conv: LCIMConversation?,
         url: String = "",
-        username: String = ""
+        username: String = "",
+        objectId: String = "",
     ): JSONObject {
         val data = JSONObject()
         data["conv"] = conv
         data["content"] = conv?.lastMessage?.content.toString()
         data["time"] = conv?.lastMessageAt?.time.toString()
         data["unReadCount"] = conv?.unreadMessagesCount.toString()
+        if (objectId.isNotEmpty()) {
+            data["objectId"] = objectId
+        }
         if (url.isNotEmpty()) {
             data["avatar"] = url
         }
@@ -69,5 +73,17 @@ object MsgFactory {
         o.put("url", lcObject.getString("avatar"))
         o.put("uid", lcObject.objectId)
         return o
+    }
+
+    fun createFriendRequestMsg(conversation: LCIMConversation?, friend: LCObject): JSONObject {
+        val item = JSONObject()
+        val isCreator = conversation?.creator == IMClientUtils.getCntUser()?.objectId
+        item["username"] = friend.getString("username")
+        item["avatar"] = friend.getString("avatar")
+        item["uid"] = friend.getString("objectId")
+        item["isCreator"] = isCreator
+        item["content"] = if (isCreator) "请求添加好友" else "好友申请已发送~"
+        item["status"] = conversation?.get("agree").toString()
+        return item
     }
 }

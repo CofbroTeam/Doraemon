@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +22,7 @@ import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.HtmlParser
 import com.cofbro.qian.utils.SignRecorder
+import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
@@ -42,6 +42,7 @@ import java.net.URLEncoder
  * 2023.10.6
  */
 class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
+    private var signWithHasFailed = false
     private var latitude = 0.0
     private var longitude = 0.0
     private var locationText = ""
@@ -256,7 +257,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private suspend fun startSignTogether(data: String) {
         // 开始代签
         val signWith = requireActivity().getBySp("signWith")?.toBoolean() ?: false
-        if (signWith && (data.contains("success") || data.contains("签到成功"))) {
+        if (signWith && (signWithHasFailed || data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             showLoadingView()
             signWithAccounts()
@@ -526,8 +527,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 requireContext(),
                 Constants.RecycleJson.COOKIE_JSON_DATA
             )
-            otherSignUsers = data.getJSONArray(Constants.Account.USERS) ?: JSONArray()
-            cookieSignData.getJSONArray(Constants.Account.USERS).forEach { user ->
+            otherSignUsers = data.getJSONArrayExt(Constants.Account.USERS)
+            cookieSignData.getJSONArrayExt(Constants.Account.USERS).forEach { user ->
                 val timestamp =
                     (user as? JSONObject)?.getStringExt(Constants.Account.TIME)?.toLong() ?: 0L
                 if (System.currentTimeMillis() - timestamp <= 24 * 60 * 60 * 1000) {
@@ -538,6 +539,10 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
             if (firstUser != null) {
                 remark = firstUser.getStringExt(Constants.Account.REMARK)
                 tryLogin(firstUser)
+            } else {
+                withContext(Dispatchers.Main) {
+                    hideLoadingView()
+                }
             }
         }
     }
@@ -546,6 +551,9 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         if (!alreadySign) return
         val uid = if (cookies.isEmpty()) CacheUtils.cache["uid"] ?: "" else findUID(cookies)
         val status = body.contains("成功") || body.contains("success")
+        if (!status) {
+            signWithHasFailed = true
+        }
         record(uid, status)
     }
 

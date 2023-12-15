@@ -54,14 +54,14 @@
 目前项目还处于开发阶段，如果您想尝鲜已开发的功能或者迫切需要使用签到功能，请在 `issue` 中告诉我们。
 
 ### 1. 链接
-[尝鲜版请点击这里](https://raw.githubusercontent.com/CofbroTeam/Doraemon/main/app.apk)。由于项目处于开发阶段，并且我们没有测试同学，因此如果大家在使用过程中遇到 `bug`，或者对本项目有更好的 `需求和建议`，烦请在 `issue` 中提出，一起让 Doraemon 更加完善。
+[尝鲜版请前往 releases](https://github.com/CofbroTeam/Doraemon/releases)。由于项目处于开发阶段，并且我们没有测试同学，因此如果大家在使用过程中遇到 `bug`，或者对本项目有更好的 `需求和建议`，烦请在 `issue` 中提出，一起让 Doraemon 更加完善。
 
 ### 2. QR-Code
 请使用浏览器或手机自带的二维码扫描器扫描。
 <div> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60125d13-97d2-4515-a3e4-6460ac97c9d0" width = 200 height = 200 /> </div>
 
 ## ⚡ 特别说明
-开发阶段，正常情况下**三天集成一次**，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。<br>如果您有任何问题，欢迎在 `issues` 中提出，或加入 QQ 群：`567290278` 详细交流。
+开发阶段，正常情况下**7天集成一次**，如果想随时使用最新代码，请自行在 `Actions` 中获取 `apk`。<br>如果您有任何问题，欢迎在 `issues` 中提出，或加入 QQ 群：`567290278` 详细交流。
 
 - [Doraemon文档，强烈建议观看](https://www.yuque.com/cofbro/doraemon)
 

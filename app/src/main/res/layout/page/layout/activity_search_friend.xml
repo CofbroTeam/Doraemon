@@ -29,9 +29,11 @@
         <EditText
             android:id="@+id/searchFriends"
             android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:background="@null"
-            android:hint="点击搜索用户名字"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/search_user_edit_text_bg"
+            android:drawableEnd="@drawable/ic_search"
+            android:hint="@string/search_friend_hint"
             android:inputType="number"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
@@ -41,8 +43,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/tv_back"
             app:layout_constraintEnd_toStartOf="@+id/tv_delete"
             app:layout_constraintStart_toEndOf="@+id/tv_back"
-            app:layout_constraintTop_toTopOf="@+id/tv_back"
-            android:drawableEnd="@drawable/ic_search" />
+            app:layout_constraintTop_toTopOf="@+id/tv_back" />
 
         <TextView
             android:id="@+id/tv_delete"
@@ -50,7 +51,7 @@
             android:layout_height="40dp"
             android:layout_marginEnd="16dp"
             android:gravity="center"
-            android:text="取消"
+            android:text="@string/search_friend_cancel"
             android:textColor="@color/appColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#E3F2FD"
+    android:background="@drawable/app_white_small_radius_bg"
     android:padding="16dp">
 
     <TextView
@@ -21,6 +21,7 @@
         android:src="@drawable/duolaa"
         android:scaleType="centerCrop"
         android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
         android:padding="8dp" />
 
     <LinearLayout
@@ -32,21 +33,19 @@
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:text="取消"
             android:textColor="#FFFFFF"
             android:background="#2196F3"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/btn_confirm"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:text="确定"
             android:textColor="#FFFFFF"
             android:background="#2196F3"
-            android:layout_marginTop="16dp"
             android:layout_marginStart="8dp" />
 
     </LinearLayout>

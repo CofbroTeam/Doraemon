@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/app_tool"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/tv_detail_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/back" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tv_version_detail_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:gravity="center"
+        android:letterSpacing="0.04"
+        android:text="@string/update_detail_version_title"
+        android:textColor="@color/black"
+        android:textSize="38sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_tool" />
+
+    <ImageView
+        android:id="@+id/tv_version_detail_mask"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/text_gradient"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_version_detail_title"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_title"
+        app:layout_constraintTop_toTopOf="@+id/tv_version_detail_title" />
+
+    <TextView
+        android:id="@+id/textView23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/update_detail_version_subtitle"
+        android:textColor="#3A3A3A"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_version_detail_title" />
+
+    <TextView
+        android:id="@+id/tv_version_detail_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="@string/update_detail_version_detail_info"
+        android:textColor="@color/appColor"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_version_detail_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:text="DAMX_20231212 | DEVELOP"
+        app:layout_constraintBottom_toTopOf="@+id/tv_version_detail_detail"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_detail"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_detail" />
+
+    <TextView
+        android:id="@+id/tv_version_detail_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:letterSpacing="0.03"
+        android:text="@string/update_detail_version_tip_latest"
+        android:textColor="#323131"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tv_version_detail_number"
+        app:layout_constraintEnd_toEndOf="@+id/tv_version_detail_number"
+        app:layout_constraintStart_toStartOf="@+id/tv_version_detail_number" />
+
+    <TextView
+        android:id="@+id/tv_version_detail_update"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/app_comm_radius_bg"
+        android:gravity="center"
+        android:letterSpacing="0.1"
+        android:text="@string/update_detail_version_update_button_title"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

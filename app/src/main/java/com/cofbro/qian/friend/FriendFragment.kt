@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -21,8 +20,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.cofbro.hymvvmutils.base.BaseFragment
-import com.cofbro.hymvvmutils.base.SP_PASSWORD
-import com.cofbro.hymvvmutils.base.SP_USER_NAME
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.qian.data.URL
 import com.cofbro.qian.databinding.FragmentFriendBinding
@@ -267,6 +264,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
          */
         viewModel.realConversationLiveData.observe(this) {
             messageListAdapter?.setData(it)
+            userListAdapter?.setMessageConv(it)
         }
 
         viewModel.friendRequestLiveData.observe(this) {
@@ -306,28 +304,27 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 val username = user["username"].toString()
                 val url = user["avatar"].toString()
                 val data =
-                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username)
+                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username, user.objectId)
                 messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-                messageConv.add(data)
-
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
+//                messageConv.add(data)
             }
             viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
@@ -350,16 +347,16 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 userListAdapter?.setData(it)
             },
             onError = {
-                Log.d(TAG, "loadUserList: 加载好友失败")
+                ToastUtils.show("加载好友失败")
             }
         )
     }
 
     private fun formatUsersInfo(users: List<LCObject>) {
         users.forEach {
-            var name = ""
-            var url = ""
-            var uid = ""
+            val name: String
+            val url: String
+            val uid: String
             if (it.getString("ownerId") == IMClientUtils.getCntUser()?.objectId.toString()) {
                 url = it.getString("targetAvatar") ?: ""
                 name = it.getString("targetName") ?: ""
@@ -375,10 +372,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
-    private fun clearText() {
-        binding?.editText?.hint = "搜索用户名字"
-//        binding?.editText?.text?.clear()
-    }
 
     override fun showLoading(msg: String?) {
         if (!msg.isNullOrEmpty()) {
@@ -481,6 +474,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         if (username.isNotEmpty() && password.isNotEmpty()) {
             IMClientUtils.loginIM(username, password,
                 onSuccess = {
+                    loginStatus = true
                     viewModel.loginIMLiveData.postValue(it)
                 },
                 onError = {
@@ -525,7 +519,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                         // 2.4 补全Relation表中的关系
                         saveFriendRelation(it)
                     }
-
                 },
                 onError = {
                     Log.d(TAG, "responseFriendRequest: 问候语发送失败")
