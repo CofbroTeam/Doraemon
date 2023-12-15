@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.*
+import android.os.Bundle
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.Log
@@ -15,9 +16,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.BaseInputConnection
+import android.view.inputmethod.CompletionInfo
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.ExtractedText
+import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.TextAttribute
+import android.view.inputmethod.TextSnapshot
 import androidx.core.content.ContextCompat
 import com.cofbro.qian.R
 import com.cofbro.qian.view.InputView.Config.CLICK_SCALE_RANGE
@@ -458,12 +465,6 @@ class InputView : View {
             Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(b)
-        // 重点 这个坑一定要记住
-        /**
-         * 坑！！！！！！！！！
-         * 坑！！！！！！！！！
-         * 坑！！！！！！！！！
-         */
         drawable.bounds = Rect(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
         drawable.draw(canvas)
         return b
@@ -480,13 +481,30 @@ class InputView : View {
     inner class MyInputConnection(targetView: View, fullEditor: Boolean) :
         BaseInputConnection(targetView, fullEditor) {
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
-            val temp = inputString + text.toString()
+            super.commitText(text, newCursorPosition)
+            val temp = editable.toString().replace("\\s".toRegex(), "")
             if (temp.length < DEFAULT_TEXT_COUNT) {
                 inputString = temp
             }
             invalidate()
             return true
         }
+
+        override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
+            super.setComposingText(text, newCursorPosition)
+            val l = editable.toString().replace("\\s".toRegex(), "")
+            inputString = l
+            invalidate()
+            return true
+        }
+
+        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
+            if (inputString.isNotEmpty()) {
+                inputString = inputString.substring(0, inputString.length - 1)
+            }
+            return super.deleteSurroundingText(beforeLength, afterLength)
+        }
+
 
         override fun sendKeyEvent(event: KeyEvent?): Boolean {
             /** 当手指离开的按键的时候 */
@@ -495,9 +513,9 @@ class InputView : View {
             }
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event.keyCode == KeyEvent.KEYCODE_DEL) {
-                    //删除按键
+                    // 删除按键
                     if (inputString.isNotEmpty()) {
-                        inputString = inputString.substring(0, inputString.length - 1)
+                        deleteSurroundingText(1, 0)
                     }
                 } else {
                     /** 不同机型处理输入是通过 commitText或者 sendKeyEvent执行(目前还没发现两种都执行的机型)
@@ -513,21 +531,7 @@ class InputView : View {
                 }
             }
             postInvalidate()
-            return true
-        }
-
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int): Boolean {
-            Log.d(
-                "tag",
-                "deleteSurroundingText beforeLength=$beforeLength afterLength=$afterLength"
-            )
-            return true
-        }
-
-        override fun finishComposingText(): Boolean {
-            // 结束组合文本输入的时候，这个方法基本上会出现在切换输入法类型，点击回车（完成、搜索、发送、下一步）点击输入法右上角隐藏按钮会触发。
-            Log.d("tag", "finishComposingText")
-            return true
+            return super.sendKeyEvent(event)
         }
     }
 }
