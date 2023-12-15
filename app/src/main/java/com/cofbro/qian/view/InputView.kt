@@ -7,24 +7,16 @@ import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.*
-import android.os.Bundle
 import android.text.InputType
 import android.util.AttributeSet
-import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.BaseInputConnection
-import android.view.inputmethod.CompletionInfo
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.ExtractedText
-import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputContentInfo
 import android.view.inputmethod.InputMethodManager
-import android.view.inputmethod.TextAttribute
-import android.view.inputmethod.TextSnapshot
 import androidx.core.content.ContextCompat
 import com.cofbro.qian.R
 import com.cofbro.qian.view.InputView.Config.CLICK_SCALE_RANGE
@@ -507,10 +499,6 @@ class InputView : View {
 
 
         override fun sendKeyEvent(event: KeyEvent?): Boolean {
-            /** 当手指离开的按键的时候 */
-            if (event != null) {
-                Log.d("tag", "sendKeyEvent:KeyCode=" + event.keyCode)
-            }
             if (event?.action == KeyEvent.ACTION_DOWN) {
                 if (event.keyCode == KeyEvent.KEYCODE_DEL) {
                     // 删除按键
@@ -524,10 +512,11 @@ class InputView : View {
                     // 如果不是删除按键
                     val unicodeChar = event.unicodeChar
                     val character = unicodeChar.toChar().toString()
-                    val temp = inputString + character
-                    if (temp.length < DEFAULT_TEXT_COUNT) {
-                        inputString = temp
-                    }
+//                    val temp = inputString + character
+//                    if (temp.length < DEFAULT_TEXT_COUNT) {
+//                        inputString = temp
+//                    }
+                    commitText(character, 1)
                 }
             }
             postInvalidate()
