@@ -2,7 +2,6 @@ package com.cofbro.qian.update
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,17 +10,15 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.view.LayoutInflater
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.FileProvider
 import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
-import com.cofbro.qian.R
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.parse2Long
 import com.cofbro.qian.view.AutoUpdateTipDialog
-import com.cofbro.qian.view.TipDialog
+import com.cofbro.qian.view.DownloadDialog
 import com.hjq.toast.ToastUtils
 import java.io.BufferedReader
 import java.io.File
@@ -44,7 +41,7 @@ class AutoUpdater(private val mContext: Context) {
     private var downLoadThread: Thread? = null
     private var mProgress: ProgressBar? = null
     private var progress = 0f
-    private var txtStatus: TextView? = null
+    private var mTextStatus: TextView? = null
     private var mHandler: DownloadHandler? = null
     private val downApkWork = Runnable {
         try {
@@ -195,8 +192,8 @@ class AutoUpdater(private val mContext: Context) {
     @SuppressLint("SetTextI18n")
     private fun updateDownloadProgress() {
         val formattedNum = String.format("%.2f", progress)
-        txtStatus!!.text = "$formattedNum%"
-        mProgress!!.progress = progress.toInt()
+        mTextStatus?.text = "$formattedNum%"
+        mProgress?.progress = progress.toInt()
     }
 
     private fun installAPK() {
@@ -241,18 +238,16 @@ class AutoUpdater(private val mContext: Context) {
     }
 
     private fun showDownloadDialog() {
-        val dialog = AlertDialog.Builder(mContext)
-        dialog.setTitle("软件版本更新")
-        val inflater = LayoutInflater.from(mContext)
-        val v = inflater.inflate(R.layout.dialog_download, null)
-        mProgress = v.findViewById(R.id.progressBar)
-        txtStatus = v.findViewById(R.id.txtStatus)
-        dialog.setCancelable(false)
-        dialog.setView(v)
-        dialog.setNegativeButton("取消") { _, _ ->
-            intercept = true
+        DownloadDialog(mContext).apply {
+            setOnNegativeButtonListener {
+                intercept = true
+                dismiss()
+            }
+            setCancelable(false)
+            show()
+            mProgress = progress
+            mTextStatus = textStatus
         }
-        dialog.show()
         downloadApk()
     }
 

@@ -65,4 +65,8 @@
 
     <string name="search_friend_hint">点击搜索用户名字</string>
     <string name="search_friend_cancel">取消</string>
+
+    <string name="download_progress_title">软件版本更新</string>
+    <string name="download_progress_content">更新详情可在检查更新中查看</string>
+    <string name="download_progress_cancel">取消</string>
 </resources>
