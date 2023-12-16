@@ -192,8 +192,8 @@ class AutoUpdater(private val mContext: Context) {
     @SuppressLint("SetTextI18n")
     private fun updateDownloadProgress() {
         val formattedNum = String.format("%.2f", progress)
-        mTextStatus!!.text = "$formattedNum%"
-        mProgress!!.progress = progress.toInt()
+        mTextStatus?.text = "$formattedNum%"
+        mProgress?.progress = progress.toInt()
     }
 
     private fun installAPK() {
