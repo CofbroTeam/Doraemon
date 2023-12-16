@@ -111,7 +111,6 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel, ActivitySearchF
             IMClientUtils.createNewConversation(
                 uid,
                 onSuccess = {
-                    clearText()
                     ToastUtils.show("好友申请发送成功")
                 },
                 onError = {

@@ -22,14 +22,18 @@ class FriendsViewHolder<T : Friends>(private val binding: ItemSearchfrendsListBi
             if (t?.isfriend == true) {
                 visibility = View.GONE
             } else {
-                setItemClickListener {
-                    itemClick?.invoke()
-                }
+                bindAction()
             }
         }
     }
 
     fun setItemClickListener(itemClickListener: () -> Unit) {
         itemClick = itemClickListener
+    }
+
+    private fun bindAction() {
+        itemView.setOnClickListener {
+           itemClick?.invoke()
+        }
     }
 }

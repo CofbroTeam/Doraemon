@@ -259,8 +259,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
         /**
          * data分为两部分获取
-         * 1 -> conv
-         * 2 -> user
+         * 1 -> 聊天的conversation
+         * 2 -> 用户好友请求的conversation
          */
         viewModel.realConversationLiveData.observe(this) {
             messageListAdapter?.setData(it)
@@ -304,27 +304,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 val username = user["username"].toString()
                 val url = user["avatar"].toString()
                 val data =
-                    MsgFactory.createConversationMsg(convList.getOrNull(index), url, username, user.objectId)
+                    MsgFactory.createConversationMsg(
+                        convList.getOrNull(index),
+                        url,
+                        username,
+                        user.objectId
+                    )
                 messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
-//                messageConv.add(data)
             }
             viewModel.realConversationLiveData.postValue(messageConv)
         }, onError = {})
@@ -379,18 +365,6 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         }
     }
 
-    override fun onMessage(
-        message: LCIMMessage?,
-        conversation: LCIMConversation?,
-        client: LCIMClient?
-    ) {
-        Log.d(TAG, "onMessage: 收到消息")
-        insertUserListIfNewFriend(message) { username, url ->
-            insertMessageAccordingToConv(conversation, username, url)
-        }
-        MessageSubscriber.dispatch(conversation, message)
-    }
-
     private fun insertUserListIfNewFriend(
         message: LCIMMessage?,
         onSuccess: (String, String) -> Unit
@@ -404,6 +378,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 return
             }
         }
+        // 不是好友，则向好友列表插入数据
         IMClientUtils.queryContainUserForConversation(message?.from ?: "",
             onSuccess = {
                 it.getOrNull(0)?.apply {
@@ -425,14 +400,14 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         username: String = "",
         url: String = ""
     ) {
-        notifyConversationMsgChanged(conversation)
-        // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
-        val data = MsgFactory.createConversationMsg(conversation, url, username)
-        messageConv.add(0, data)
-        messageListAdapter?.insertBeforeFirst(data)
+        if (!notifyConversationMsgChanged(conversation)) {
+            // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
+            val data = MsgFactory.createConversationMsg(conversation, url, username)
+            insertMessageConv(data)
+        }
     }
 
-    fun notifyConversationMsgChanged(conversation: LCIMConversation?) {
+    fun notifyConversationMsgChanged(conversation: LCIMConversation?): Boolean {
         messageConv.forEachIndexed { index, convItem ->
             val conv = convItem.getObject("conv", LCIMConversation::class.java)
             if (conversation?.conversationId == conv.conversationId) {
@@ -441,9 +416,22 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 convItem["time"] = conversation?.lastMessageAt?.time.toString()
                 convItem["unReadCount"] = conversation?.unreadMessagesCount.toString()
                 messageListAdapter?.notifyItemChanged(index)
-                return
+                return true
             }
         }
+        return false
+    }
+
+    override fun onMessage(
+        message: LCIMMessage?,
+        conversation: LCIMConversation?,
+        client: LCIMClient?
+    ) {
+        Log.d(TAG, "onMessage: 收到消息")
+        insertUserListIfNewFriend(message) { username, url ->
+            insertMessageAccordingToConv(conversation, username, url)
+        }
+        MessageSubscriber.dispatch(conversation, message)
     }
 
     override fun onInvite(client: LCIMClient?, conversation: LCIMConversation?, operator: String?) {
@@ -530,6 +518,13 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
     fun insertDataIntoUserList(data: List<LCObject>) {
         friendList.addAll(0, data)
         userListAdapter?.insertItemRange(data)
+        userListAdapter?.setMessageConv(messageConv)
+    }
+
+    private fun insertMessageConv(data: JSONObject) {
+        messageConv.add(0, data)
+        userListAdapter?.setMessageConv(messageConv)
+        messageListAdapter?.insertBeforeFirst(data)
     }
 
     /**
@@ -545,8 +540,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
                 val url = user["avatar"].toString()
                 val data = MsgFactory.createConversationMsg(conversation, url, username)
                 // 更新数据源
-                messageConv.add(data)
-                messageListAdapter?.insertBeforeFirst(data)
+                insertMessageConv(data)
                 onSuccess(user)
             }, onError = {
                 Log.d(TAG, "insertConv: 查询单个用户失败")
