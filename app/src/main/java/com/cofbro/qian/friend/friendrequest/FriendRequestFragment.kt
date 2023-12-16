@@ -59,6 +59,8 @@ class FriendRequestFragment(private val conv: List<LCIMConversation>) : DialogFr
             setOnItemClickListener { pos ->
                 findFriendFragment()?.let { friendFragment ->
                     conv.getOrNull(pos)?.let {
+                        // 更新好友请求列表
+                        mAdapter?.remove(pos)
                         // 更新聊天列表
                         friendFragment.responseFriendRequest(it, true)
                         // 更新用户列表

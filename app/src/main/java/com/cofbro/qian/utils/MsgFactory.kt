@@ -82,7 +82,7 @@ object MsgFactory {
         item["avatar"] = friend.getString("avatar")
         item["uid"] = friend.getString("objectId")
         item["isCreator"] = isCreator
-        item["content"] = if (isCreator) "请求添加好友" else "好友申请已发送~"
+        item["content"] = if (isCreator) "好友申请已发送~" else "请求添加您为好友"
         item["status"] = conversation?.get("agree").toString()
         return item
     }

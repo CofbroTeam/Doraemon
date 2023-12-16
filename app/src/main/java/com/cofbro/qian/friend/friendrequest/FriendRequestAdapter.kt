@@ -64,4 +64,9 @@ class FriendRequestAdapter : RecyclerView.Adapter<FriendRequestAdapter.FriendReq
         data = ArrayList(d)
         notifyDataSetChanged()
     }
+
+    fun remove(pos: Int) {
+        data.removeAt(pos)
+        notifyItemRemoved(pos)
+    }
 }

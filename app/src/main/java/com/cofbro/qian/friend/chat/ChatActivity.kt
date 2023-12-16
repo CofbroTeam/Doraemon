@@ -58,7 +58,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         super.onDestroy()
         MessageSubscriber.unsubscribe(this)
         unregisterKeyboardHeight()
-        conv?.read()
     }
 
     override fun onMessage(conv: LCIMConversation, message: LCIMMessage?) {
@@ -250,6 +249,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
     }
 
     override fun onStop() {
+        conv?.read()
         findFriendFragment()?.notifyConversationMsgChanged(conv)
         super.onStop()
     }
