@@ -130,12 +130,18 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
         }
 
         binding?.ivSend?.setOnClickListener {
-            val msg = binding?.etSendMsg?.text.toString()
-            sendMsg(msg)
+            sendMsg()
         }
 
         binding?.ivMoreOption?.setOnClickListener {
             showPopMenu(it)
+        }
+    }
+
+    private fun sendMsg() {
+        val msg = binding?.etSendMsg?.text.toString()
+        if (msg.isNotEmpty()) {
+            sendMsg(msg)
         }
     }
 
@@ -280,7 +286,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessag
 
     private fun showPopMenu(view: View) {
         val menu = PopupMenu(this, view)
-        menu.gravity = Gravity.RIGHT
+        menu.gravity = Gravity.END
         menu.menuInflater.inflate(R.menu.pop_request_option, menu.menu)
         menu.setOnMenuItemClickListener {
             if (it.itemId == R.id.pop_request_sign) {

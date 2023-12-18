@@ -301,8 +301,8 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
         // 根据uid查询当前聊天user
         queryContainsUserInfo(queryUserInfoUid, onSuccess = {
             it.forEachIndexed { index, user ->
-                val username = user["username"].toString()
-                val url = user["avatar"].toString()
+                val username = user["username"]?.toString() ?: ""
+                val url = user["avatar"]?.toString() ?: ""
                 val data =
                     MsgFactory.createConversationMsg(
                         convList.getOrNull(index),
@@ -367,7 +367,7 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun insertUserListIfNewFriend(
         message: LCIMMessage?,
-        onSuccess: (String, String) -> Unit
+        onSuccess: (String?, String?) -> Unit
     ) {
         friendList.forEach {
             if (message?.from == (it.getString("uid") ?: "")) {
@@ -397,12 +397,12 @@ class FriendFragment : BaseFragment<FriendViewModel, FragmentFriendBinding>(), I
 
     private fun insertMessageAccordingToConv(
         conversation: LCIMConversation?,
-        username: String = "",
-        url: String = ""
+        username: String? = "",
+        url: String? = ""
     ) {
         if (!notifyConversationMsgChanged(conversation)) {
             // 如果找不到一样的，说明列表中没有该对话，应该将其插入对话列表中
-            val data = MsgFactory.createConversationMsg(conversation, url, username)
+            val data = MsgFactory.createConversationMsg(conversation, url ?: "", username ?: "")
             insertMessageConv(data)
         }
     }
