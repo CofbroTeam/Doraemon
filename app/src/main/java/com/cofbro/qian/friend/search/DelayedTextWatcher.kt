@@ -5,7 +5,6 @@ import android.text.TextWatcher
 import android.widget.EditText
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 
 class DelayedTextWatcher(
     private val editText: EditText,
@@ -32,20 +31,18 @@ class DelayedTextWatcher(
             lastInputTime = System.currentTimeMillis()
             return
         }
-        val lastChar = input.last()
-        if (Character.isDigit(lastChar)) {
-            val currentTime = System.currentTimeMillis()
-            val timeSinceLastInput = currentTime - lastInputTime
-            if (timeSinceLastInput >= delayMillis) {
-                search = true
-                action.invoke()
-            } else {
-                search = false
-                val delay = delayMillis - timeSinceLastInput
-                handler.postDelayed({ action.invoke() }, delay)
-            }
-            lastInputTime = currentTime
+        //val lastChar = input.last()
+        val currentTime = System.currentTimeMillis()
+        val timeSinceLastInput = currentTime - lastInputTime
+        if (timeSinceLastInput >= delayMillis) {
+            search = true
+            action.invoke()
+        } else {
+            search = false
+            val delay = delayMillis - timeSinceLastInput
+            handler.postDelayed({ action.invoke() }, delay)
         }
+        lastInputTime = currentTime
     }
 }
 

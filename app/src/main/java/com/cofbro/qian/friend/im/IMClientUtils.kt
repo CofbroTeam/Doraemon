@@ -357,6 +357,27 @@ object IMClientUtils {
     }
 
     /**
+     * 查询特定对话
+     * @param friendId the objectId of your friend
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
+    fun querySpecificConversation(
+        friendId: String,
+        onSuccess: (List<LCObject>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val query1 = LCQuery<LCObject>("_Conversation")
+        query1.whereEqualTo("name", "${getCntUser()?.objectId} & $friendId")
+
+        val query2 = LCQuery<LCObject>("_Conversation")
+        query2.whereEqualTo("name", "$friendId & ${getCntUser()?.objectId}")
+
+        val query = LCQuery.or(listOf(query1, query2))
+        query.findInBackground().subscribe(DefaultObserver<List<LCObject>>(onSuccess, onError))
+    }
+
+    /**
      * 更新Conversation的agree字段，表示已成为好友
      * @param conversation conversation
      * @param accept status of agree signing

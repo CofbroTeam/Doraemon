@@ -108,16 +108,28 @@ class SearchFriendActivity : BaseActivity<SearchFriendViewModel, ActivitySearchF
 
     private fun sendFriendRequest(uid: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            IMClientUtils.createNewConversation(
-                uid,
-                onSuccess = {
-                    ToastUtils.show("好友申请发送成功")
-                },
-                onError = {
-                    ToastUtils.show("好友申请发送失败")
+            IMClientUtils.querySpecificConversation(uid, onSuccess = {
+                if (it.isEmpty()) {
+                    sendFriendRequestReally(uid)
+                } else {
+                    ToastUtils.show("您已经发送请求了，请等待对方同意")
                 }
-            )
+            }, onError = {
+                ToastUtils.show(it)
+            })
         }
+    }
+
+    private fun sendFriendRequestReally(uid: String) {
+        IMClientUtils.createNewConversation(
+            uid,
+            onSuccess = {
+                ToastUtils.show("好友申请发送成功")
+            },
+            onError = {
+                ToastUtils.show("好友申请发送失败")
+            }
+        )
     }
 
     private fun initArgs() {

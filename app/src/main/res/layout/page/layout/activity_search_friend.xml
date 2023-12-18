@@ -34,7 +34,6 @@
             android:background="@drawable/search_user_edit_text_bg"
             android:drawableEnd="@drawable/ic_search"
             android:hint="@string/search_friend_hint"
-            android:inputType="number"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
             android:textColor="@color/black"
