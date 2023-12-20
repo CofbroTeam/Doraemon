@@ -24,9 +24,9 @@ import com.cofbro.qian.utils.getIntExt
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
-import com.cofbro.qian.view.CodingDialog
-import com.cofbro.qian.view.FullScreenDialog
-import com.cofbro.qian.view.TipDialog
+import com.cofbro.qian.view.dialog.CodingDialog
+import com.cofbro.qian.view.dialog.FullScreenDialog
+import com.cofbro.qian.view.dialog.TipDialog
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.hjq.toast.ToastUtils
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator

@@ -15,7 +15,7 @@ import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
-import com.cofbro.qian.view.FullScreenDialog
+import com.cofbro.qian.view.dialog.FullScreenDialog
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

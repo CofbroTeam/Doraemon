@@ -28,7 +28,7 @@ import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.KeyboardUtil
 import com.cofbro.qian.utils.MsgFactory
-import com.cofbro.qian.view.TipDialog
+import com.cofbro.qian.view.dialog.TipDialog
 import com.hjq.toast.ToastUtils
 
 class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>(), IMessageDispatchEvent {

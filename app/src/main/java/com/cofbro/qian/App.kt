@@ -26,7 +26,11 @@ class App : Application(), Application.ActivityLifecycleCallbacks {
         val filter = IntentFilter(Intent.ACTION_PACKAGE_REPLACED)
         filter.addDataScheme("package")
         registerReceiver(installCompleteReceiver, filter)
-    //LeanCloud.initializeSecurely(this, "C8NqVi2SeysVgB2AImB7CAFB-gzGzoHsz", "https://c8nqvi2s.lc-cn-n1-shared.com")
+        LeanCloud.initializeSecurely(
+            this,
+            "C8NqVi2SeysVgB2AImB7CAFB-gzGzoHsz",
+            "https://c8nqvi2s.lc-cn-n1-shared.com"
+        )
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

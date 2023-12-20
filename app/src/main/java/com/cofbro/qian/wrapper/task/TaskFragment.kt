@@ -26,10 +26,12 @@ import com.cofbro.qian.utils.getJSONArrayExt
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.safeParseToJson
 import com.cofbro.qian.utils.showSignResult
-import com.cofbro.qian.view.CodingDialog
-import com.cofbro.qian.view.FullScreenDialog
-import com.cofbro.qian.view.GestureInputDialog
+import com.cofbro.qian.view.dialog.CodingDialog
+import com.cofbro.qian.view.dialog.FullScreenDialog
+import com.cofbro.qian.view.dialog.GestureInputDialog
 import com.cofbro.qian.wrapper.WrapperActivity
+import com.cofbro.qian.wrapper.task.holder.Task
+import com.cofbro.qian.wrapper.task.holder.TaskRunnableHolder
 import com.hjq.toast.ToastUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,11 +50,8 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     private var locationText = ""
     private var location = ""
     private var remark = ""
-    private var alreadySignCount = 0
-    private var otherSignUsers: JSONArray? = null
     private var qrCodeId = ""
     private var alreadySign = false
-    private var cookies = ""
 
     // 签到的aid
     private var id = ""
@@ -205,48 +204,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
                 }
             }
         }
-
-        // 尝试登录
-        viewModel.loginLiveData.observe(this) { response ->
-            val data = response.data ?: return@observe
-            lifecycleScope.launch(Dispatchers.IO) {
-                val body = data.body?.string()?.safeParseToJson()
-                val headers = data.headers
-                cookies = headers.values("Set-Cookie").toString()
-                if (body?.getBoolean("status") == true) {
-                    signWith(id, code, cookies)
-                }
-            }
-        }
-
-        // cookie签到
-        viewModel.cookieSignLiveData.observe(this) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                cookies = it
-                signWith(id, code, cookies)
-            }
-        }
-
-        // 绑定签到
-        // todo 修改签到逻辑
-        viewModel.signTogetherLiveData.observe(this) { response ->
-            val data = response.data ?: return@observe
-            lifecycleScope.launch(Dispatchers.IO) {
-                val body = data.body?.string() ?: ""
-                signRecord(body, cookies)
-                alreadySignCount++
-                if (alreadySignCount < (otherSignUsers?.size ?: 0)) {
-                    val itemUser =
-                        otherSignUsers?.getOrNull(alreadySignCount) as? JSONObject ?: JSONObject()
-                    remark = itemUser.getStringExt(Constants.Account.REMARK)
-                    tryLogin(itemUser)
-                } else {
-                    withContext(Dispatchers.Main) {
-                        hideLoadingView()
-                    }
-                }
-            }
-        }
     }
 
     override fun onStop() {
@@ -260,7 +217,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         if (signWith && (signWithHasFailed || data.contains("success") || data.contains("签到成功"))) {
             // 如果本账号签到成功，则开始自动签到其他绑定账号
             showLoadingView()
-            signWithAccounts()
+            proxy()
         }
     }
 
@@ -418,26 +375,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
     }
 
     /**
-     * 除二维码签到的代签流程入口
-     */
-    private suspend fun signTogether(aid: String, signCode: String = "", cookies: String) {
-        activity?.let {
-            viewModel.signTogether(
-                URL.getNormalSignPath(it.courseId, it.classId, aid, signCode),
-                cookies
-            )
-        }
-    }
-
-    /**
-     * 二维码代签流程入口
-     */
-    private suspend fun signTogether(qrCodeId: String, cookies: String) {
-        val uid = findUID(cookies)
-        viewModel.signTogether(URL.getSignWithCameraPath(qrCodeId, location) + "&uid=$uid", cookies)
-    }
-
-    /**
      * 签到流程入口
      * @param aid activeId
      */
@@ -474,6 +411,7 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         codeDialog = CodingDialog(requireContext()).apply {
             setCancelable(false)
             setPositiveClickListener {
+                showLoadingView()
                 lifecycleScope.launch(Dispatchers.IO) {
                     code = it
                     analysisAndStartSign(id)
@@ -520,31 +458,52 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         }
     }
 
-    private suspend fun signWithAccounts() {
-        withContext(Dispatchers.IO) {
-            val data = AccountManager.loadAllAccountData(requireContext())
-            val cookieSignData = AccountManager.loadAllAccountData(
-                requireContext(),
-                Constants.RecycleJson.COOKIE_JSON_DATA
-            )
-            otherSignUsers = data.getJSONArrayExt(Constants.Account.USERS)
-            cookieSignData.getJSONArrayExt(Constants.Account.USERS).forEach { user ->
-                val timestamp =
-                    (user as? JSONObject)?.getStringExt(Constants.Account.TIME)?.toLong() ?: 0L
-                if (System.currentTimeMillis() - timestamp <= 24 * 60 * 60 * 1000) {
-                    otherSignUsers?.add(user)
-                }
+    private suspend fun proxy() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val holder = TaskRunnableHolder(produceTasks())
+            holder.submit()
+            holder.blockingFetchingResult().forEach {
+                remark = it?.remark ?: ""
+                signRecord(it?.body ?: "", it?.cookies ?: "")
             }
-            val firstUser = otherSignUsers?.getOrNull(0) as? JSONObject
-            if (firstUser != null) {
-                remark = firstUser.getStringExt(Constants.Account.REMARK)
-                tryLogin(firstUser)
-            } else {
-                withContext(Dispatchers.Main) {
-                    hideLoadingView()
-                }
+            withContext(Dispatchers.Main) {
+                hideLoadingView()
             }
         }
+    }
+
+    private fun produceTasks(): List<Task> {
+        val data = loadAllSignUser()
+        val list = arrayListOf<Task>()
+        data.forEach {
+            val task = Task(it as JSONObject)
+            task.aid = id
+            task.preSignUrl = preSignUrl
+            task.classId = activity?.classId ?: ""
+            task.courseId = activity?.courseId ?: ""
+            task.code = code
+            task.location = location
+            task.qrCodeId = qrCodeId
+            list.add(task)
+        }
+        return list
+    }
+
+    private fun loadAllSignUser(): JSONArray {
+        val data = AccountManager.loadAllAccountData(requireContext())
+        val cookieSignData = AccountManager.loadAllAccountData(
+            requireContext(),
+            Constants.RecycleJson.COOKIE_JSON_DATA
+        )
+        val allSignUsers = data.getJSONArrayExt(Constants.Account.USERS)
+        cookieSignData.getJSONArrayExt(Constants.Account.USERS).forEach { user ->
+            val timestamp =
+                (user as? JSONObject)?.getStringExt(Constants.Account.TIME)?.toLong() ?: 0L
+            if (System.currentTimeMillis() - timestamp <= 24 * 60 * 60 * 1000) {
+                allSignUsers.add(user)
+            }
+        }
+        return allSignUsers
     }
 
     private fun signRecord(body: String, cookies: String = "") {
@@ -562,43 +521,6 @@ class TaskFragment : BaseFragment<TaskViewModel, FragmentTaskBinding>() {
         val statusName = if (status) "成功" else "失败"
         val username = if (remark.isNotEmpty()) "$uid - ($remark)" else uid
         SignRecorder.record(requireContext(), username, courseName, statusName)
-    }
-
-    private fun tryLogin(user: JSONObject) {
-        val username = user.getStringExt(Constants.Account.USERNAME)
-        val password = user.getStringExt(Constants.Account.PASSWORD)
-        val cookieSign = user.getStringExt(Constants.Account.COOKIE)
-        if (username.isNotEmpty() && password.isNotEmpty()) {
-            viewModel.tryLogin(URL.getLoginPath(username, password))
-        } else {
-            viewModel.tryLoginWithCookies(cookieSign)
-        }
-    }
-
-    private suspend fun signWith(id: String, code: String = "", cookies: String) {
-        viewModel.analysisForSignTogether(URL.getAnalysisPath(id),
-            cookies,
-            onSuccess = {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val data = it.body?.string()
-                    val analysis2Code = data?.substringAfter("code='+'")?.substringBefore("'") ?: ""
-                    viewModel.analysis2(URL.getAnalysis2Path(analysis2Code), cookies)
-                    delay(200)
-                    val uid = findUID(cookies)
-                    val signWithPreSign = preSignUrl.substringBefore("uid=") + "uid=$uid"
-                    viewModel.preSign(signWithPreSign, cookies)
-                    if (qrCodeId.isEmpty()) {
-                        viewModel.request(URL.checkSignCodePath(id, code), cookies)
-                        signTogether(id, code, cookies)
-                    } else {
-                        signTogether(qrCodeId, cookies)
-                    }
-                }
-            },
-            onFailure = { msg ->
-                ToastUtils.show(msg)
-            }
-        )
     }
 
     private fun findUID(cookies: String): String {

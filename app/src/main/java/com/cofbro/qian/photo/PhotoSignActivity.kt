@@ -13,7 +13,7 @@ import com.cofbro.qian.utils.GlideEngine
 import com.cofbro.qian.utils.Downloader
 import com.cofbro.qian.utils.getStringExt
 import com.cofbro.qian.utils.showSignResult
-import com.cofbro.qian.view.FullScreenDialog
+import com.cofbro.qian.view.dialog.FullScreenDialog
 import com.luck.picture.lib.basic.PictureSelector
 import com.luck.picture.lib.config.SelectMimeType
 import com.luck.picture.lib.entity.LocalMedia

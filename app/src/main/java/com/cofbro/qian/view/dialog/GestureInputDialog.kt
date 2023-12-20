@@ -1,4 +1,4 @@
-package com.cofbro.qian.view
+package com.cofbro.qian.view.dialog
 
 import android.app.AlertDialog
 import android.content.Context
@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import com.cofbro.qian.R
+import com.cofbro.qian.view.GestureInputView
 
 class GestureInputDialog(context: Context) : AlertDialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {
