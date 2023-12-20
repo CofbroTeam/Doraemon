@@ -11,7 +11,7 @@ import com.cofbro.qian.friend.im.IMClientUtils
 import com.cofbro.qian.friend.viewholder.DefaultViewHolder
 import com.cofbro.qian.utils.CacheUtils
 import com.cofbro.qian.utils.MsgFactory
-import com.cofbro.qian.view.WaitDialog
+import com.cofbro.qian.view.dialog.WaitDialog
 import com.hjq.toast.ToastUtils
 
 class CookieSignCardSelfViewHolder(private val binding: ItemChatCookieSignCardMyselfBinding) :

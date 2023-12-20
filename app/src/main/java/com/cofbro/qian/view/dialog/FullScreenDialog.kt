@@ -1,4 +1,4 @@
-package com.cofbro.qian.view
+package com.cofbro.qian.view.dialog
 
 import android.app.AlertDialog
 import android.content.Context

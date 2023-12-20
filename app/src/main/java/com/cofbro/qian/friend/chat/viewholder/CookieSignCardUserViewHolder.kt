@@ -13,7 +13,7 @@ import com.cofbro.qian.utils.AccountManager
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.MsgFactory
 import com.cofbro.qian.utils.getStringExt
-import com.cofbro.qian.view.WaitDialog
+import com.cofbro.qian.view.dialog.WaitDialog
 import com.hjq.toast.ToastUtils
 import kotlin.concurrent.thread
 

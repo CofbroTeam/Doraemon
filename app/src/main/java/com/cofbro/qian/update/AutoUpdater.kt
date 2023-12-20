@@ -17,8 +17,8 @@ import com.cofbro.hymvvmutils.base.getBySp
 import com.cofbro.hymvvmutils.base.saveUsedSp
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.parse2Long
-import com.cofbro.qian.view.AutoUpdateTipDialog
-import com.cofbro.qian.view.DownloadDialog
+import com.cofbro.qian.view.dialog.AutoUpdateTipDialog
+import com.cofbro.qian.view.dialog.DownloadDialog
 import com.hjq.toast.ToastUtils
 import java.io.BufferedReader
 import java.io.File

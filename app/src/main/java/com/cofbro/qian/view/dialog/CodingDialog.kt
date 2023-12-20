@@ -1,4 +1,4 @@
-package com.cofbro.qian.view
+package com.cofbro.qian.view.dialog
 
 import android.app.AlertDialog
 import android.content.Context
@@ -10,7 +10,6 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
 import com.cofbro.qian.R
-import com.cofbro.qian.utils.KeyboardUtil
 import com.hjq.toast.ToastUtils
 
 class CodingDialog(context: Context) : AlertDialog(context) {

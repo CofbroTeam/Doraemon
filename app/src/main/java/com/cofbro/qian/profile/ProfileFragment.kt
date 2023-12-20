@@ -27,7 +27,6 @@ import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.Downloader
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
-import com.cofbro.qian.view.AutoUpdateTipDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

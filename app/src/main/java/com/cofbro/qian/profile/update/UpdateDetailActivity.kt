@@ -16,7 +16,7 @@ import com.cofbro.qian.update.AutoUpdater
 import com.cofbro.qian.utils.Constants
 import com.cofbro.qian.utils.dp2px
 import com.cofbro.qian.utils.getStatusBarHeight
-import com.cofbro.qian.view.FullScreenDialog
+import com.cofbro.qian.view.dialog.FullScreenDialog
 
 
 class UpdateDetailActivity : BaseActivity<UpdateDetailViewModel, ActivityUpdateDetailBinding>() {
