@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -46,8 +48,21 @@ class ProfileFragment : BaseFragment<ProfileViewModel, FragmentProfileBinding>()
 
     private fun initView() {
         adjustMarginOfView()
+        adjustContainerHeight()
         profileMessageInfo()
         checkSignWithStatus()
+    }
+
+    private fun adjustContainerHeight() {
+        binding?.tvLogin?.post {
+            val bottomHeight = CacheUtils.cache[Constants.Cache.BOTTOM_BAR_HEIGHT]?.toInt() ?: 0
+            val layout = binding?.tvLogin?.layoutParams as? MarginLayoutParams
+            layout?.bottomMargin = bottomHeight
+            binding?.tvLogin?.layoutParams = layout
+//            val layout = binding?.profileContainer?.layoutParams
+//            layout?.height = (binding?.profileContainer?.height ?: 0) + bottomHeight * 3
+//            binding?.profileContainer?.layoutParams = layout
+        }
     }
 
     private fun checkSignWithStatus() {
