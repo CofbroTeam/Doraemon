@@ -34,6 +34,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         AutoUpdater(this).checkUpdate()
     }
 
+    private fun saveBottomBarHeight(virtualHeight: Int) {
+        CacheUtils.cache[Constants.Cache.BOTTOM_BAR_HEIGHT] = (binding?.navigationBar?.height?.plus(virtualHeight)).toString()
+    }
 
 
     private fun initView() {
@@ -100,6 +103,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
             val windowInsects = ViewCompat.getRootWindowInsets(window.decorView)
             val height = windowInsects?.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.navigationBars())?.bottom ?: 0
             updateLayoutParams(height)
+            saveBottomBarHeight(height)
         }
     }
 

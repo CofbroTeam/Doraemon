@@ -473,6 +473,7 @@ object Constants {
         const val LOGIN_ACTIVITY = "LoginActivity"
         const val MAIN_ACTIVITY = "MainActivity"
         const val CONV = "conv"
+        const val BOTTOM_BAR_HEIGHT = "bottomBarHeight"
     }
 
     object Login {

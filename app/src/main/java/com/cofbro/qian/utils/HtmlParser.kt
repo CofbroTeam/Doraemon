@@ -5,6 +5,15 @@ import com.cofbro.qian.mapsetting.util.PreWeb
 import org.jsoup.Jsoup
 
 object HtmlParser {
+    fun parseImToken(html: String): JSONObject {
+        val data = JSONObject()
+        val doc = Jsoup.parse(html)
+        data["imToken"] = doc.getElementById("myToken") ?: ""
+        data["tid"] = doc.getElementById("myTuid") ?: ""
+        return data
+    }
+
+
     fun parseHomeworkHTML(html: String): List<JSONObject> {
         val jsonObject = arrayListOf<JSONObject>()
         try {
