@@ -11,11 +11,9 @@
 </div></center>
 
 
-
 ---
 
 <div align="center" style="font-weight:bold"><b>学习通智能签到助手︱还你一个不被签到问题打扰、认真学习的梦</b></div>  
-
 
 
 ## 🗒️ 各级页面
@@ -23,11 +21,11 @@
 |:---:|:---:|:---:|:---:|
 | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/31bf4fd1-e112-4082-8bf6-1d8fe89dde0c"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fccb8e7b-16aa-415f-8f8a-4cbf3151bec3"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/27c5d615-a85e-4bf7-b1bf-a3b1b0b849e8"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/e3835137-50d0-47bd-bcc0-2f4b18750218"/> </div> |
 | **作业列表页** | **作业上传页** | **账号绑定页** | **个人页** |
-| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fd5c12de-ebfa-49ea-ad36-acccaf9f07c8"/> </div>| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/81e06049-799c-41b5-841c-f2ed27746643"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/185a9037-2159-46fa-9481-1cba4497397d"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/7367d640-94fb-4ebb-809b-312bc4f28a8e"/> </div>
-| **签到日志页** | **建议页** | **敬请期待** | **敬请期待** |
-| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/44685cee-c529-466f-88ce-224f452f02d5"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60eb6700-be6d-494e-8594-491a62d905c3"/> </div>|
-
-
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/fd5c12de-ebfa-49ea-ad36-acccaf9f07c8"/> </div>| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/81e06049-799c-41b5-841c-f2ed27746643"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/185a9037-2159-46fa-9481-1cba4497397d"/> </div> | <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/5209454c-47e7-46a0-8b65-37ff7cde7e1f"/> </div>
+| **签到日志页** | **建议页** | **好友聊天页** | **线上代签** |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/43a94c9a-9776-4ef5-8783-1615f045d216"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/60eb6700-be6d-494e-8594-491a62d905c3"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/0fc55057-3292-49fa-847f-b3043491be8e"/> </div>|<div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/9e8cecdb-26f8-4efc-ad93-c2baac1988d3"/> </div>|
+| **检查更新页** | **抢答页** | **敬请期待** | **敬请期待** |
+| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/05818664-5dc1-43ba-959d-7c59e19d6e15"/> </div>| <div align="center"> <img src="https://github.com/CofbroTeam/Doraemon/assets/101956946/ab64d827-cdee-4e10-aeba-d3eabad9d0c8"/> </div>
 
 
 ## ✨ 特点
