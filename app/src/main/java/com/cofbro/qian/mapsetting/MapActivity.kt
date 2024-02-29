@@ -321,7 +321,10 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
         const val RESULT_CODE_INPUTTIPS = 101
         const val RESULT_CODE_KEYWORDS = 102
     }
-
+    //1.普通签到“1”（选择位置之后签到）2.普通签到“2”(选择位置之后，更改位置签到) 特殊签到——3.默认签到（无选择位置）4.默认签到（选择位置，保留地点）
+    enum class MapSignType {
+        NORMAL_NOCHANGELOACTION, NOMAL_CHANGELOCATION, SPECIAL_DEFAULT, SEPECIAL_CHANGELOCATION
+    }
     private fun initViewClick() {
         binding?.selectButton?.setOnClickListener {
             /**
@@ -332,72 +335,64 @@ class MapActivity : BaseActivity<MapViewModel, ActivityMapBinding>(), AMap.OnMar
                 val intent = Intent(applicationContext, MainActivity::class.java)
                 startActivity(intent)
             }
-            if (viewModel.statuscontent != "签到成功" && viewModel.currentTipPoint.latitude.toInt() != 0 && viewModel.currentTipPoint.latitude.toInt() != 0) {
-                // 成功初始化mark并成功定位
-                if (viewModel.Tip_address != null && viewModel.Tip_name != null) {
-                    val cityName = viewModel.Tip_City
-                    val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
-                    if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
-                        val Lating = AmapUtils.mapPointGdTurnBaiDu(
-                            viewModel.currentTipPoint.longitude,viewModel.currentTipPoint.latitude)
+            var MapSignType = MapSignType.SPECIAL_DEFAULT // 默认为默认签到
+            if (viewModel.Tip_address != null && viewModel.Tip_name != null){
+                if(binding?.etLocationName?.text.toString().isEmpty()){
+                    MapSignType = MapActivity.MapSignType.NORMAL_NOCHANGELOACTION
+                        val cityName = viewModel.Tip_City
+                        val address = urlEncodeChinese(cityName + " " + viewModel.Tip_name)
+                        if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
+                            val Lating = AmapUtils.mapPointGdTurnBaiDu(
+                                viewModel.currentTipPoint.longitude,viewModel.currentTipPoint.latitude)
+                            viewModel.signUrl =
+                                URL.getLocationSignPath(
+                                    address,
+                                    viewModel.aid,
+                                    viewModel.uid,
+                                    Lating.latitude.toString(),
+                                    Lating.longitude.toString()
+                                )
+                            sign(viewModel.signUrl)
+                }else{
+                    MapSignType = MapActivity.MapSignType.NOMAL_CHANGELOCATION
+                        val Lating = AmapUtils.mapPointGdTurnBaiDu( viewModel.currentTipPoint.latitude,
+                            viewModel.currentTipPoint.longitude)
                         viewModel.signUrl =
                             URL.getLocationSignPath(
-                                address,
+                                address = binding?.etLocationName?.text.toString(),
                                 viewModel.aid,
                                 viewModel.uid,
                                 Lating.latitude.toString(),
                                 Lating.longitude.toString()
                             )
                         sign(viewModel.signUrl)
-                        /**
-                         * 实现一起签到
-                         */
-
-                    } else {
-                        ToastUtils.show("请稍后")
                     }
-                } else {
+            }else if (viewModel.Tip_address == null && viewModel.Tip_name == null){
+                if (binding?.etLocationName?.text.toString().isNotEmpty()){
+                    MapSignType = MapActivity.MapSignType.SEPECIAL_CHANGELOCATION
+                    val defaultUrl = URL.getLocationSignPath(
+                        address = binding?.etLocationName?.text.toString(),
+                        aid = viewModel.aid,
+                        uid = viewModel.uid,
+                        lat = viewModel.default_Sign_Lating?.latitude.toString(),
+                        long = viewModel.default_Sign_Lating?.longitude.toString()
+                    )
+                    viewModel.signUrl = defaultUrl
+                    sign(defaultUrl)
+                }else{
                     /**
                      * 没有任何输入，直接上传默认地址 首先判断是否签到成功 bug:presign无默认位置
                      */
-                    if (viewModel.default_Sign_Location?.isNotEmpty() == true) {
-                        val defaultUrl = URL.getLocationSignPath(
-                            address = viewModel.default_Sign_Location,
-                            aid = viewModel.aid,
-                            uid = viewModel.uid,
-                            lat = viewModel.default_Sign_Lating?.latitude.toString(),
-                            long = viewModel.default_Sign_Lating?.longitude.toString()
-                        )
-                        viewModel.signUrl = defaultUrl
-                        sign(defaultUrl)
-
-                    } else {
-                        /**
-                         * 判断是否签到成功，或者本来就没有签到位置
-                         */
-
-                    }
-
-                }
-            } else {
-                //Toast.makeText(this, "没有定位", Toast.LENGTH_SHORT).show()
-                /**
-                 * 选择上传让老师看到的位置
-                 */
-                if (viewModel.currentTipPoint.latitude != 0.0 && viewModel.currentTipPoint.longitude != 0.0) {
-                    val Lating = AmapUtils.mapPointGdTurnBaiDu( viewModel.currentTipPoint.latitude,
-                        viewModel.currentTipPoint.longitude)
-                    viewModel.signUrl =
-                        URL.getLocationSignPath(
-                            address = binding?.etLocationName?.text.toString(),
-                            viewModel.aid,
-                            viewModel.uid,
-                            Lating.latitude.toString(),
-                            Lating.longitude.toString()
-                        )
-                    sign(viewModel.signUrl)
-                } else {
-
+                    MapSignType = MapActivity.MapSignType.SPECIAL_DEFAULT
+                    val defaultUrl = URL.getLocationSignPath(
+                        address = viewModel.default_Sign_Location,
+                        aid = viewModel.aid,
+                        uid = viewModel.uid,
+                        lat = viewModel.default_Sign_Lating?.latitude.toString(),
+                        long = viewModel.default_Sign_Lating?.longitude.toString()
+                    )
+                    viewModel.signUrl = defaultUrl
+                    sign(defaultUrl)
                 }
             }
         }
