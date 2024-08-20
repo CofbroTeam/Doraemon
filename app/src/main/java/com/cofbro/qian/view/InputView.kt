@@ -9,6 +9,7 @@ import android.content.res.TypedArray
 import android.graphics.*
 import android.text.InputType
 import android.util.AttributeSet
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -32,6 +33,8 @@ import com.cofbro.qian.view.InputView.Config.TEXT_INDENTED
 import kotlin.math.abs
 
 class InputView : View {
+    private val TAG = "InputView"
+
     object Config {
         // 输入框中首字符的缩进距离
         const val TEXT_INDENTED = 30f
@@ -153,9 +156,7 @@ class InputView : View {
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
+        context, attrs, defStyleAttr
     ) {
         init(attrs)
     }
@@ -246,11 +247,7 @@ class InputView : View {
         }
 
         canvas.drawLine(
-            l + TEXT_INDENTED,
-            t,
-            l + TEXT_INDENTED,
-            b,
-            cursorPaint
+            l + TEXT_INDENTED, t, l + TEXT_INDENTED, b, cursorPaint
         )
     }
 
@@ -289,10 +286,7 @@ class InputView : View {
 
     // hint的Y轴上的动画 hint的X轴上的动画
     private fun hintOffsetYAnimation(
-        offsetYStart: Float,
-        offsetYEnd: Float,
-        offsetXStart: Float,
-        offsetXEnd: Float
+        offsetYStart: Float, offsetYEnd: Float, offsetXStart: Float, offsetXEnd: Float
     ) {
         if (getTextString().isNotEmpty()) return
         ValueAnimator.ofFloat(offsetYStart, offsetYEnd).apply {
@@ -355,8 +349,7 @@ class InputView : View {
         isFocusableInTouchMode = true
         requestFocus()
         val im =
-            context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                ?: return
+            context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager ?: return
         im.showSoftInput(this, InputMethodManager.SHOW_FORCED)
     }
 
@@ -474,7 +467,7 @@ class InputView : View {
         BaseInputConnection(targetView, fullEditor) {
         override fun commitText(text: CharSequence?, newCursorPosition: Int): Boolean {
             super.commitText(text, newCursorPosition)
-            val temp = editable.toString().replace("\\s".toRegex(), "")
+            val temp = editable.toString().replace("\\s".toRegex(), "").replace("\u0000", "")
             if (temp.length < DEFAULT_TEXT_COUNT) {
                 inputString = temp
             }
@@ -484,7 +477,7 @@ class InputView : View {
 
         override fun setComposingText(text: CharSequence?, newCursorPosition: Int): Boolean {
             super.setComposingText(text, newCursorPosition)
-            val l = editable.toString().replace("\\s".toRegex(), "")
+            val l = editable.toString().replace("\\\\s".toRegex(), "").replace("\u0000", "")
             inputString = l
             invalidate()
             return true
@@ -511,12 +504,14 @@ class InputView : View {
                      */
                     // 如果不是删除按键
                     val unicodeChar = event.unicodeChar
-                    val character = unicodeChar.toChar().toString()
+                    if (unicodeChar > 0) {
+                        val character = unicodeChar.toChar().toString()
+                        commitText(character, 1)
+                    }
 //                    val temp = inputString + character
 //                    if (temp.length < DEFAULT_TEXT_COUNT) {
 //                        inputString = temp
 //                    }
-                    commitText(character, 1)
                 }
             }
             postInvalidate()
