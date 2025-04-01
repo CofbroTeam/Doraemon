@@ -35,7 +35,7 @@ jobs:
           -Pandroid.injected.signing.key.alias=unused
 
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: unsigned-apk
         path: |
