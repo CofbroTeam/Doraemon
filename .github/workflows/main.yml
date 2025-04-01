@@ -1,7 +1,6 @@
 name: Android Unsigned APK Build
 
 on:
-  # 可根据需求修改触发条件，这里配置为推送到 main 分支和手动触发
   push:
     branches:
       - main
@@ -29,7 +28,7 @@ jobs:
 
       - name: Build Unsigned APK
         run: |
-          ./gradlew assembleRelease \
+          ./gradlew assembleRelease --warning-mode all \
             -Pandroid.injected.signing.store.type=none \
             -Pandroid.injected.signing.store.password=unused \
             -Pandroid.injected.signing.key.password=unused \
