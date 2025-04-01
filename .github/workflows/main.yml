@@ -1,36 +1,54 @@
-name: Release
+name: Android Unsigned APK Build
+
 on:
+  # 可根据需求修改触发条件，这里配置为推送到 main 分支和手动触发
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
   workflow_dispatch:
+
 jobs:
-  build:
+  build-unsigned-apk:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 设置 Java 环境
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          distribution: temurin
-          java-version: 11
-      - uses: gradle/gradle-build-action@v2
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'gradle'
+
+      # 给 gradlew 脚本添加执行权限
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 运行 Gradle 构建任务，跳过签名步骤
+      - name: Build unsigned APK
+        uses: gradle/gradle-build-action@v2
         with:
-          gradle-version: current
-          # 修改参数以跳过签名相关任务
+          gradle-version: 'current'
           arguments: assembleRelease -x :app:packageRelease
-      - run: |
-          # 找到生成的未签名 APK 文件，这里假设生成路径为 app/build/outputs/apk/release
+
+      # 查找并移动生成的未签名 APK 文件
+      - name: Move unsigned APK
+        run: |
           apk_file=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
           if [ -n "$apk_file" ]; then
-            mv $apk_file LittleGooseOffice_$GITHUB_REF_NAME.apk
+            mv $apk_file unsigned_app.apk
           else
             echo "未找到 APK 文件"
             exit 1
           fi
-      - uses: ncipollo/release-action@v1
+
+      # 上传未签名的 APK 作为工作流的产物
+      - name: Upload unsigned APK
+        uses: actions/upload-artifact@v3
         with:
-          artifacts: "*.apk"
-          token: ${{ github.token }}
-          generateReleaseNotes: true
+          name: unsigned-apk
+          path: unsigned_app.apk
