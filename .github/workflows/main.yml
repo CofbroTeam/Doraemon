@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - "v*"
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,16 +18,17 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-version: current
-          arguments: assembleRelease
-      - uses: r0adkll/sign-android-release@v1
-        id: sign_app
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-      - run: mv ${{steps.sign_app.outputs.signedReleaseFile}} LittleGooseOffice_$GITHUB_REF_NAME.apk
+          # 修改参数以跳过签名相关任务
+          arguments: assembleRelease -x :app:packageRelease
+      - run: |
+          # 找到生成的未签名 APK 文件，这里假设生成路径为 app/build/outputs/apk/release
+          apk_file=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          if [ -n "$apk_file" ]; then
+            mv $apk_file LittleGooseOffice_$GITHUB_REF_NAME.apk
+          else
+            echo "未找到 APK 文件"
+            exit 1
+          fi
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "*.apk"
