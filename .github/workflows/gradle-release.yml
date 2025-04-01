@@ -31,12 +31,8 @@ jobs:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         with:
-          arguments: assembleRelease
+          arguments: assembleRelease -x :app:packageRelease
 
-      - name: Clean up
-        run: |
-          rm signingkey.jks
-          rm -f ${{github.workspace}}/app/build/outputs/apk/release/app-release-unsigned.apk
 
       - name: Upload to GitHub release
         uses: ncipollo/release-action@v1
