@@ -79,3 +79,14 @@
 
 ## ❗ 免责声明
 本项目仅作为交流学习使用，通过本项目加深网络通信、接口编写、交互设计等方面知识的理解，请勿用作商业用途，任何人或组织使用项目中代码进行的任何违法行为与本人无关。如有触及相关平台规定或者权益，烦请联系我们删除。
+
+
+## Star趋势
+
+<a href="https://www.star-history.com/?repos=cofbroteam%2Fdoraemon&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=cofbroteam/doraemon&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=cofbroteam/doraemon&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=cofbroteam/doraemon&type=date&legend=top-left" />
+ </picture>
+</a>
