@@ -33,6 +33,7 @@ class FriendRequestAdapter : RecyclerView.Adapter<FriendRequestAdapter.FriendReq
             val isCreator = t?.getBooleanExt("isCreator")
             if (isCreator == true) {
                 binding.tvTime.text = status
+                binding.tvLastMessage.text = "好友请求发送"
             } else {
                 when (status) {
                     "agree" -> {
@@ -48,9 +49,10 @@ class FriendRequestAdapter : RecyclerView.Adapter<FriendRequestAdapter.FriendReq
                         binding.tvTime.text = "已拒绝"
                     }
                 }
+                binding.tvLastMessage.text = t?.getString("content")
             }
             binding.tvUsername.text = t?.getStringExt("username")
-            binding.tvLastMessage.text = t?.getString("content")
+
             setImage(binding.ivAvatar, t?.getString("avatar"))
         }
     }
